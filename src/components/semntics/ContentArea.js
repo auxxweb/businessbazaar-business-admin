@@ -11,14 +11,14 @@ import { Route, Routes } from "react-router-dom";
 import Subscription from "../Subscription";
 // // import Department from "../pages/Questions";
 // import Designation from "../pages/Designation";
-// import SettingAndConfi from "../pages/SettingAndConfi";
+import SettingAndConfi from "../pages/SettingAndConfi";
 import JudgeDetails from "../pages/JudgeDetails";
 import DashBoard from "../pages/DashBoard";
-import Zones from "../pages/Zones";
+import Zones from "../pages/leads";
 import Login from "../pages/Login";
-import Judges from "../pages/judges";
-import Participants from "../pages/participants";
-import Questions from "../pages/Questions";
+import Judges from "../pages/products";
+import Participants from "../pages/services";
+// import Questions from "../pages/Questions";
 import Bundles from "../pages/Bundles";
 import ParticipantDetails from "../pages/ParticipantDetail";
 import QuestionDetails from "../pages/questionDetails";
@@ -41,13 +41,14 @@ function ContentArea() {
       <Route path="/judges/:id" element={<JudgeDetails />} />
       <Route path="/participants" element={<Participants />} />
       <Route path="/participants/:id" element={<ParticipantDetails />} />
-      <Route path="/questions" element={<Questions />} />
+      {/* <Route path="/questions" element={<Questions />} /> */}
       <Route path="/questions/:id" element={<QuestionDetails />} />
       <Route path="/bundles" element={<Bundles />} />
       <Route path="/bundles/:id" element={<BundleDetails />} />
       <Route path="/result" element={<ResponseAndResult />} />
       <Route path="/result/:id" element={<ResultDetails />} />
       <Route path="/subscription" element={<Subscription />} />
+      <Route path="/settings" element={<SettingAndConfi />} />
     </Routes>
   );
 }

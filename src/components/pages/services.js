@@ -226,17 +226,17 @@ const Participants = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Participants</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">Services</h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
-          <span className="flex items-center">
+          {/* <span className="flex items-center">
             <span
               className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={toggleModal}
             >
               Add Participant
             </span>
-          </span>
+          </span> */}
           <Modal
             isVisible={isModalVisible}
             onClose={handleModalClose}
@@ -500,10 +500,10 @@ const Participants = () => {
         <thead  className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
           <tr>
             <th className="px-4 py-4 text-left border-r border-gray-400">Sl No</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Name</th>
             <th className="px-4 py-4 text-left border-r border-gray-400">Image</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Zone</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Email</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">Title</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">Description</th>
             <th className="px-4 py-4 text-left">Action</th>
           </tr>
         </thead>

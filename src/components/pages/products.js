@@ -285,15 +285,15 @@ const Judges = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Judges</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">Products</h2>
         <div className="ml-auto flex items-center space-x-4">
           <span className="flex items-center">
-            <span
+            {/* <span
               className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={toggleModal}
             >
               Add Judge
-            </span>
+            </span> */}
 
             <Modal
               isVisible={isModalVisible}
@@ -628,23 +628,23 @@ const Judges = () => {
               Image
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Name
+              Title
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Zone
+              ID
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Email
+              Description
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Main Judge
+             Price
             </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
+            {/* <th className="px-4 py-4 text-left border-r border-gray-400">
               Password
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Status
-            </th>
+            </th> */}
             <th className="px-4 py-4 text-left">Action</th>
           </tr>
         </thead>
