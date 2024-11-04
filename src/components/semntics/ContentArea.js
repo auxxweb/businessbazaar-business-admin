@@ -8,7 +8,7 @@ import { Route, Routes } from "react-router-dom";
 // import ProjetsPage from "../pages/ProjetsPage";
 // import PaymentPage from "../pages/PaymentPage";
 // import PaySlip from "../PaySlip";
-// import Subscription from "../Subscription";
+import Subscription from "../Subscription";
 // // import Department from "../pages/Questions";
 // import Designation from "../pages/Designation";
 // import SettingAndConfi from "../pages/SettingAndConfi";
@@ -47,6 +47,7 @@ function ContentArea() {
       <Route path="/bundles/:id" element={<BundleDetails />} />
       <Route path="/result" element={<ResponseAndResult />} />
       <Route path="/result/:id" element={<ResultDetails />} />
+      <Route path="/subscription" element={<Subscription />} />
     </Routes>
   );
 }

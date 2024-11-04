@@ -5,7 +5,7 @@ const Subscription = () => {
     <>
 <div className="p-2 flex justify-between items-center">
   <h1 className="text-2xl font-semibold">Subscription</h1>
-  <button className="bg-green-600 px-4 text-white py-1 rounded-full">+ Auto Renewal</button>
+  {/* <button className="bg-green-600 px-4 text-white py-1 rounded-full">+ Auto Renewal</button> */}
 </div>
 
 <div className="bg-white p-4 rounded-lg shadow-md ">

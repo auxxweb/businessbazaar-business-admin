@@ -103,7 +103,7 @@ fill={
                 }
               />
             </svg>
-            <span className={`text-custom-16 ml-4`}>Zones</span>
+            <span className={`text-custom-16 ml-4`}>Leads</span>
           </span>
         </div>
 
@@ -138,7 +138,7 @@ fill={
               />
             </svg>
 
-            <span className="text-custom-16 ml-4">Judges</span>
+            <span className="text-custom-16 ml-4">Products</span>
           </span>
         </div>
         <div
@@ -173,13 +173,13 @@ fill={
               />
             </svg>
 
-            <span className="text-custom-16 ml-4">Participants</span>
+            <span className="text-custom-16 ml-4">Services</span>
           </span>
         </div>
         <div
-          onClick={() => navigate("/questions")}
+          onClick={() => navigate("/subscription")}
           className={`cursor-pointer flex items-center ${
-            location?.pathname?.split('/')[1] === "questions"
+            location?.pathname?.split('/')[1] === "subscription"
               ? "text-[#25e2b6]"
               : "text-[#909294]"
           }  hover:text-[#75eed2]`}
@@ -190,7 +190,7 @@ fill={
               height="20"
               viewBox="0 0 64 64"
               fill={
-                location?.pathname?.split("/")[1] === "questions"
+                location?.pathname?.split("/")[1] === "subscription"
                   ? "#1DB290"
                   : "currentColor"
               }
@@ -207,7 +207,7 @@ fill={
               />
             </svg>
 
-            <span className="text-custom-16 ml-4">Questions</span>
+            <span className="text-custom-16 ml-4">Subscription</span>
           </span>
         </div>
         <div

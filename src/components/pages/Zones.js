@@ -180,8 +180,8 @@ const Zones = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Zones</h2>
-        <div className="ml-auto flex items-center space-x-4">
+        <h2 className="text-2xl font-semibold text-gray-700">Leads</h2>
+        {/* <div className="ml-auto flex items-center space-x-4">
           <span className="flex items-center">
             <span
               className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
@@ -268,7 +268,7 @@ const Zones = () => {
               </div>
             </Modal>
           </span>
-        </div>
+        </div> */}
       </div>
       <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
         {/* Parent div for span elements */}
@@ -293,9 +293,9 @@ const Zones = () => {
     <tr>
       <th className="px-4 py-4 text-left border-r border-gray-400">Sl No</th>
       <th className="px-4 py-4 text-left border-r border-gray-400">Name</th>
-      <th className="px-4 py-4 text-left border-r border-gray-400">Link</th>
-      <th className="px-4 py-4 text-left border-r border-gray-400">Description</th>
-      <th className="px-4 py-4 text-left">Action</th>
+      <th className="px-4 py-4 text-left border-r border-gray-400">Email</th>
+      <th className="px-4 py-4 text-left border-r border-gray-400">Phone</th>
+      <th className="px-4 py-4 text-left">Message</th>
     </tr>
   </thead>
   <tbody className="border-[2px] border-opacity-70 border-[#969696]">
