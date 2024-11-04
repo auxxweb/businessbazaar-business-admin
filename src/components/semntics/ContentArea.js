@@ -26,7 +26,7 @@ import BundleDetails from "../pages/BundleDetails";
 import ResponseAndResult from "../pages/ResponseAndResult";
 import ForgotPassword from "../pages/forgotPassword";
 import ChangePassword from "../pages/changePassword";
-import ResultDetails from "../pages/resultDetails";
+// import ResultDetails from "../pages/resultDetails";
 
 function ContentArea() {
   return (
@@ -46,7 +46,7 @@ function ContentArea() {
       <Route path="/bundles" element={<Bundles />} />
       <Route path="/bundles/:id" element={<BundleDetails />} />
       <Route path="/result" element={<ResponseAndResult />} />
-      <Route path="/result/:id" element={<ResultDetails />} />
+      {/* <Route path="/result/:id" element={<ResultDetails />} /> */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/settings" element={<SettingAndConfi />} />
     </Routes>
