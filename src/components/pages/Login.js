@@ -50,23 +50,23 @@ const Login = () => {
     <>
       <div
         className="relative min-h-screen bg-cover bg-center "
-        style={{ backgroundImage: 'url("/quranBackground.jpeg")' }}
+        style={{ color: 'grey' }}
       >
         <div className="relative z-10 flex flex-col h-full items-center space-y-4 justify-center p-3 ">
           <div className="flex flex-row w-28 h-auto justify-center">
-            <img
+            {/* <img
               src="/quranLogo.svg"
               alt=" Logo"
               className="h-full w-full object-contain"
               priority
-            />
+            /> */}
           </div>
           <div className="w-full max-w-lg ">
             <form
               onSubmit={onSubmit}
-              className="bg-white border space-y-3 sm:space-y-4 border-[#C19D5C] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
+              className="bg-white border space-y-3 sm:space-y-4 border-[#0EB599] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
             >
-              <h1 className=" text-4xl sm:text-5xl text-[#C19D5C] font-semibold">
+              <h1 className=" text-4xl sm:text-5xl  font-semibold">
                 Log In
               </h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
@@ -77,7 +77,7 @@ const Login = () => {
               <div className="relative mb-10 group space-y-1 items-center">
                 {/* Increased margin for spacing */}
                 <label
-                  className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-[#C19D5C] bg-transparent m-auto" // Increased padding and adjusted label positioning
+                  className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium  bg-transparent m-auto" // Increased padding and adjusted label positioning
                   htmlFor="name"
                 >
                   User Name
@@ -95,7 +95,7 @@ const Login = () => {
               {/* Password Input Field */}
               <div className="relative  group  space-y-1">
                 <label
-                  className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-[#C19D5C] bg-transparent m-auto" // Increased padding and adjusted label positioning
+                  className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium  bg-transparent m-auto" // Increased padding and adjusted label positioning
                   htmlFor="password"
                 >
                   Password
@@ -120,7 +120,7 @@ const Login = () => {
               </div>
 
               {/* Forgot Password Link (Right-aligned under Password) */}
-              <div className="flex justify-between mb-8 text-sm text-[#C19D5C] ">
+              <div className="flex justify-between mb-8 text-sm text-[#0EB599] ">
                 <span className="space-x-2 flex items-center">
                   <input type="checkbox" className="bg-[#C19D5C] h-4 w-4" />
                   <span className="hover:underline cursor-pointer">
@@ -139,7 +139,7 @@ const Login = () => {
               <div className="pt-3">
                 <button
                   disabled={isLoading}
-                  className="w-full  py-3 max-w-[217px] hover:-translate-y-1 transform transition rounded-lg bg-gradient-to-r from-[#C19D5C] to-[#5F4D2D]  text-white  "
+                  className="w-full  py-3 max-w-[217px] hover:-translate-y-1 transform transition rounded-lg bg-gradient-to-r from-[#0EB599] to-[#000000]  text-white  "
                   type="submit"
                 >
                   Log In
