@@ -52,17 +52,17 @@ const DashBoardSection2 = () => {
     {
       logo: zones,
       count: data?.data?.zones,
-      title: "Zones",
+      title: "Leads",
     },
     {
       logo: judges,
       count: data?.data?.judges,
-      title: "Judges",
+      title: "Category",
     },
     {
       logo: participats,
       count: data?.data?.participants,
-      title: "Participants",
+      title: "Products",
     },
   ];
 
