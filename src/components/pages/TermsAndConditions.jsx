@@ -1,20 +1,30 @@
 import { useState } from "react";
+import useTermsAndConditions from "../../Hooks/useTermsAndConditions";
+import BackdropLoader from "../reUsableCmponent/BackdropLoader";
 
 const TermsAndConditions = () => {
-  const [terms, setTerms] = useState([]);
+  const {
+    termsAndConditions,
+    loading,
+    deleteTermsAndConditions,
+    createTermsAndConditions,
+  } = useTermsAndConditions();
+
   const [title, setTitle] = useState("");
   const [data, setData] = useState("");
 
   const handleAddTerm = () => {
     if (title && data) {
-      setTerms([...terms, { title, data, id: Date.now() }]);
-      setTitle("");
-      setData("");
+      if (title && data) {
+        createTermsAndConditions({ termsAndConditions: [{ title, data }] });
+        setTitle("");
+        setData("");
+      }
     }
   };
 
-  const handleDeleteTerm = (id) => {
-    setTerms(terms.filter((term) => term.id !== id));
+  const handleDeleteTerm = async (id) => {
+    await deleteTermsAndConditions(id);
   };
 
   return (
@@ -49,8 +59,10 @@ const TermsAndConditions = () => {
 
       {/* Listing Section */}
       <h2 className="text-lg font-semibold mb-4">Terms & Conditions List</h2>
+      <BackdropLoader isLoading={loading} />
+
       <div className="space-y-4">
-        {terms.map((term) => (
+        {termsAndConditions.map((term) => (
           <div
             key={term.id}
             className="p-4 border rounded flex justify-between items-start"
@@ -61,7 +73,7 @@ const TermsAndConditions = () => {
             </div>
             <button
               className="text-red-500 hover:underline"
-              onClick={() => handleDeleteTerm(term.id)}
+              onClick={() => handleDeleteTerm(term._id)}
             >
               Delete
             </button>
