@@ -62,7 +62,7 @@ const DashBoardSection2 = () => {
     {
       logo: participats,
       count: data?.data?.participants,
-      title: "Products",
+      title: "Plan",
     },
   ];
 
