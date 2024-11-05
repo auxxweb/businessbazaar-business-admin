@@ -20,13 +20,13 @@ import Judges from "../pages/products";
 import Participants from "../pages/services";
 // import Questions from "../pages/Questions";
 import Bundles from "../pages/Bundles";
-import ParticipantDetails from "../pages/ParticipantDetail";
+import ParticipantDetails from "../pages/businessDetails";
 import QuestionDetails from "../pages/questionDetails";
 import BundleDetails from "../pages/BundleDetails";
 import ResponseAndResult from "../pages/ResponseAndResult";
 import ForgotPassword from "../pages/forgotPassword";
 import ChangePassword from "../pages/changePassword";
-// import ResultDetails from "../pages/resultDetails";
+import BusinessDetails from "../pages/businessDetails";
 
 function ContentArea() {
   return (
@@ -49,6 +49,7 @@ function ContentArea() {
       {/* <Route path="/result/:id" element={<ResultDetails />} /> */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/settings" element={<SettingAndConfi />} />
+      <Route path="/businessDetails" element={<BusinessDetails />} />
     </Routes>
   );
 }

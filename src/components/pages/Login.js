@@ -19,7 +19,7 @@ const Login = () => {
     const email = formData.get("email"); // Get email input value
     const password = formData.get("password");
     try {
-        navigate("/"); // Redirect after form submission
+      navigate("/"); // Redirect after form submission
 
       const body = {
         email,

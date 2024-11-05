@@ -211,6 +211,40 @@ fill={
           </span>
         </div>
         <div
+          onClick={() => navigate("/businessDetails")}
+          className={`cursor-pointer flex items-center ${
+            location?.pathname?.split('/')[1] === "businessDetails"
+              ? "text-[#25e2b6]"
+              : "text-[#909294]"
+          }  hover:text-[#75eed2]`}
+        >
+          <span className="flex items-center ml-2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname?.split("/")[1] === "businessDetails"
+                  ? "#1DB290"
+                  : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg"
+              className="transition-colors duration-200"
+            >
+              <path
+                d="M3 3h18v18H3V3zm3 2v3h3V5H6zm5 0v3h3V5h-3zm5 0v3h3V5h-3zM5 10v3h3v-3H5zm5 0v3h3v-3h-3zm5 0v3h3v-3h-3zm-10 5v3h3v-3H5zm5 0v3h3v-3h-3zm5 0v3h3v-3h-3z"
+                fill={
+                  location?.pathname?.split("/")[1] === "businessDetails"
+                    ? "#1DB290"
+                    : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Bussiness Info</span>
+          </span>
+        </div>
+        <div
           onClick={() => navigate("/settings")}
           className={`cursor-pointer flex items-center ${
             location?.pathname?.split('/')[1] === "settings"
