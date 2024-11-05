@@ -4,9 +4,12 @@ import { useLoginMutation } from "../../api/auth";
 import { getUserCredential } from "../../common/utils";
 import { PiEyeFill, PiEyeSlashFill } from "react-icons/pi";
 import { toast } from "sonner";
+import { useDispatch } from 'react-redux';
+import { setBusinessData } from '../../api/slices/business';
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const userData = getUserCredential();
   const [login, { isLoading }] = useLoginMutation();
@@ -29,8 +32,9 @@ const Login = () => {
       if (res?.data?.success) {
         localStorage.setItem(
           "userCredential",
-          JSON.stringify(res?.data?.admin?.token)
+          JSON.stringify(res?.data?.data?.token)
         );
+        dispatch(setBusinessData(res?.data?.data));
         navigate("/"); // Redirect after form submission
       } else {
         toast.error(res.data.message,{

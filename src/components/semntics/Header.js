@@ -8,13 +8,19 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../reUsableCmponent/modal/Modal";
 import { useUpdatePasswordMutation } from "../../api/auth";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { clearBusinessData } from '../../api/slices/business';
+
 function Header({ toggleSidebar }) {
+  const dispatch = useDispatch();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [updatePassword, { isLoading: isLoadingUpdatePassword }] =
     useUpdatePasswordMutation();
   const navigate = useNavigate();
   const handleSignout = () => {
     window.localStorage.removeItem("userCredential");
+    dispatch(clearBusinessData());
     navigate("/login");
   };
 

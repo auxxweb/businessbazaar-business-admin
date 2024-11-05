@@ -1,7 +1,10 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
-import { store } from "./api/store";
+
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from "./api/store";
+
 import Browse from "./components/semntics/Browse";
 import { Toaster } from "sonner";
 
@@ -9,9 +12,11 @@ function App() {
   return (
     <BrowserRouter>
       <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <Browse />
         {/* Wrap your app in BrowserRouter */}
         <Toaster />
+        </PersistGate>
       </Provider>
     </BrowserRouter>
   );

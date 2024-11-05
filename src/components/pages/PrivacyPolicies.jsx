@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
 const PrivacyPolicies = () => {
+    const {_id} = useSelector((state) => state.business.data);
     const [policies, setTerms] = useState([]);
     const [title, setTitle] = useState('');
     const [data, setData] = useState('');
+
+    console.log(_id, "businessData")
   
     const handleAddTerm = () => {
       if (title && data) {
