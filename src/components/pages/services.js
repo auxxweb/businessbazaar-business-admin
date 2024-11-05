@@ -229,18 +229,18 @@ const Participants = () => {
         <h2 className="text-2xl font-semibold text-gray-700">Services</h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
-          {/* <span className="flex items-center">
+          <span className="flex items-center">
             <span
               className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={toggleModal}
             >
-              Add Participant
+              Add Service
             </span>
-          </span> */}
+          </span>
           <Modal
             isVisible={isModalVisible}
             onClose={handleModalClose}
-            modalHeader={editPopupData ? "Edit Participant" : "Add Participant"}
+            modalHeader={editPopupData ? "Edit Service" : "Add Service"}
           >
             <form onSubmit={onSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -249,81 +249,24 @@ const Participants = () => {
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Full name
+                    Service Title
                   </label>
                   <input
                     type="text"
                     name="name"
                     id="name"
                     className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Full name"
+                    placeholder="Service Title" 
                     required
                     defaultValue={
                       editPopupData?.name ? editPopupData?.name : ""
                     }
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="zone"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Zone
-                  </label>
-                  <Select
-                    className="border-gray-400"
-                    options={selectOption}
-                    onChange={handleChange}
-                    value={zonesList}
-                    isMulti={false}
-                    // hideSelectedOptions
-                    closeMenuOnSelect={true} // Keep the dropdown open for multiple selections
-                    placeholder="Select Zones"
-                    components={{ MultiValue: () => null }} // Hide selected options in input
-                  />
-                </div>
+         
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Email address"
-                    required
-                    defaultValue={
-                      editPopupData?.email ? editPopupData?.email : ""
-                    }
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Phone number
-                  </label>
-                  <input
-                    type="number"
-                    name="phone"
-                    id="phone"
-                    className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Phone number"
-                    required
-                    defaultValue={
-                      editPopupData?.phone ? editPopupData?.phone : ""
-                    }
-                  />
-                </div>
-              </div>
+             
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -331,59 +274,19 @@ const Participants = () => {
                     htmlFor="address"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Address
+                    Description
                   </label>
                   <input
                     type="text"
                     name="address"
                     id="address"
                     className="mt-1 h-24 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Address"
+                    placeholder="Description"
                     required
                     defaultValue={
                       editPopupData?.address ? editPopupData?.address : ""
                     }
                   />
-                </div>
-                <div>
-                  <div>
-                    <label
-                      htmlFor="phoneNumber"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Age
-                    </label>
-                    <input
-                      type="age"
-                      name="age"
-                      id="age"
-                      className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      placeholder="Age"
-                      required
-                      defaultValue={
-                        editPopupData?.age ? editPopupData?.age : ""
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="gender"
-                      className="block text-sm font-medium text-gray-700 mt-3"
-                    >
-                      Gender
-                    </label>
-                    <select
-                      name="gender"
-                      id="gender"
-                      defaultValue={
-                        editPopupData?.gender ? editPopupData?.gender : ""
-                      }
-                      className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                    </select>
-                  </div>
                 </div>
               </div>
               <div>
