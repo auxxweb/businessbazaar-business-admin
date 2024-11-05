@@ -27,6 +27,8 @@ import ResponseAndResult from "../pages/ResponseAndResult";
 import ForgotPassword from "../pages/forgotPassword";
 import ChangePassword from "../pages/changePassword";
 import BusinessDetails from "../pages/businessDetails";
+import TermsAndConditions from "../pages/TermsAndConditions"
+import PrivacyPolicies from "../pages/PrivacyPolicies"
 
 function ContentArea() {
   return (
@@ -50,6 +52,8 @@ function ContentArea() {
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/settings" element={<SettingAndConfi />} />
       <Route path="/businessDetails" element={<BusinessDetails />} />
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      <Route path="/privacy-policies" element={<PrivacyPolicies />} />
     </Routes>
   );
 }

@@ -321,6 +321,66 @@ function Sidebar({ isOpen, setIsOpen }) {
             <span className="text-custom-16 ml-4">Competition Result</span>
           </span>
         </div>
+
+        <div
+          onClick={() => navigate("/terms-and-conditions")}
+          className={`cursor-pointer flex items-center ${
+            location?.pathname?.split("/")[1] === "terms-and-conditions"
+              ? "text-[#25e2b6]"
+              : "text-[#909294]"
+          }  hover:text-[#75eed2]`}
+        >
+          <span className="flex items-center ml-2">
+            <svg
+              width="22"
+              height="21"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname === "/terms-and-conditions" ? "#1DB290" : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 9l-6 6-3-3 1.41-1.41L12 14.17l4.59-4.59L17 11z"
+                fill={
+                  location?.pathname === "/terms-and-conditions" ? "#1DB290" : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Terms & conditions</span>
+          </span>
+        </div>
+
+        <div
+          onClick={() => navigate("/privacy-policies")}
+          className={`cursor-pointer flex items-center ${
+            location?.pathname?.split("/")[1] === "privacy-policies"
+              ? "text-[#25e2b6]"
+              : "text-[#909294]"
+          }  hover:text-[#75eed2]`}
+        >
+          <span className="flex items-center ml-2">
+            <svg
+              width="22"
+              height="21"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname === "/privacy-policies" ? "#1DB290" : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 9l-6 6-3-3 1.41-1.41L12 14.17l4.59-4.59L17 11z"
+                fill={
+                  location?.pathname === "/privacy-policies" ? "#1DB290" : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Privacy Policies</span>
+          </span>
+        </div>
         <div
           onClick={toggleModal}
           className="cursor-pointer flex items-center text-[#909294] hover:text-[#dc554e]"

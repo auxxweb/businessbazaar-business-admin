@@ -10,7 +10,7 @@ export const authApi = tagInjection.injectEndpoints({
       query: (body) => {
         return {
           body,
-          url: "/api/admin/auth/login",
+          url: "/api/v1/business/login",
           method: "post",
         };
       },
