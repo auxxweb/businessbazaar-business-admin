@@ -1,10 +1,24 @@
-import React from "react";
+// import React from "react";
+import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
+import Modal from "../reUsableCmponent/modal/Modal";
 import { useLocation, useNavigate } from "react-router-dom";
+// import { resetLogin } from "../../Features/Authority";
+import { useDispatch } from "react-redux";
 
 function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+    // navigate('/browse');
+    const toggleModal = () => {
+      setIsModalVisible(!isModalVisible);
+    };
+    const handleLogout = () => {
+      dispatch({});
+      navigate("/login");
+    };
 
   return (
     <Transition
@@ -367,6 +381,40 @@ function Sidebar({ isOpen, setIsOpen }) {
             <span className="text-custom-16 ml-4">Privacy Policies</span>
           </span>
         </div>
+        <div
+          onClick={toggleModal}
+          className="cursor-pointer flex items-center text-[#909294] hover:text-[#dc554e]"
+        >
+          <span className="flex items-center ml-2 ">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M16 17l5-5-5-5M21 12H9" />
+              <path d="M9 21H4a2 2 0 01-2-2V5a2 2 0 012-2h5" />
+            </svg>
+            <span className="text-custom-16 ml-4">Logout</span>
+          </span>
+        </div>
+        <Modal
+          isVisible={isModalVisible}
+          onClose={toggleModal}
+          modalHeader={"Are you you want to logout?"}
+        >
+          <button
+            onClick={() => handleLogout()}
+            type="button"
+            className="bg-gray-200 p-3 w-full flex justify-center items-center mb-4 border border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white"
+          >
+            Logout
+          </button>
+        </Modal>
       </div>
     </Transition>
   );
