@@ -121,6 +121,43 @@ function Sidebar({ isOpen, setIsOpen }) {
           </span>
         </div>
 
+
+        <div
+          onClick={() => navigate("/judges")}
+          className={`cursor-pointer flex items-center ${
+            location?.pathname?.split("/")[1] === "judges"
+              ? "text-[#25e2b6]"
+              : "text-[#909294]"
+          }  hover:text-[#75eed2]`}
+        >
+          <span className="flex items-center ml-2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 64 64"
+              fill={
+                location?.pathname?.split("/")[1] === "judges"
+                  ? "#1DB290"
+                  : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg"
+              className="transition-colors duration-200"
+            >
+              <path
+                d="M32 3l-30 15 30 15 30-15-30-15zm0 9.5l20 10-20 10-20-10 20-10zm0 11l-20 10v7l20-10 20 10v-7l-20-10zm0 8.5l-10 5v2l10-5 10 5v-2l-10-5z"
+                fill={
+                  location?.pathname?.split("/")[1] === "judges"
+                    ? "#1DB290"
+                    : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Landing Page Info</span>
+          </span>
+        </div>
+
+
         <div
           onClick={() => navigate("/judges")}
           className={`cursor-pointer flex items-center ${
@@ -292,7 +329,7 @@ function Sidebar({ isOpen, setIsOpen }) {
           </span>
         </div>
 
-        <div
+        {/* <div
           onClick={() => navigate("/result")}
           className={`cursor-pointer flex items-center ${
             location?.pathname?.split("/")[1] === "result"
@@ -320,7 +357,7 @@ function Sidebar({ isOpen, setIsOpen }) {
 
             <span className="text-custom-16 ml-4">Competition Result</span>
           </span>
-        </div>
+        </div> */}
 
         <div
           onClick={() => navigate("/terms-and-conditions")}

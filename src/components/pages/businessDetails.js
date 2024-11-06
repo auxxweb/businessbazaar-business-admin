@@ -6,6 +6,7 @@ const BusinessDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const businessId = location.pathname?.split("/")[2];
+  
 
   const { data, error, isLoading } = useGetParticipantDetailQuery(businessId);
 
