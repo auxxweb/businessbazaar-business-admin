@@ -15,10 +15,16 @@ import {
 } from "../../api/participants";
 import { useGetZonesListQuery } from "../../api/common";
 import FilterPopup from "../reUsableCmponent/filterPopup";
-import ParticipantAvatar from "../../assets/images/person-placeholder.png"
+import ParticipantAvatar from "../../assets/images/person-placeholder.png";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
 
 const Participants = () => {
+  const { service, specialServices, services } = useSelector(
+    (state) => state.business.data
+  );
+  console.log(service, specialServices, services);
+
   const navigate = useNavigate();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [zonesList, setZonesList] = useState({});
@@ -40,14 +46,6 @@ const Participants = () => {
     search: searchValue,
     zones: selectedZones,
   });
-  const { data: zoneList, refetch: ZoneListsRefetch } = useGetZonesListQuery();
-  useEffect(() => {
-    ZoneListsRefetch();
-  }, [])
-  const [addParticipant, { isLoading: isLoadingMutation }] =
-    useAddParticipantMutation();
-  const [editParticipant, { isLoading: isLoadingEdit }] =
-    useEditParticipantMutation();
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -60,60 +58,6 @@ const Participants = () => {
   const onSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission
     const formData = new FormData(event.target);
-    if (!zonesList || !zonesList.value) {
-      toast.warning("Please select a zone", {
-        position: "top-right",
-        duration: 2000,
-        style: {
-          backgroundColor: "#e9c70b", // Custom red color for error
-          color: "#FFFFFF" // Text color
-        },
-        dismissible: true
-      });
-      return; // Stop the form from submitting if no zone is selected
-    } // Make sure event.target is the form
-    formData?.append("zone", zonesList?.value);
-    try {
-      if (editPopupData) {
-        formData?.append("participantId", editPopupData?._id);
-        const res = await editParticipant?.(formData);
-        if (res?.data?.success) {
-          refetch();
-          ZoneListsRefetch();
-          toggleModal();
-          setEditPopupData(null);
-        } else {
-          toast.error(res.data.message,{
-            position: "top-right",
-            duration: 2000,  
-            style: {
-              backgroundColor: "#fb0909", // Custom green color for success
-              color: "#FFFFFF", // Text color
-            },
-            dismissible: true,  
-          });
-        }
-      } else {
-        const res = await addParticipant?.(formData);
-        if (res?.data?.success) {
-          refetch();
-          ZoneListsRefetch();
-          toggleModal();
-        } else {
-          toast.error(res.data.message,{
-            position: "top-right",
-            duration: 2000,  
-            style: {
-              backgroundColor: "#fb0909", // Custom green color for success
-              color: "#FFFFFF", // Text color
-            },
-            dismissible: true,  
-          });
-        }
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
   };
 
   const handleSearchChange = useDebouncedCallback(
@@ -142,9 +86,6 @@ const Participants = () => {
     setFilterZonesList(selectedOptions || {});
   };
 
-  const selectOption = zoneList?.zones?.map((zone) => {
-    return { value: zone?._id, label: zone?.name };
-  });
   const handleRemoveZone = (zonesToRemove) => {
     setFilterZonesList(
       filterZonesList.filter((zone) => zone.value !== zonesToRemove.value)
@@ -184,14 +125,13 @@ const Participants = () => {
         duration: 2000,
         style: {
           backgroundColor: "#e5cc0e", // Custom red color for error
-          color: "#FFFFFF" // Text color
+          color: "#FFFFFF", // Text color
         },
-        dismissible: true
+        dismissible: true,
       });
       return; // Exit the function if there's no valid image
     }
-
-};
+  };
 
   const handleDeleteModalClose = () => {
     setShowDeletePopup(false);
@@ -208,14 +148,14 @@ const Participants = () => {
         setSelectedParticipantId(null);
         setShowDeletePopup(false);
       } else {
-        toast.error(deleteres.data.message,{
+        toast.error(deleteres.data.message, {
           position: "top-right",
-          duration: 2000,  
+          duration: 2000,
           style: {
             backgroundColor: "#fb0909", // Custom green color for success
             color: "#FFFFFF", // Text color
           },
-          dismissible: true,  
+          dismissible: true,
         });
       }
     } catch (error) {
@@ -256,17 +196,14 @@ const Participants = () => {
                     name="name"
                     id="name"
                     className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Service Title" 
+                    placeholder="Service Title"
                     required
                     defaultValue={
                       editPopupData?.name ? editPopupData?.name : ""
                     }
                   />
                 </div>
-         
               </div>
-
-             
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -313,7 +250,6 @@ const Participants = () => {
               </div>
               <div className="flex justify-center p-6">
                 <button
-                  disabled={isLoadingMutation || isLoadingEdit}
                   type="submit"
                   className="bg-[#0EB599] hover:bg-[#068A55] text-white font-bold py-2 px-6 rounded-3xl"
                 >
@@ -330,62 +266,12 @@ const Participants = () => {
           filterHeader="Zone"
           isOpen={isFilterPopupOpen}
           togglePopup={toggleFilterPopup}
-        >
-          <div className="space-y-4">
-            {/* Example Filter Option 1 */}
-            {selectOption && (
-              <div className="m-4 w-60">
-                <Select
-                  className="border-gray-400"
-                  options={selectOption}
-                  onChange={handleFilterChange}
-                  value={filterZonesList}
-                  isMulti
-                  hideSelectedOptions
-                  closeMenuOnSelect={false} // Keep the dropdown open for multiple selections
-                  placeholder="Select Zones"
-                  components={{ MultiValue: () => null }} // Hide selected options in input
-                />
-                <div className="pt-2">
-                  {filterZonesList.length > 0 && (
-                    <ul className="flex flex-wrap gap-1">
-                      {filterZonesList.map((zone) => (
-                        <li
-                          key={zone.value}
-                          className="bg-[#1DB290] flex items-center justify-between text-white rounded-full py-0.5 px-2 text-xs font-light"
-                        >
-                          <span>{zone.label}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveZone(zone)}
-                            className="ml-2"
-                          >
-                            <IoIosClose className="text-lg" />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            )}
-            {/* Apply Filters Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleFilterClick}
-                type="submit"
-                className="bg-[#0EB599] hover:bg-[#068A55] text-white font-bold py-2 px-6 rounded-3xl"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        </FilterPopup>
+        ></FilterPopup>
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
           {/* Parent div for span elements */}
           <span className="flex items-center justify-center">
             <input
-                className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
+              className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
               placeholder="Search by name"
               onChange={(e) => {
                 handleSearchChange(e.target.value);
@@ -393,20 +279,28 @@ const Participants = () => {
             />
           </span>
           <span className="flex items-center">
-            <span  className="cursor-pointer bg-[#0EB599] hover:bg-[#068A55] text-white p-2 lg:w-[100px] text-center rounded-3xl">
+            <span className="cursor-pointer bg-[#0EB599] hover:bg-[#068A55] text-white p-2 lg:w-[100px] text-center rounded-3xl">
               Search
             </span>
           </span>
         </div>
       </div>
       <table className="min-w-full table-auto mt-6">
-        <thead  className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
+        <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
           <tr>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Sl No</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Image</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Title</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Sl No
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Image
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Title
+            </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Description</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Description
+            </th>
             <th className="px-4 py-4 text-left">Action</th>
           </tr>
         </thead>
@@ -414,60 +308,53 @@ const Participants = () => {
           {isLoading ? (
             <>Loading...</>
           ) : (
-            data?.participant?.map((participant, index) => (
+            specialServices?.data?.map((splServices, index) => (
               <tr
-                 className="odd:bg-teal-100 even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+                className="odd:bg-teal-100 even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
                 key={index}
               >
-                <td
-                  onClick={() => navigate(`/participants/${participant?._id}`)}
-                  className="px-4 py-2 border-r border-gray-400"
-                >
+                <td className="px-4 py-2 border-r border-gray-400">
                   {index + 1}
                 </td>
+             
                 <td
-                  onClick={() => navigate(`/participants/${participant?._id}`)}
                   className="px-4 py-2 border-r border-gray-400"
-                >
-                  <u style={{cursor:"pointer"}} onMouseOver={({target})=>target.style.color="blue"}
-    onMouseOut={({target})=>target.style.color="black"}
-> {participant?.name}</u>
-                </td>
-                <td
-                  onClick={() => navigate(`/participants/${participant?._id}`)}
-                className="px-4 py-2 border-r border-gray-400"
                 >
                   <img
                     alt="img"
-                    src={participant?.image ?? ParticipantAvatar}
+                    src={splServices?.image ?? ParticipantAvatar}
                     className="w-14 h-14 rounded-full mr-2 mt-2"
                   />
                 </td>
                 <td
-                  onClick={() => navigate(`/participants/${participant?._id}`)}
                   className="px-4 py-2 border-r border-gray-400"
                 >
-                  {participant?.zone?.name}
+                  {splServices?.title}
                 </td>
                 <td
-                  onClick={() => navigate(`/participants/${participant?._id}`)}
                   className="px-4 py-2 border-r border-gray-400"
                 >
-                  <div className="flex -space-x-2">{participant?.email}</div>
+                  {splServices?._id}
                 </td>
-                <td  className="px-4 py-2 border-r border-gray-400">
-                  <button onClick={() => handleEditClick(participant)}>
+                <td
+                  onClick={() => navigate(`/participants/${splServices?._id}`)}
+                  className="px-4 py-2 border-r border-gray-400"
+                >
+                  <div className="flex -space-x-2">{splServices?.description}</div>
+                </td>
+                <td className="px-4 py-2 border-r border-gray-400">
+                  <button onClick={() => {}}>
                     <img
                       alt="pics"
                       src="/icons/edit.svg"
-                     className="w-6 h-6 rounded-full mr-2"
+                      className="w-6 h-6 rounded-full mr-2"
                     />
                   </button>
-                  <button onClick={() => handleDeleteClick(participant?._id)}>
+                  <button onClick={() => {}}>
                     <img
                       alt="pics"
                       src="/icons/delete.svg"
-                     className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                      className="w-6 h-6 rounded-full mr-2 fill-red-500"
                     />
                   </button>
                 </td>
