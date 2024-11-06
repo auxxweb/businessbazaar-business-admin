@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { getApi } from "../api/api";
-import { useSelector } from "react-redux";
 
 const useLeads = () => {
-  const { _id } = useSelector((state) => state.business.data);
 
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,10 +20,8 @@ const useLeads = () => {
   };
 
   useEffect(() => {
-    if (_id) {
       fetchLeads();
-    }
-  }, [_id]);
+  }, []);
 
   return {
     leads,
