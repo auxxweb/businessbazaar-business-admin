@@ -43,6 +43,7 @@ export const deleteApi = async (url, authToken = true) => {
 
 export const getApi = async (url, authToken) => {
   const token = localStorage.getItem("userCredential");
+  const parsedToken = JSON.parse(token)
 
   const config = {
     headers: {
@@ -52,7 +53,7 @@ export const getApi = async (url, authToken) => {
 
   if (authToken) {
     config.headers = {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${parsedToken}`,
     };
   }
 
