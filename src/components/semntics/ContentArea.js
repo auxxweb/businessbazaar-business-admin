@@ -29,6 +29,9 @@ import ChangePassword from "../pages/changePassword";
 import BusinessDetails from "../pages/businessDetails";
 import TermsAndConditions from "../pages/TermsAndConditions"
 import PrivacyPolicies from "../pages/PrivacyPolicies"
+import BasicServices from "../pages/basicServices";
+import LandingPage from "../pages/LandingPage";
+import WelcomePage from "../pages/WelcomePage";
 
 function ContentArea() {
   return (
@@ -39,9 +42,12 @@ function ContentArea() {
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/changePassword/:forgotId" element={<ChangePassword />} />
       <Route path="/zones" element={<Zones />} />
-      <Route path="/judges" element={<Judges />} />
+      <Route path="/landing-page" element={<LandingPage />} />
+      <Route path="/welcome-page" element={<WelcomePage />} />
+      <Route path="/products" element={<Judges />} />
       <Route path="/judges/:id" element={<JudgeDetails />} />
-      <Route path="/participants" element={<Participants />} />
+      <Route path="/special-services" element={<Participants />} />
+      <Route path="/services" element={<BasicServices />} />
       <Route path="/participants/:id" element={<ParticipantDetails />} />
       <Route path="/questions/:id" element={<QuestionDetails />} />
       <Route path="/bundles" element={<Bundles />} />

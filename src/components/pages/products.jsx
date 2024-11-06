@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
-import { setBusinessData, updateBusinessKey } from "../../api/slices/business";
+import { setBusinessData } from "../../api/slices/business";
 
 const Judges = () => {
   const dispatch = useDispatch();

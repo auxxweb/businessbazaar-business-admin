@@ -19,7 +19,7 @@ import ParticipantAvatar from "../../assets/images/person-placeholder.png";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 
-const Participants = () => {
+const BasicServices = () => {
   const { service, specialServices, services } = useSelector(
     (state) => state.business.data
   );
@@ -166,7 +166,7 @@ const Participants = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Special Services</h2>
+        <h2 className="text-2xl font-semibold text-gray-700"> Services</h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
           <span className="flex items-center">
@@ -308,7 +308,7 @@ const Participants = () => {
           {isLoading ? (
             <>Loading...</>
           ) : (
-            specialServices?.data?.map((splServices, index) => (
+            service?.map((splServices, index) => (
               <tr
                 className="odd:bg-teal-100 even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
                 key={index}
@@ -404,4 +404,4 @@ const Participants = () => {
   );
 };
 
-export default Participants;
+export default BasicServices;
