@@ -43,12 +43,10 @@ function ContentArea() {
       <Route path="/judges/:id" element={<JudgeDetails />} />
       <Route path="/participants" element={<Participants />} />
       <Route path="/participants/:id" element={<ParticipantDetails />} />
-      {/* <Route path="/questions" element={<Questions />} /> */}
       <Route path="/questions/:id" element={<QuestionDetails />} />
       <Route path="/bundles" element={<Bundles />} />
       <Route path="/bundles/:id" element={<BundleDetails />} />
       <Route path="/result" element={<ResponseAndResult />} />
-      {/* <Route path="/result/:id" element={<ResultDetails />} /> */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/settings" element={<SettingAndConfi />} />
       <Route path="/businessDetails" element={<BusinessDetails />} />
