@@ -280,8 +280,8 @@ const Judges = () => {
       </Modal>
 
       <table className="min-w-full table-auto mt-6">
-        <thead className="bg-white border-gray-400 border">
-          <tr>
+        <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
+          <tr >
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Sl No
             </th>
