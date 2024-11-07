@@ -67,6 +67,7 @@ export default function WelcomePage() {
 
   const handleLandingSubmit = () => {
     // Prepare updated business data immutably
+    console.log(businessData)
     const updatedData = {
       ...businessData,
       welcomePart: {

@@ -6,9 +6,9 @@ import { setBusinessData } from "../../api/slices/business";
 
 const Judges = () => {
   const dispatch = useDispatch();
-  const businessDetails = useSelector((state) => state.business.data);
+  const businessData = useSelector((state) => state.business.data);
 
-  console.log(businessDetails);
+  console.log(businessData);
 
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -35,10 +35,10 @@ const Judges = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    if (businessDetails) {
-      setProducts(businessDetails.productSection || []);
+    if (businessData) {
+      setProducts(businessData.productSection || []);
     }
-  }, [businessDetails]);
+  }, [businessData]);
 
   const handleShowModal = (product) => {
     setSelectedProduct(product);
@@ -113,88 +113,87 @@ const Judges = () => {
     }
   };
 
+  const handleShowCreateModal = () => setShowCreateModal(true);
+
   const handleInputChange = async (e) => {
     const { name, value, type } = e.target;
-
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = { accessLink: URL.createObjectURL(file) };
+        const preReq = await preRequestFun(file, name);
         if (preReq && preReq.accessLink) {
-          setUpdatedProduct((prevProduct) => ({
+          setUpdatedProduct(prevProduct => ({
             ...prevProduct,
-            image: "preReq.accessLink",
+            image: preReq.accessLink, // Remove quotes here
           }));
-          setImagePreview(URL.createObjectURL(file)); // Set image preview
+          setImagePreview(URL.createObjectURL(file)); 
         } else {
           console.error("Access link not found in response.");
         }
       }
     } else {
-      setUpdatedProduct((prevProduct) => ({
-        ...prevProduct,
-        [name]: value,
-      }));
+      setUpdatedProduct(prevProduct => ({ ...prevProduct, [name]: value }));
     }
   };
-
-  const handleShowCreateModal = () => setShowCreateModal(true);
-
+  
+  // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
     const { name, value, type } = e.target;
-
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const preReq = { accessLink: URL.createObjectURL(file) };
-          let accessLink = "";
-          if (preReq && preReq.accessLink) {
-            accessLink = preReq.accessLink;
-            setNewProduct((prevProduct) => ({
-              ...prevProduct,
-              image: "accessLink",
-            }));
-          } else {
-            console.error("Access link not found in response.");
-          }
-        };
-        reader.readAsDataURL(file);
-
-        // Image preview
-        setImageCreatePreview(URL.createObjectURL(file));
+        const preReq = await preRequestFun(file, name);
+        if (preReq && preReq.accessLink) {
+          setNewProduct(prevProduct => ({ ...prevProduct, image: preReq.accessLink }));
+          setImageCreatePreview(URL.createObjectURL(file));
+      
+        }
       }
     } else {
-      setNewProduct((prevProduct) => ({
-        ...prevProduct,
-        [name]: value,
-      }));
+      setNewProduct(prevProduct => ({ ...prevProduct, [name]: value }));
     }
   };
-
-  const handleSaveChanges = (event) => {
-    const index = products.findIndex(
-      (product) => product._id == updatedProduct._id
+  const handleSaveChanges = () => {
+    const updatedProducts = products.map(product =>
+      product._id === updatedProduct._id ? updatedProduct : product
     );
-    products[index] = updatedProduct;
-    dispatch(setBusinessData(businessDetails));
-
+    const updatedData = { ...businessData, productSection: updatedProducts };
+    dispatch(setBusinessData(updatedData));
     handleCloseModal();
   };
 
   const handleDeleteProduct = () => {
-    setProducts((prevBusinessData) => {
-      return {
-        ...prevBusinessData,
-        productSection: prevBusinessData?.productSection?.filter(
-          (product) => product?._id !== selectedProduct?._id
-        ),
-      };
-    });
+    setProducts((prevProducts) => 
+      prevProducts.filter((product) => product._id !== selectedProduct._id)
+    );
+  
+    const updatedData = { 
+      ...businessData, 
+      productSection: products.filter((product) => product._id !== selectedProduct._id) 
+    };
+  
+    dispatch(setBusinessData(updatedData));
+  
     handleDeleteCloseModal();
   };
+  
 
+  const handleCreateProduct = () => {
+    setProducts((prevProducts) => {
+      const updatedProducts = [...prevProducts, newProduct];
+      
+      const updatedData = { ...businessData, productSection: updatedProducts };
+      console.log(updatedData, 'aaaaaaaaaaaaaaaaaaaaaaa');
+      
+      dispatch(setBusinessData(updatedData));
+      
+      return updatedProducts; // Return the updated products for setProducts    
+      handleCloseModal();
+
+    });
+    
+  };
+  
   return (
     <>
       <div className="flex rounded-lg p-4">
@@ -273,15 +272,15 @@ const Judges = () => {
           <Button variant="dark" onClick={handleCreateCloseModal}>
             Close
           </Button>
-          <Button variant="success" onClick={handleSaveChanges}>
+          <Button variant="success" onClick={handleCreateProduct}>
             Save changes
           </Button>
         </Modal.Footer>
       </Modal>
 
       <table className="min-w-full table-auto mt-6">
-        <thead className="bg-white border-gray-400 border">
-          <tr>
+        <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
+          <tr >
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Sl No
             </th>
@@ -334,15 +333,18 @@ const Judges = () => {
                   />
                 </button>{" "}
                 <button
-                  variant="danger"
-                  onClick={() => setShowDeleteModal(true)}
-                >
-                  <img
-                    alt="pics"
-                    src="/icons/delete.svg"
-                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  />
-                </button>
+                variant="danger"
+                onClick={() => {
+                  setShowDeleteModal(true);
+                  setSelectedProduct(product);
+                }}
+              >
+                <img
+                  alt="pics"
+                  src="/icons/delete.svg"
+                  className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                />
+              </button>
               </td>
             </tr>
           ))}
