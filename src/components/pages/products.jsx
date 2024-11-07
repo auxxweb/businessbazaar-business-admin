@@ -8,7 +8,7 @@ const Judges = () => {
   const dispatch = useDispatch();
   const businessDetails = useSelector((state) => state.business.data);
 
-  console.log(businessDetails)
+  console.log(businessDetails);
 
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -56,13 +56,25 @@ const Judges = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedProduct(null);
-    setUpdatedProduct({ _id: "", title: "", description: "", price: "", image: null });
+    setUpdatedProduct({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
     setImagePreview("");
   };
 
   const handleCreateCloseModal = () => {
     setShowCreateModal(false);
-    setNewProduct({ _id: "", title: "", description: "", price: "", image: null });
+    setNewProduct({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
     setImageCreatePreview("");
   };
 
@@ -162,24 +174,21 @@ const Judges = () => {
   };
 
   const handleSaveChanges = (event) => {
-
-    const index = products.findIndex((product)=>(
-      product._id  == updatedProduct._id
-    ))
+    const index = products.findIndex(
+      (product) => product._id == updatedProduct._id
+    );
     products[index] = updatedProduct;
     dispatch(setBusinessData(businessDetails));
-  
+
     handleCloseModal();
   };
-  
-    
 
   const handleDeleteProduct = () => {
     setProducts((prevBusinessData) => {
       return {
         ...prevBusinessData,
-        productSection: prevBusinessData.productSection.filter(
-          (product) => product._id !== selectedProduct._id
+        productSection: prevBusinessData?.productSection?.filter(
+          (product) => product?._id !== selectedProduct?._id
         ),
       };
     });
@@ -273,11 +282,19 @@ const Judges = () => {
       <table className="min-w-full table-auto mt-6">
         <thead className="bg-white border-gray-400 border">
           <tr>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Sl No</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Image</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Title</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Sl No
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Image
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Title
+            </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Actions</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -294,10 +311,7 @@ const Judges = () => {
               <td className="px-4 py-4">{product.title}</td>
               <td className="px-4 py-4">{product._id}</td>
               <td className="px-4 py-4">
-                <Button
-                  variant="info"
-                  onClick={() => handleShowModal(product)}
-                >
+                <Button variant="info" onClick={() => handleShowModal(product)}>
                   Edit
                 </Button>{" "}
                 <Button
@@ -385,9 +399,7 @@ const Judges = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this product?
-        </Modal.Body>
+        <Modal.Body>Are you sure you want to delete this product?</Modal.Body>
         <Modal.Footer>
           <Button variant="dark" onClick={handleDeleteCloseModal}>
             Cancel
