@@ -96,7 +96,7 @@ const Zones = () => {
           />
         </span>
         <span className="flex items-center ">
-          <span className="cursor-pointer bg-[#0EB599] hover:bg-[#068A55] text-white p-2 lg:w-[100px] text-center rounded-3xl">
+          <span className="cursor-pointer bg-[#105193] hover:bg-[#107D93] text-white p-2 lg:w-[100px] text-center rounded-3xl">
             Search
           </span>
         </span>
@@ -123,7 +123,7 @@ const Zones = () => {
         <tbody className="border-[2px] border-opacity-70 border-[#969696]">
           {leads?.map((lead, index) => (
             <tr
-              className="odd:bg-teal-100 even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
               key={index}
             >
               <td className="px-4 py-2 border-r border-gray-400">

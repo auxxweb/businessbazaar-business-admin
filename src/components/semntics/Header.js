@@ -82,8 +82,8 @@ function Header({ toggleSidebar }) {
   return (
 
     <header
-      className="flex items-center justify-between p-4"
-      style={{ background: "linear-gradient(135deg, #068A55, #16CABB)" }}
+      className="flex items-center justify-between p-3"
+      style={{ background: "linear-gradient(135deg, #105193, #107D93)" }}
     >
               <link
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -120,12 +120,12 @@ function Header({ toggleSidebar }) {
         </svg>
       </button>
 
-      <img src="../logo.jpeg" alt="Description of Image" width="55" height="43" />
+      <img src="../logo.jpeg" alt="Description of Image" width="65" height="53" />
 
 
       <div className="flex items-center space-x-2">
-        <img src={avatar} className="h-9 w-9 object-contain rounded-full" />
-        <span className="text-white">Admin</span>
+        <img src={avatar} className="h-9 w-9 object-contain " />
+        <span className="text-white">Auxxweb Solutions</span>
         <div className=" group cursor-pointer relative">
           <div>
             <HiDotsVertical className="text-white h-5 w-5" />
@@ -207,7 +207,7 @@ function Header({ toggleSidebar }) {
             <button
               disabled={isLoadingUpdatePassword}
               type="submit"
-              className="bg-[#0EB599] hover:bg-[#068A55] text-white font-bold py-2 px-6 rounded-3xl"
+              className="bg-[#105193] hover:bg-[#107D93] text-white font-bold py-2 px-6 rounded-3xl"
             >
               {isLoadingUpdatePassword ? "loading..." : "Update"}
             </button>

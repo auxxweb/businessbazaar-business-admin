@@ -80,7 +80,7 @@ const LandingPage = () => {
       {/* Save Changes Button */}
       <button
         onClick={() => console.log({ title, description, image })}
-        className="mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition btn btn-success"
+        className="mt-6 bg-[#105193] text-white py-2 px-4 rounded-lg hover:bg-[#107D93] transition "
       >
         Save Changes
       </button>

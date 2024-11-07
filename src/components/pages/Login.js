@@ -70,7 +70,7 @@ const Login = () => {
           <div className="w-full max-w-lg ">
             <form
               onSubmit={onSubmit}
-              className="bg-white border space-y-3 sm:space-y-4 border-[#0EB599] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
+              className="bg-white border space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
             >
               <h1 className=" text-4xl sm:text-5xl  font-semibold">
                 Log In
@@ -126,7 +126,7 @@ const Login = () => {
               </div>
 
               {/* Forgot Password Link (Right-aligned under Password) */}
-              <div className="flex justify-between mb-8 text-sm text-[#0EB599] ">
+              <div className="flex justify-between mb-8 text-sm text-[#105193] ">
                 <span className="space-x-2 flex items-center">
                   <input type="checkbox" className="bg-[#C19D5C] h-4 w-4" />
                   <span className="hover:underline cursor-pointer">
@@ -145,7 +145,7 @@ const Login = () => {
               <div className="pt-3">
                 <button
                   disabled={isLoading}
-                  className="w-full  py-3 max-w-[217px] hover:-translate-y-1 transform transition rounded-lg bg-gradient-to-r from-[#0EB599] to-[#000000]  text-white  "
+                  className="w-full  py-3 max-w-[217px] hover:-translate-y-1 transform transition rounded-lg bg-gradient-to-r from-[#105193] to-[#000000]  text-white  "
                   type="submit"
                 >
                   Log In

@@ -212,7 +212,7 @@ const BundleDetails = () => {
             </div>
           </div>
           <button onClick={() => handleEditClick(data?.bundle)}
-          className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
+          className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               >
               Insert new Question
             </button>
@@ -231,7 +231,7 @@ const BundleDetails = () => {
           <tbody className="border-[2px] border-opacity-50 border-[#969696]">
             {data?.bundle?.questions?.map((question, index) => (
               <tr
-                className="font-light odd:bg-teal-100 even:bg-white border-[2px] border-opacity-50 border-[#969696]"
+                className="font-light odd:bg-[#d4e0ec] even:bg-white border-[2px] border-opacity-50 border-[#969696]"
                 key={index}>
                 <td className="w-6 px-4 py-2">{question?.questionId}</td>
                 <td className="px-4 py-2 " dir={getTextDirection(question?.question)}>
@@ -325,7 +325,7 @@ const BundleDetails = () => {
             <button
               disabled={isLoadingEdit}
               type="submit"
-              className="bg-[#0EB599] hover:bg-[#068A55] text-white font-bold py-2 px-6 rounded-3xl"
+              className="bg-[#105193] hover:bg-[#107D93] text-white font-bold py-2 px-6 rounded-3xl"
             >
               Submit
             </button>
