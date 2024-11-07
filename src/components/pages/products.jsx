@@ -8,7 +8,7 @@ const Judges = () => {
   const dispatch = useDispatch();
   const businessDetails = useSelector((state) => state.business.data);
 
-  console.log(businessDetails)
+  console.log(businessDetails);
 
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -56,13 +56,25 @@ const Judges = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedProduct(null);
-    setUpdatedProduct({ _id: "", title: "", description: "", price: "", image: null });
+    setUpdatedProduct({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
     setImagePreview("");
   };
 
   const handleCreateCloseModal = () => {
     setShowCreateModal(false);
-    setNewProduct({ _id: "", title: "", description: "", price: "", image: null });
+    setNewProduct({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
     setImageCreatePreview("");
   };
 
@@ -162,24 +174,21 @@ const Judges = () => {
   };
 
   const handleSaveChanges = (event) => {
-
-    const index = products.findIndex((product)=>(
-      product._id  == updatedProduct._id
-    ))
+    const index = products.findIndex(
+      (product) => product._id == updatedProduct._id
+    );
     products[index] = updatedProduct;
     dispatch(setBusinessData(businessDetails));
-  
+
     handleCloseModal();
   };
-  
-    
 
   const handleDeleteProduct = () => {
     setProducts((prevBusinessData) => {
       return {
         ...prevBusinessData,
-        productSection: prevBusinessData.productSection.filter(
-          (product) => product._id !== selectedProduct._id
+        productSection: prevBusinessData?.productSection?.filter(
+          (product) => product?._id !== selectedProduct?._id
         ),
       };
     });
@@ -193,7 +202,7 @@ const Judges = () => {
         <div className="ml-auto flex items-center space-x-4">
           <span className="flex items-center">
             <span
-              className="bg-[#0EB599] hover:bg-[#068A55] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
+              className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={handleShowCreateModal}
             >
               Add Product
@@ -273,39 +282,67 @@ const Judges = () => {
       <table className="min-w-full table-auto mt-6">
         <thead className="bg-white border-gray-400 border">
           <tr>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Sl No</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Image</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Title</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Sl No
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Image
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Title
+            </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Actions</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Price
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
           {products.map((product, index) => (
-            <tr key={product._id} className="border-b">
-              <td className="px-4 py-4">{index + 1}</td>
-              <td className="px-4 py-4">
+            <tr
+              key={product._id}
+              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+            >
+              <td className="px-4 py-4 text-left border-r border-gray-400">
+                {index + 1}
+              </td>
+              <td className="px-4 py-4 text-left border-r border-gray-400">
                 <img
                   src={product.image || "default-image.png"}
                   alt="Product"
                   className="w-12 h-12 object-cover"
                 />
               </td>
-              <td className="px-4 py-4">{product.title}</td>
-              <td className="px-4 py-4">{product._id}</td>
-              <td className="px-4 py-4">
-                <Button
-                  variant="info"
-                  onClick={() => handleShowModal(product)}
-                >
-                  Edit
-                </Button>{" "}
-                <Button
+              <td className="px-4 py-4 text-left border-r border-gray-400">
+                {product.title}
+              </td>
+              <td className="px-4 py-4 text-left border-r border-gray-400">
+                {product._id}
+              </td>
+              <td className="px-4 py-4 text-left border-r border-gray-400">
+                {product.price}
+              </td>
+              <td className="px-4 py-4 text-left border-r border-gray-400">
+                <button variant="info" onClick={() => handleShowModal(product)}>
+                  <img
+                    alt="pics"
+                    src="/icons/edit.svg"
+                    className="w-6 h-6 rounded-full mr-2"
+                  />
+                </button>{" "}
+                <button
                   variant="danger"
                   onClick={() => setShowDeleteModal(true)}
                 >
-                  Delete
-                </Button>
+                  <img
+                    alt="pics"
+                    src="/icons/delete.svg"
+                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                  />
+                </button>
               </td>
             </tr>
           ))}
@@ -385,9 +422,7 @@ const Judges = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this product?
-        </Modal.Body>
+        <Modal.Body>Are you sure you want to delete this product?</Modal.Body>
         <Modal.Footer>
           <Button variant="dark" onClick={handleDeleteCloseModal}>
             Cancel

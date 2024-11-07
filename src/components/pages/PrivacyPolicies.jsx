@@ -47,7 +47,7 @@ const PrivacyPolicies = () => {
             onChange={(e) => setData(e.target.value)}
           ></textarea>
           <button
-            className="bg-[rgb(6,138,85)] text-white p-2 rounded hover:bg-[rgb(22,202,187)] "
+              className="mt-6 bg-[#105193] text-white py-2 px-4 rounded-lg hover:bg-[#107D93] transition "
             onClick={handleAddTerm}
           >
             Add Policy
