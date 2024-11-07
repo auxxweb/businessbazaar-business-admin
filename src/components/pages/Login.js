@@ -59,7 +59,7 @@ const Login = () => {
         style={{ color: "grey" }}
       >
         <div className="relative z-10 flex flex-col h-full items-center space-y-4 justify-center p-3 ">
-          <div className="flex flex-row w-28 h-auto justify-center">
+          <div className="flex flex-row w-28 h-auto justify-center ">
             {/* <img
               src="/quranLogo.svg"
               alt=" Logo"
@@ -70,7 +70,7 @@ const Login = () => {
           <div className="w-full max-w-lg ">
             <form
               onSubmit={onSubmit}
-              className="bg-white border space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
+              className="bg-white border-grey space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
             >
               <div className="flex justify-center mb-6">
                 <img
@@ -79,9 +79,7 @@ const Login = () => {
                   className="h-24 object-contain"
                 />
               </div>
-              <h1 className=" text-4xl sm:text-5xl  font-semibold text-black">
-                Welcome back
-              </h1>
+              <h1 className="text-3xl font-semibold text-center text-[#333]">Welcome back</h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
                 Sign in to your account to continue!
               </h3>
@@ -96,7 +94,7 @@ const Login = () => {
                   Email address
                 </label>
                 <input
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#CCCCCC] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent outline-none focus:border-gold-600 "
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#105193] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent focus:ring-2 focus:ring-[#105193] outline-none focus:border-gold-600 "
                   type="email"
                   id="email"
                   placeholder="Email"
@@ -115,7 +113,7 @@ const Login = () => {
                 </label>
                 <div className="relative">
                   <input
-                    className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#CCCCCC] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent outline-none focus:border-gold-600 "
+                    className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#105193] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent focus:ring-2 focus:ring-[#105193] outline-none focus:border-gold-600 "
                     type={showPassword ? "text" : "password"}
                     id="password"
                     name="password"
