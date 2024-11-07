@@ -115,8 +115,8 @@ const Zones = () => {
               Email
             </th>
           
+            <th className="px-4 py-4 text-left border-r border-gray-400">Phone number</th>
             <th className="px-4 py-4 text-left border-r border-gray-400">Message</th>
-            {/* <th className="px-4 py-4 text-left">Actions</th> */}
 
           </tr>
         </thead>
@@ -144,6 +144,9 @@ const Zones = () => {
               
               <td className="px-4 py-2 border-r border-gray-400">
                 <div className="flex -space-x-2">{lead?.email}</div>
+              </td>
+              <td className="px-4 py-2 border-r border-gray-400">
+                <div className="flex -space-x-2">{"+91000000000"}</div>
               </td>
 
               <td className="px-4 py-2 border-r border-gray-400">
