@@ -4,8 +4,8 @@ import { useLoginMutation } from "../../api/auth";
 import { getUserCredential } from "../../common/utils";
 import { PiEyeFill, PiEyeSlashFill } from "react-icons/pi";
 import { toast } from "sonner";
-import { useDispatch } from 'react-redux';
-import { setBusinessData } from '../../api/slices/business';
+import { useDispatch } from "react-redux";
+import { setBusinessData } from "../../api/slices/business";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -37,14 +37,14 @@ const Login = () => {
         dispatch(setBusinessData(res?.data?.data));
         navigate("/"); // Redirect after form submission
       } else {
-        toast.error(res.data.message,{
+        toast.error(res.data.message, {
           position: "top-right",
-          duration: 2000,  
+          duration: 2000,
           style: {
             backgroundColor: "#fb0909", // Custom green color for success
             color: "#FFFFFF", // Text color
           },
-          dismissible: true,  
+          dismissible: true,
         });
       }
     } catch (error) {
@@ -55,8 +55,8 @@ const Login = () => {
   return (
     <>
       <div
-        className="relative min-h-screen bg-cover bg-center "
-        style={{ color: 'grey' }}
+        className="relative min-h-screen bg-cover bg-[#e7edf4] "
+        style={{ color: "grey" }}
       >
         <div className="relative z-10 flex flex-col h-full items-center space-y-4 justify-center p-3 ">
           <div className="flex flex-row w-28 h-auto justify-center">
@@ -72,11 +72,18 @@ const Login = () => {
               onSubmit={onSubmit}
               className="bg-white border space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
             >
-              <h1 className=" text-4xl sm:text-5xl  font-semibold">
-                Log In
+              <div className="flex justify-center mb-6">
+                <img
+                  src="/logo.jpeg"
+                  alt="Logo"
+                  className="h-24 object-contain"
+                />
+              </div>
+              <h1 className=" text-4xl sm:text-5xl  font-semibold text-black">
+                Welcome back
               </h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
-                Enter your Username And Password To Login in!
+                Sign in to your account to continue!
               </h3>
 
               {/* Email Input Field */}
@@ -86,7 +93,7 @@ const Login = () => {
                   className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium  bg-transparent m-auto" // Increased padding and adjusted label positioning
                   htmlFor="name"
                 >
-                  User Name
+                  Email address
                 </label>
                 <input
                   className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#CCCCCC] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent outline-none focus:border-gold-600 "
@@ -145,7 +152,7 @@ const Login = () => {
               <div className="pt-3">
                 <button
                   disabled={isLoading}
-                  className="w-full  py-3 max-w-[217px] hover:-translate-y-1 transform transition rounded-lg bg-gradient-to-r from-[#105193] to-[#000000]  text-white  "
+                  className="w-full py-3 bg-gradient-to-r from-[#105193] to-[#107D93] text-white font-semibold rounded-lg hover:translate-y-1 transform transition duration-300 "
                   type="submit"
                 >
                   Log In
