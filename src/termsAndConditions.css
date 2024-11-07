@@ -1,0 +1,125 @@
+/* General styles */
+.terms-conditions-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 300px;
+  margin-bottom: 30px;
+}
+
+.preview-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 200px;
+  background-color: #f9f9f9;
+}
+
+.preview-content {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Quill specific styling */
+.react-quill {
+  height: 300px;
+}
+
+.react-quill .ql-toolbar {
+  border-bottom: 1px solid #ddd;
+  border-radius: 8px 8px 0 0;
+}
+
+.react-quill .ql-container {
+  height: 250px;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Styling the preview content */
+.preview-content h1,
+.preview-content h2 {
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+}
+
+.preview-content ul,
+.preview-content ol {
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.preview-content blockquote {
+  font-style: italic;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-left: 5px solid #ccc;
+}
+
+.preview-content strong {
+  font-weight: bold;
+}
+
+.preview-content em {
+  font-style: italic;
+}
+
+.preview-content code {
+  background-color: #f4f4f4;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* Styling for list items */
+.preview-content ul,
+.preview-content ol {
+  padding-left: 20px;
+}
+
+.preview-content ul li,
+.preview-content ol li {
+  margin-bottom: 8px;
+}
+
+.preview-content ul {
+  list-style-type: disc;
+}
+
+.preview-content ol {
+  list-style-type: decimal;
+}
+
+/* Styling for links */
+.preview-content a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.preview-content a:hover {
+  text-decoration: underline;
+}
+
+/* Styling for subscript and superscript */
+.preview-content sub {
+  font-size: 0.8rem;
+  vertical-align: sub;
+}
+
+.preview-content sup {
+  font-size: 0.8rem;
+  vertical-align: super;
+}
+

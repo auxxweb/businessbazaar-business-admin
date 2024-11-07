@@ -23,27 +23,14 @@ const Subscription = () => {
             <p className="text-gray-700 mt-2">ID: {plan?._id}</p>
           </div>
 
-          <div className="flex items-center">
-            <svg
-              className="w-10 h-10 text-yellow-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6.75A4.5 4.5 0 117.5 11.25v4.5A4.5 4.5 0 1112 15V11.25z"
-              ></path>
-            </svg>
-            <span className="text-gray-700">Auto-renewal off</span>
+          <div className="items-center">
+            <p className="text-gray-700">Started Date</p>
+            <p className="text-gray-700 ml-2">02-05-2023</p>
           </div>
 
           <div className="items-center">
             <p className="text-gray-700">Expiration Date</p>
-            <p className="text-gray-700 ml-2">02-05-2024</p>
+            <p className="text-gray-700 ml-2">01-05-2024</p>
           </div>
           <div className="items-center">
             <p className="text-gray-700">Renewal Price</p>

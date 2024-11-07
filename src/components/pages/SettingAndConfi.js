@@ -4,7 +4,7 @@ const SettingAndConfi = () => {
   return (
     <>
     <div><h1 className="font-semibold text-2xl m-4">Settings</h1></div>
-<div className="bg-white p-8 rounded-lg border border-gray-300 shadow-md max-w-5xl mx-auto">
+<div className="bg-white p-8 rounded-lg border border-gray-300 shadow-md max-w-6xl mx-auto">
   <h2 className="text-xl font-semibold mb-4 flex items-center">
     <span className="mr-2">🔑</span> Change Password
   </h2>
@@ -42,14 +42,14 @@ const SettingAndConfi = () => {
   </div>
 
   <div className="text-center">
-    <button className="bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400">
+    <button   className="mt-6 bg-[#105193] text-white py-2 px-4 rounded-lg hover:bg-[#107D93] transition ">
       Update
     </button>
   </div>
 </div>
 
 
-<div className="bg-teal-50 p-4 rounded-lg max-w-6xl mx-auto">
+<div className=" p-4 rounded-lg max-w-6xl mx-auto">
 
   <div className="border border-gray-300 flex items-center bg-white p-4 mb-4 rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer">
     <span className="mr-3">
