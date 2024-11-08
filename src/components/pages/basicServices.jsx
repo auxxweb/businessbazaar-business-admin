@@ -1,281 +1,282 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { IoIosClose } from "react-icons/io";
-import Select from "react-select";
-import { useDebouncedCallback } from "use-debounce";
-import Pagination from "../Pagination";
-// import EmpCard from "../reUsableCmponent/EmpCard";
-import Modal from "../reUsableCmponent/modal/Modal";
-import {
-  useAddParticipantMutation,
-  useDeleteParticipantMutation,
-  //   useDeleteParticipantMutation,
-  useEditParticipantMutation,
-  useGetParticipantQuery,
-} from "../../api/participants";
-import { useGetZonesListQuery } from "../../api/common";
-import FilterPopup from "../reUsableCmponent/filterPopup";
-import ParticipantAvatar from "../../assets/images/person-placeholder.png";
-import { toast } from "sonner";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { Button, Modal, Form } from "react-bootstrap";
+import axios from "axios";
+import { setBusinessData } from "../../api/slices/business";
 
 const BasicServices = () => {
-  const { service, specialServices, services } = useSelector(
-    (state) => state.business.data
-  );
-  console.log(service, specialServices, services);
+  const dispatch = useDispatch();
+  const businessData = useSelector((state) => state.business.data);
 
-  const navigate = useNavigate();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [zonesList, setZonesList] = useState({});
-  const [imageUrl, setImageUrl] = useState(null);
-  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
-  const [filterZonesList, setFilterZonesList] = useState([]);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [selectedParticipantId, setSelectedParticipantId] = useState(null);
-  const [selectedZones, setSelectedZones] = useState();
-  const [editPopupData, setEditPopupData] = useState(null);
-  const [currentPage, setCurrentPage] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
-  const limit = 10;
-  const [deleteParticipant, { isLoading: isLoadingDelete }] =
-    useDeleteParticipantMutation();
-  const { data, isLoading, refetch } = useGetParticipantQuery({
-    limit,
-    page: currentPage,
-    search: searchValue,
-    zones: selectedZones,
+  console.log(businessData)
+
+  const service = businessData.service
+
+  const [services, setServices] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newService, setNewService] = useState({
+    _id: "",
+    title: "",
+    description: "",
+    image: null,
   });
+  const [imageCreatePreview, setImageCreatePreview] = useState("");
 
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
+  const [updatedServices, setUpdatedServices] = useState({
+    _id: "",
+    title: "",
+    description: "",
+    image: null,
+  });
+  const [imagePreview, setImagePreview] = useState("");
 
-  const toggleFilterPopup = () => {
-    setIsFilterPopupOpen(!isFilterPopupOpen);
-  };
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const onSubmit = async (event) => {
-    event.preventDefault(); // Prevent the default form submission
-    const formData = new FormData(event.target);
-  };
+  useEffect(() => {
+    if (businessData) {
+      setServices(businessData.service || []);
+    }
+  }, [businessData]);
 
-  const handleSearchChange = useDebouncedCallback(
-    // function
-    (value) => {
-      setSearchValue(value ?? "");
-    },
-    500
-  );
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleModalClose = () => {
-    toggleModal();
-    setZonesList({});
-    setImageUrl(null);
-  };
-
-  const handleChange = (selectedOptions) => {
-    setZonesList(selectedOptions || {});
-  };
-
-  const handleFilterChange = (selectedOptions) => {
-    setFilterZonesList(selectedOptions || {});
-  };
-
-  const handleRemoveZone = (zonesToRemove) => {
-    setFilterZonesList(
-      filterZonesList.filter((zone) => zone.value !== zonesToRemove.value)
-    );
-  };
-
-  const handleFilterClick = () => {
-    setSelectedZones(filterZonesList?.map((zone) => zone?.value));
-    toggleFilterPopup();
-  };
-
-  const handleDeleteClick = (id) => {
-    setShowDeletePopup(true);
-    setSelectedParticipantId(id);
-  };
-
-  const handleEditClick = (participant) => {
-    toggleModal();
-    setEditPopupData(participant);
-    setZonesList({
-      value: participant?.zone?._id,
-      label: participant?.zone?.name,
+  const handleShowModal = (Servi) => {
+    setSelectedService(Servi);
+    setUpdatedServices({
+      _id: Servi._id,
+      title: Servi.title,
+      description: Servi.description,
+      image: Servi.image,
     });
-    setImageUrl(participant?.image);
+    setImagePreview(Servi.image); // Initialize preview with current image
+    setShowModal(true);
   };
 
-  const handlePreviewImage = (e) => {
-    // Handle image upload if the image file is selected
-    const imageFile = e.target.files[0]; // Access the selected image file
-    if (imageFile && imageFile.size <= 5 * 1024 * 1024) {
-      // Check if it's valid
-      setImageUrl(URL.createObjectURL(e.target.files[0]));
-    } else {
-      // Optionally, you could show an error toast here
-      toast.warning("Please select a valid image file (less than 5 MB).", {
-        position: "top-right",
-        duration: 2000,
-        style: {
-          backgroundColor: "#e5cc0e", // Custom red color for error
-          color: "#FFFFFF", // Text color
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedService(null);
+    setUpdatedServices({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
+    setImagePreview("");
+  };
+
+  const handleCreateCloseModal = () => {
+    setShowCreateModal(false);
+    setNewService({
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
+      image: null,
+    });
+    setImageCreatePreview("");
+  };
+
+  const handleDeleteCloseModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  const preRequestFun = async (file, position) => {
+    const url = `${process.env.REACT_APP_BE_API_KEY}/api/v1/s3url`;
+    const requestBody = {
+      files: [
+        {
+          position: position,
+          file_type: file.type,
         },
-        dismissible: true,
-      });
-      return; // Exit the function if there's no valid image
-    }
-  };
+      ],
+    };
 
-  const handleDeleteModalClose = () => {
-    setShowDeletePopup(false);
-  };
-
-  const handleDelete = async () => {
     try {
-      const body = {
-        participantId: selectedParticipantId,
-      };
-      const deleteres = await deleteParticipant?.(body);
-      if (deleteres?.data?.success) {
-        refetch();
-        setSelectedParticipantId(null);
-        setShowDeletePopup(false);
-      } else {
-        toast.error(deleteres.data.message, {
-          position: "top-right",
-          duration: 2000,
-          style: {
-            backgroundColor: "#fb0909", // Custom green color for success
-            color: "#FFFFFF", // Text color
-          },
-          dismissible: true,
-        });
+      const response = await axios.post(url, requestBody, {
+        headers: { "Content-Type": "application/json" },
+      });
+      const preReq = response.data.data[0];
+
+      if (!preReq.url) {
+        throw new Error("The URL is not defined in the response.");
       }
+      await axios.put(preReq.url, file, {
+        headers: { "Content-Type": file.type },
+      });
+
+      return preReq;
     } catch (error) {
-      console.log("error", error);
+      console.error("Error uploading file:", error.message || error);
+      throw new Error("File upload failed");
     }
   };
+
+  const handleShowCreateModal = () => setShowCreateModal(true);
+
+  const handleInputChange = async (e) => {
+    const { name, value, type } = e.target;
+    if (type === "file") {
+      const file = e.target.files[0];
+      if (file) {
+        const preReq = await preRequestFun(file, name);
+        if (preReq && preReq.accessLink) {
+          setUpdatedServices(prevServices => ({
+            ...prevServices,
+            image: preReq.accessLink, // Remove quotes here
+          }));
+          setImagePreview(URL.createObjectURL(file)); 
+        } else {
+          console.error("Access link not found in response.");
+        }
+      }
+    } else {
+      setUpdatedServices(prevServices => ({ ...prevServices, [name]: value }));
+    }
+  };
+  
+  // Fix handleCreateInputChange similarly
+  const handleCreateInputChange = async (e) => {
+    const { name, value, type } = e.target;
+    if (type === "file") {
+      const file = e.target.files[0];
+      if (file) {
+        const preReq = await preRequestFun(file, name);
+        console.log(preReq)
+        if (preReq && preReq.accessLink) {
+          setNewService(prevServices => ({ ...prevServices, image: preReq.accessLink }));
+          setImageCreatePreview(URL.createObjectURL(file));
+      
+        }
+      }
+    } else {
+      setNewService(prevServices => ({ ...prevServices, [name]: value }));
+    }
+  };
+  const handleSaveChanges = () => {
+    const updatedService = services.map(Servi =>
+      Servi._id === updatedServices._id ? updatedServices : Servi
+    );
+    console.log(updatedServices)
+    const updatedData = { ...businessData, service: updatedService };
+    dispatch(setBusinessData(updatedData));
+    handleCloseModal();
+  };
+
+  const handleDeleteServices = () => {
+    setServices((prevServices) => 
+      prevServices.filter((Servi) => Servi._id !== selectedService._id)
+    );
+  
+    const updatedData = { 
+      ...businessData, 
+      service: services.filter((Servi) => Servi._id !== selectedService._id) 
+    };
+  
+    dispatch(setBusinessData(updatedData));
+  
+    handleDeleteCloseModal();
+  };
+  
+  const handleCreateService = () => {
+    setServices((prevServices) => {
+      const updatedServices = Array.isArray(prevServices) ? [...prevServices, newService] : [newService];
+  
+      const updatedData = { ...businessData, service: updatedServices };
+  
+      dispatch(setBusinessData(updatedData));
+      handleCloseModal();
+      return updatedServices;   
+    });
+  };
+  
+
+
+
 
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700"> Services</h2>
+        <h2 className="text-2xl font-semibold text-gray-700">Special Services</h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
-          <span className="flex items-center">
-            <span
+          <button
+              onClick={handleShowCreateModal}
               className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
-              onClick={toggleModal}
             >
               Add Service
-            </span>
-          </span>
-          <Modal
-            isVisible={isModalVisible}
-            onClose={handleModalClose}
-            modalHeader={editPopupData ? "Edit Service" : "Add Service"}
-          >
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Service Title
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Service Title"
-                    required
-                    defaultValue={
-                      editPopupData?.name ? editPopupData?.name : ""
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    id="address"
-                    className="mt-1 h-24 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Description"
-                    required
-                    defaultValue={
-                      editPopupData?.address ? editPopupData?.address : ""
-                    }
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="main"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Image
-                </label>
-                <input
-                  type="file"
-                  name="image"
-                  id="image"
-                  className="mt-1 block w-full border-2 p-1 border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  onChange={handlePreviewImage}
+            </button>
+          <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Services</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formTitle">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                value={newService.title}
+                onChange={handleCreateInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formDescription" className="mt-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                type="text"
+                name="description"
+                value={newService.description}
+                onChange={handleCreateInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formImage" className="mt-3">
+              <Form.Label>Image</Form.Label>
+              <Form.Control
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleCreateInputChange}
+              />
+              {imageCreatePreview && (
+                <img
+                  src={imageCreatePreview}
+                  alt="Image Preview"
+                  className="mt-3"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    marginInline: "auto",
+                  }}
                 />
-                {imageUrl && (
-                  <img
-                    className="mt-2 w-20 h-auto"
-                    src={imageUrl}
-                    alt="previewImage"
-                  />
-                )}
-              </div>
-              <div className="flex justify-center p-6">
-                <button
-                  type="submit"
-                  className="bg-[#105193] hover:bg-[#107D93] text-white font-bold py-2 px-6 rounded-3xl"
-                >
-                  Submit
-                  {/* {isLoadingMutation || isLoadingEdit ? "loading..." : "Submit"} */}
-                </button>
-              </div>
-            </form>
-          </Modal>
+              )}
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="dark" onClick={handleCreateCloseModal}>
+            Close
+          </Button>
+          <Button variant="success" onClick={handleCreateService}>
+            Save changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
         </div>
       </div>
       <div className="flex rounded-lg p-4 pr-0 pt-0">
-        <FilterPopup
-          filterHeader="Zone"
-          isOpen={isFilterPopupOpen}
-          togglePopup={toggleFilterPopup}
-        ></FilterPopup>
+      
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
           {/* Parent div for span elements */}
           <span className="flex items-center justify-center">
             <input
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
               placeholder="Search by name"
-              onChange={(e) => {
-                handleSearchChange(e.target.value);
-              }}
+              // onChange={(e) => {
+              //   handleSearchChange(e.target.value);
+              // }}
             />
           </span>
           <span className="flex items-center">
@@ -305,10 +306,8 @@ const BasicServices = () => {
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
-          {isLoading ? (
-            <>Loading...</>
-          ) : (
-            service?.map((splServices, index) => (
+
+            {services?.map((splServices, index) => (
               <tr
                 className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
                 key={index}
@@ -322,7 +321,7 @@ const BasicServices = () => {
                 >
                   <img
                     alt="img"
-                    src={splServices?.image ?? ParticipantAvatar}
+                    src={splServices?.image ?? "t"}
                     className="w-14 h-14 rounded-full mr-2 mt-2"
                   />
                 </td>
@@ -337,20 +336,20 @@ const BasicServices = () => {
                   {splServices?._id}
                 </td>
                 <td
-                  onClick={() => navigate(`/participants/${splServices?._id}`)}
+                  
                   className="px-4 py-2 border-r border-gray-400"
                 >
                   <div className="flex -space-x-2">{splServices?.description}</div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  <button onClick={() => {}}>
+                  <button onClick={(e) => {handleShowModal(splServices)}}>
                     <img
                       alt="pics"
                       src="/icons/edit.svg"
                       className="w-6 h-6 rounded-full mr-2"
                     />
                   </button>
-                  <button onClick={() => {}}>
+                  <button onClick={() => {setShowDeleteModal(true);setSelectedService(splServices)}}>
                     <img
                       alt="pics"
                       src="/icons/delete.svg"
@@ -359,47 +358,87 @@ const BasicServices = () => {
                   </button>
                 </td>
               </tr>
-            ))
-          )}
+              
+            ))}
+
+ {/* Edit Servi Modal */}
+ <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Services</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formTitle">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                value={updatedServices.title}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formDescription" className="mt-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                type="text"
+                name="description"
+                value={updatedServices.description}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="formImage" className="mt-3">
+              <Form.Label>Image</Form.Label>
+              <Form.Control
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleInputChange}
+              />
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Image Preview"
+                  className="mt-3"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    marginInline: "auto",
+                  }}
+                />
+              )}
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="dark" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="success" onClick={handleSaveChanges}>
+            Save changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Delete Servi Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={handleDeleteCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this Servi?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="dark" onClick={handleDeleteCloseModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteServices}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
         </tbody>
       </table>
-      {/* <div className="flex flex-wrap justify-center mt-4">
-        <EmpCard
-          cardArray={data?.participant}
-          selectedRole={""}
-          selectedDesignation={"client"}
-          isGrid={true}
-        />
-      </div> */}
-      <div className="m-auto flex justify-end ">
-        <Pagination
-          itemsPerPage={limit}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-          totalPages={data?.totalPages}
-        />
-      </div>
-      <Modal isVisible={showDeletePopup} onClose={handleDeleteModalClose}>
-        <h3 className="flex self-center text-lg font-bold">
-          Are you sure want to Delete?
-        </h3>
-        <div className="flex justify-center p-6">
-          <button
-            onClick={handleDeleteModalClose}
-            type="submit"
-            className="border border-green-500 text-green-600 hover:bg-green-700 hover:text-white font-bold  py-2 m-2 px-8 rounded-2xl"
-          >
-            No
-          </button>
-          <button
-            disabled={isLoadingDelete}
-            onClick={handleDelete}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 m-2 px-8 rounded-2xl"
-          >
-            YES
-          </button>
-        </div>
-      </Modal>
     </>
   );
 };

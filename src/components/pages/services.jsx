@@ -9,7 +9,9 @@ const Participants = () => {
   const dispatch = useDispatch();
   const businessData = useSelector((state) => state.business.data);
 
-  const specialServices = businessData.specialServices.data
+  console.log(businessData)
+
+  const specialServices = businessData.specialServices
 
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -19,7 +21,6 @@ const Participants = () => {
     _id: "",
     title: "",
     description: "",
-    price: "",
     image: null,
   });
   const [imageCreatePreview, setImageCreatePreview] = useState("");
@@ -28,7 +29,6 @@ const Participants = () => {
     _id: "",
     title: "",
     description: "",
-    price: "",
     image: null,
   });
   const [imagePreview, setImagePreview] = useState("");
@@ -37,7 +37,7 @@ const Participants = () => {
 
   useEffect(() => {
     if (businessData) {
-      setServices(businessData.specialServices.data || []);
+      setServices(businessData.specialServices || []);
     }
   }, [businessData]);
 
@@ -47,7 +47,6 @@ const Participants = () => {
       _id: Servi._id,
       title: Servi.title,
       description: Servi.description,
-      price: Servi.price,
       image: Servi.image,
     });
     setImagePreview(Servi.image); // Initialize preview with current image
@@ -155,11 +154,11 @@ const Participants = () => {
     }
   };
   const handleSaveChanges = () => {
-    const updatedServices = services.map(Servi =>
+    const updatedService = services.map(Servi =>
       Servi._id === updatedServices._id ? updatedServices : Servi
     );
     console.log(updatedServices)
-    const updatedData = { ...businessData, specialServices: updatedServices };
+    const updatedData = { ...businessData, specialServices: updatedService };
     dispatch(setBusinessData(updatedData));
     handleCloseModal();
   };
@@ -343,14 +342,14 @@ const Participants = () => {
                   <div className="flex -space-x-2">{splServices?.description}</div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  <button onClick={() => {}}>
+                  <button onClick={(e) => {handleShowModal(splServices)}}>
                     <img
                       alt="pics"
                       src="/icons/edit.svg"
                       className="w-6 h-6 rounded-full mr-2"
                     />
                   </button>
-                  <button onClick={() => {}}>
+                  <button onClick={() => {setShowDeleteModal(true);setSelectedService(splServices)}}>
                     <img
                       alt="pics"
                       src="/icons/delete.svg"
@@ -365,7 +364,7 @@ const Participants = () => {
  {/* Edit Servi Modal */}
  <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Servi</Modal.Title>
+          <Modal.Title>Edit Special Services</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -384,15 +383,6 @@ const Participants = () => {
                 type="text"
                 name="description"
                 value={updatedServices.description}
-                onChange={handleInputChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="formPrice" className="mt-3">
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type="number"
-                name="price"
-                value={updatedServices.price}
                 onChange={handleInputChange}
               />
             </Form.Group>
