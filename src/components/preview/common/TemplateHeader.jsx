@@ -23,15 +23,6 @@ const TemplateHeader = ({ businessData }) => {
         </IconButton>
       </Box>
       <Container>
-        <Navbar.Brand
-          href="/"
-          className="fw-bold w-50 nav-logo"
-          style={{ fontSize: "36px" }}
-        >
-          <IconButton aria-label="delete" size="small" color="red">
-            <ArrowBackIosIcon fontSize="inherit" />
-          </IconButton>
-        </Navbar.Brand>
         {/* Align Brand to the start (left side) */}
         <Navbar.Brand
           href="#"

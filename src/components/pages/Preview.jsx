@@ -30,11 +30,6 @@ export default function Preview() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(
-      isPremium,
-      typeof isPremium,
-      "premium; in peview baisc xxxxxzzzzzzzzzzzzzzzzzzzzzzz"
-    );
     if (isPremium) {
       navigate("/preview/premium", { replace: true });
     }
