@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useLeads from "../../Hooks/useLeads";
 import BackdropLoader from "../reUsableCmponent/BackdropLoader";
+
 import { getApi } from "../../api/api";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+import Loader from "../Loader/Loader";
 
 const Zones = () => {
   const { leads, loading } = useLeads();
@@ -32,9 +35,7 @@ const Zones = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <BackdropLoader isLoading={loading} />
         <h2 className="text-2xl font-semibold text-gray-700">Leads</h2>
-        
       </div>
       <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
         {/* Parent div for span elements */}
@@ -66,60 +67,55 @@ const Zones = () => {
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Email
             </th>
-          
-            <th className="px-4 py-4 text-left border-r border-gray-400">Phone number</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">Message</th>
-
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Phone number
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Message
+            </th>
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-70 border-[#969696]">
-          {leads?.map((lead, index) => (
-            <tr
-              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
-              key={index}
-            >
-              <td className="px-4 py-2 border-r border-gray-400">
-                {index + 1}
+          {loading ? (
+            <tr>
+              <td colSpan="5" className="px-4 py-4 text-center">
+                <div className="flex justify-center items-center">
+                  <Loader />
+                </div>
               </td>
-              <td
-                style={{ cursor: "pointer" }}
-                className="px-4 py-2 border-r border-gray-400"
-              >
-                <u
-                  style={{ cursor: "pointer" }}
-                  onMouseOver={({ target }) => (target.style.color = "blue")}
-                  onMouseOut={({ target }) => (target.style.color = "black")}
-                >
-                  {lead?.name}
-                </u>
-              </td>
-              
-              <td className="px-4 py-2 border-r border-gray-400">
-                <div className="flex -space-x-2">{lead?.email}</div>
-              </td>
-              <td className="px-4 py-2 border-r border-gray-400">
-                <div className="flex -space-x-2">{"+91000000000"}</div>
-              </td>
-
-              <td className="px-4 py-2 border-r border-gray-400">
-                <div className="flex -space-x-2">{lead?.message}</div>
-              </td>
-              {/* <td className="px-4 py-2">
-                
-                <button onClick={() => handleDeleteClick(lead?._id)}>
-                  <img
-                    alt="pics"
-                    src="/icons/delete.svg"
-                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                    style={{
-                      filter:
-                        "invert(20%) sepia(94%) saturate(7496%) hue-rotate(347deg) brightness(102%) contrast(104%)",
-                    }}
-                  />
-                </button>
-              </td> */}
             </tr>
-          ))}
+          ) : (
+            leads?.map((lead, index) => (
+              <tr
+                className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+                key={index}>
+                <td className="px-4 py-2 border-r border-gray-400">
+                  {index + 1}
+                </td>
+                <td
+                  style={{ cursor: "pointer" }}
+                  className="px-4 py-2 border-r border-gray-400">
+                  <u
+                    style={{ cursor: "pointer" }}
+                    onMouseOver={({ target }) => (target.style.color = "blue")}
+                    onMouseOut={({ target }) => (target.style.color = "black")}>
+                    {lead?.name}
+                  </u>
+                </td>
+
+                <td className="px-4 py-2 border-r border-gray-400">
+                  <div className="flex -space-x-2">{lead?.email}</div>
+                </td>
+                <td className="px-4 py-2 border-r border-gray-400">
+                  <div className="flex -space-x-2">{"+91000000000"}</div>
+                </td>
+
+                <td className="px-4 py-2 border-r border-gray-400">
+                  <div className="flex -space-x-2">{lead?.message}</div>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
