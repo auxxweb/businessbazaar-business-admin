@@ -10,8 +10,6 @@ const useBusiness = () => {
   const [colorTheme, setColorTheme] = useState("");
   const [isPremium, setIsPremium] = useState(false);
 
-  console.log(businessData, "businessData");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
