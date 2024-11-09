@@ -21,7 +21,7 @@ const PremiumPreview = () => {
   
   useEffect(() => {
     if (!isPremium) {
-      navigate("/preview", { replace: false });
+      navigate("/preview", { replace: true });
     }
   }, [isPremium]);
 

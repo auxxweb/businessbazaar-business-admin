@@ -10,10 +10,13 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import useBusiness from "../../Hooks/useBusiness";
 import ContactForm from "../preview/common/contactForm";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { Box, IconButton } from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 export default function Preview() {
-  const { businessData, colorTheme, closeDays, loading, isPremium } = useBusiness();
+  const { businessData, colorTheme, closeDays, loading, isPremium } =
+    useBusiness();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [visible, setVisible] = useState(false);
   const [review, setReview] = useState([
@@ -26,13 +29,16 @@ export default function Preview() {
 
   const navigate = useNavigate();
 
-
-  useEffect(()=>{
-    console.log(isPremium, typeof(isPremium), "premium; in peview baisc xxxxxzzzzzzzzzzzzzzzzzzzzzzz")
-    if(isPremium){
-      navigate("/preview/premium", {replace: false})
+  useEffect(() => {
+    console.log(
+      isPremium,
+      typeof isPremium,
+      "premium; in peview baisc xxxxxzzzzzzzzzzzzzzzzzzzzzzz"
+    );
+    if (isPremium) {
+      navigate("/preview/premium", { replace: true });
     }
-  },[isPremium])
+  }, [isPremium]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -239,9 +245,9 @@ export default function Preview() {
         rel="stylesheet"
       />
       <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
-          rel="stylesheet"
-        />
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+      />
       <style>
         {" "}
         {`
@@ -290,10 +296,15 @@ export default function Preview() {
         className="bg-white pjs fixed-top"
         style={{ paddingBlock: "5px" }}
       >
+        <Box ml={2}>
+          <IconButton aria-label="delete" size="small" onClick={()=> navigate("/")}>
+            <ArrowBackIosIcon fontSize="inherit" /> back
+          </IconButton>
+        </Box>
         <Container>
           {/* Align Brand to the start (left side) */}
           <Navbar.Brand
-            href="/"
+            href="#"
             className="fw-bold w-50 nav-logo"
             style={{ fontSize: "36px" }}
           >
