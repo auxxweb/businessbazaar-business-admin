@@ -8,6 +8,9 @@ const useBusiness = () => {
   const [loading, setLoading] = useState(false);
   const [businessData, setBusinessData] = useState({});
   const [colorTheme, setColorTheme] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+
+  console.log(businessData, "businessData");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,6 +35,7 @@ const useBusiness = () => {
       navigate
     );
     setBusinessData(businessDetails?.data);
+    setIsPremium(businessDetails?.data?.selectedPlan?.isPremium);
     setColorTheme(businessDetails.data.theme);
 
     const closed = allDays.filter(
@@ -54,6 +58,7 @@ const useBusiness = () => {
     businessData,
     closeDays,
     colorTheme,
+    isPremium,
   };
 };
 

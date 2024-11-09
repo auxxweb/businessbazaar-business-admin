@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import "../../assets/css/template.css";
 import Slider from "react-slick";
@@ -10,9 +10,10 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import useBusiness from "../../Hooks/useBusiness";
 import ContactForm from "../preview/common/contactForm";
+import { useNavigate } from 'react-router-dom';
 
-export default function Template() {
-  const { businessData, colorTheme, closeDays, loading } = useBusiness();
+export default function Preview() {
+  const { businessData, colorTheme, closeDays, loading, isPremium } = useBusiness();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [visible, setVisible] = useState(false);
   const [review, setReview] = useState([
@@ -22,6 +23,16 @@ export default function Template() {
       description: "",
     },
   ]);
+
+  const navigate = useNavigate();
+
+
+  useEffect(()=>{
+    console.log(isPremium, typeof(isPremium), "premium; in peview baisc xxxxxzzzzzzzzzzzzzzzzzzzzzzz")
+    if(isPremium){
+      navigate("/preview/premium", {replace: false})
+    }
+  },[isPremium])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
