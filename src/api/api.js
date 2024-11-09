@@ -1,5 +1,4 @@
 import axios from "axios";
-// import { getLocalStorageItem } from '../utils/appUtils'
 import { clearBusinessData } from './slices/business';
 
 const API_BASE_URL = process.env.REACT_APP_BE_API_KEY;
@@ -77,6 +76,8 @@ export const deleteApi = async (url, authToken = true, dispatch, navigate) => {
 export const getApi = async (url, authToken = true, dispatch, navigate) => {
   const token = localStorage.getItem("userCredential");
   const parsedToken = JSON.parse(token);
+
+  console.log(parsedToken,'aaaaaaaaaa');
 
   const config = {
     headers: {

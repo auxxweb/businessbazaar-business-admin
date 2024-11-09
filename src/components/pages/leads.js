@@ -1,51 +1,22 @@
-import React, { useState } from "react";
-import copy from "copy-to-clipboard";
+import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { LuCopyCheck } from "react-icons/lu";
-import { IoMdCopy } from "react-icons/io";
-
-import Pagination from "../Pagination";
-import { PUBLIC_USER_FRONTEND_URL } from "../../common/utils";
-import { toast } from "sonner";
 import useLeads from "../../Hooks/useLeads";
 import BackdropLoader from "../reUsableCmponent/BackdropLoader";
+import { getApi } from "../../api/api";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Zones = () => {
   const { leads, loading } = useLeads();
-  console.log(leads, "leads");
+
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editPopupData, setEditPopupData] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [selectedZoneId, setSelectedZoneId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 10;
-
-  const [copied, setCopied] = useState("");
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
-  };
-
-  const handleEditClick = (zone) => {
-    toggleModal();
-    setEditPopupData(zone);
-  };
-
-  const handleDeleteClick = (id) => {
-    setShowDeletePopup(true);
-    setSelectedZoneId(id);
-  };
-
-  const handleModalClose = () => {
-    toggleModal();
-    setEditPopupData(null);
-  };
-
-  const handleDeleteModalClose = () => {
-    setShowDeletePopup(false);
   };
   const handleSearchChange = useDebouncedCallback(
     // function
@@ -58,25 +29,6 @@ const Zones = () => {
     setCurrentPage(page);
   };
 
-  const handleCopy = async (value, mainJudge) => {
-    if (mainJudge) {
-      setCopied(value);
-      copy(PUBLIC_USER_FRONTEND_URL + "/participant/" + value);
-      setTimeout(() => {
-        setCopied("");
-      }, 2000);
-    } else {
-      toast.error("Please add at least one main judge in this zone.", {
-        position: "top-right",
-        duration: 2000,
-        style: {
-          backgroundColor: "#fb0909", // Custom green color for success
-          color: "#FFFFFF", // Text color
-        },
-        dismissible: true,
-      });
-    }
-  };
   return (
     <>
       <div className="flex rounded-lg p-4">

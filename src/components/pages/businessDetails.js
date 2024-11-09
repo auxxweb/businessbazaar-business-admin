@@ -1,17 +1,17 @@
 import placeholder from "../../assets/images/person-placeholder.png";
 import { useDispatch, useSelector } from "react-redux";
 import useCategory from "../../Hooks/useCategory";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { setBusinessData } from "../../api/slices/business";
+import { useNavigate } from "react-router-dom";
+import { getApi } from "../../api/api";
 
 const BusinessDetails = () => {
-  const businessDetails = useSelector((state) => state.business.data);
-  const { category, loading } = useCategory(businessDetails?.category);
+  const [businessDetails,setBusinessDetails] = useState([]);
+  const [category, setCategory ] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [isSocialMedia, setSocialMediaModal] = useState(false);
-
-  console.log(businessDetails, "detailsss");
 
   // State for form data within the modal
   const [formData, setFormData] = useState({
@@ -25,10 +25,33 @@ const BusinessDetails = () => {
     description: businessDetails?.description || "",
   });
 
+
+
   const [themeData, setThemeData] = useState({
     theme: businessDetails?.theme || "",
     secondaryTheme: businessDetails?.secondaryTheme || "",
   });
+  const dispatch = useDispatch()
+  
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const businessData = await getApi(`api/v1/business/profile`, true, dispatch, navigate);
+        console.log(businessData.data);
+        setBusinessDetails(businessData.data);
+        setThemeData({
+          theme: businessData.data?.theme || "",
+          secondaryTheme: businessData.data?.secondaryTheme || "",
+        })
+        setCategory(businessData?.data.category)
+        
+      } catch (error) {
+        console.error("Error fetching business details:", error.message || error);
+      } 
+    };
+    fetchData();
+  }, [dispatch, navigate]);
 
   const handleShowModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -49,7 +72,6 @@ const BusinessDetails = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const dispatch = useDispatch()
   const handleSubmit = () => {
     const updatedBusinessDetails = {
       ...businessDetails,
@@ -82,6 +104,7 @@ const BusinessDetails = () => {
     dispatch(setBusinessData(updatedBusinessDetails));
     handleCloseSystemModal();
   };
+
 
   return (
     <div className="m-4 mx-auto bg-white shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
@@ -224,7 +247,7 @@ const BusinessDetails = () => {
         </button>
 
         <div className="mt-4">
-  {businessDetails.socialMediaLinks.map((link, index) => (
+  {businessDetails?.socialMediaLinks?.map((link, index) => (
     <div>
           <a href={link?.link} key={index} className="font-semibold text-gray-600">
       {link.tag}: {link?.link || "Not available"}

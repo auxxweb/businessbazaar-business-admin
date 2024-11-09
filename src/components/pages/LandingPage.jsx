@@ -2,14 +2,18 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setBusinessData } from "../../api/slices/business";
+import { useNavigate } from "react-router-dom";
+import { getApi } from "../../api/api";
 
 const LandingPage = () => {
-  const businessData = useSelector((state) => state.business.data);
+  // const businessData = useSelector((state) => state.business.data);
+
+  const [businessData,setBusinessData] = useState([])
   
-  const [title, setTitle] = useState(businessData.landingPageHero?.title || "");
-  const [description, setDescription] = useState(businessData.landingPageHero?.description || "");
-  const [image, setImage] = useState(businessData.landingPageHero?.coverImage || "");
-  const [imagePreview, setImagePreview] = useState(businessData.landingPageHero?.coverImage || "");
+  const [title, setTitle] = useState();
+  const [description, setDescription] = useState();
+  const [image, setImage] = useState();
+  const [imagePreview, setImagePreview] = useState();
 
   const dispatch = useDispatch();
 
@@ -59,9 +63,19 @@ const LandingPage = () => {
     }
   };
 
+  const navigate = useNavigate();
   useEffect(() => {
-    setImagePreview(businessData.landingPageHero?.coverImage || "");
-  }, [businessData.landingPageHero?.coverImage]);
+    const fetchData = async () => {
+      const businessDetails = await getApi(`api/v1/business/profile`,true,dispatch,navigate);
+      setBusinessData(businessDetails.data)
+      setTitle(businessDetails.data.landingPageHero.title)
+      setDescription(businessDetails.data.landingPageHero.description)
+      setImagePreview(businessDetails.data.landingPageHero.coverImage)
+      
+    }
+    fetchData()
+
+  }, []);
 
   const handleLandingSubmit = () => {
     // Prepare updated business data immutably

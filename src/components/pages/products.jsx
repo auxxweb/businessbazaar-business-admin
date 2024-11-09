@@ -2,13 +2,28 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
-import { setBusinessData } from "../../api/slices/business";
+import { getApi } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const Judges = () => {
   const dispatch = useDispatch();
-  const businessData = useSelector((state) => state.business.data);
+  const [businessData,setBusinessData] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const businessDetails = await getApi(`api/v1/business/profile`, true, dispatch, navigate);
+       
+        setBusinessData(businessDetails.data);
 
-  console.log(businessData);
+        setProducts(businessDetails.data.productSection);
+        
+      } catch (error) {
+        console.error("Error fetching business details:", error.message || error);
+      } 
+    };
+    fetchData();
+  }, [dispatch, navigate]);
 
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -34,11 +49,7 @@ const Judges = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  useEffect(() => {
-    if (businessData) {
-      setProducts(businessData.productSection || []);
-    }
-  }, [businessData]);
+
 
   const handleShowModal = (product) => {
     setSelectedProduct(product);
@@ -157,9 +168,11 @@ const Judges = () => {
     const updatedProducts = products.map(product =>
       product._id === updatedProduct._id ? updatedProduct : product
     );
+    setProducts(updatedProducts);
     console.log(updatedProducts)
     const updatedData = { ...businessData, productSection: updatedProducts };
-    dispatch(setBusinessData(updatedData));
+    setBusinessData(updatedData);
+
     handleCloseModal();
   };
 
@@ -173,7 +186,7 @@ const Judges = () => {
       productSection: products.filter((product) => product._id !== selectedProduct._id) 
     };
   
-    dispatch(setBusinessData(updatedData));
+    setBusinessData(updatedData);
   
     handleDeleteCloseModal();
   };
@@ -185,7 +198,7 @@ const Judges = () => {
       
       const updatedData = { ...businessData, productSection: updatedProducts };
       
-      dispatch(setBusinessData(updatedData));
+      setBusinessData(updatedData);
       handleCloseModal();
       return updatedProducts;   
       

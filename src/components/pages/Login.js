@@ -29,13 +29,16 @@ const Login = () => {
         password,
       };
       const res = await login?.(body);
-      console.log(res);
       if (res?.data?.success) {
         localStorage.setItem(
           "userCredential",
           JSON.stringify(res?.data?.data?.token)
         );
-        dispatch(setBusinessData(res?.data?.data));
+        const businessProfile = {
+          'logo':res?.data?.data?.logo,
+          'businessName':res?.data?.data?.businessName
+        }
+        dispatch(setBusinessData(businessProfile));
         navigate("/"); // Redirect after form submission
       } else {
         toast.error(res.data.message, {

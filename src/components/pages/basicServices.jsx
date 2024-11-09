@@ -3,13 +3,33 @@ import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
 import { setBusinessData } from "../../api/slices/business";
+import { useNavigate } from "react-router-dom";
+import { getApi } from "../../api/api";
 
 const BasicServices = () => {
   const dispatch = useDispatch();
-  const businessData = useSelector((state) => state.business.data);
+  const [businessData,setBusinessData] = useState([]);
 
 
   const [services, setServices] = useState([]);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const businessDetails = await getApi(`api/v1/business/profile`, true, dispatch, navigate);
+       
+        setBusinessData(businessDetails.data);
+
+        setServices(businessDetails.data.specialServices.data);
+        
+      } catch (error) {
+        console.error("Error fetching business details:", error.message || error);
+      } 
+    };
+    fetchData();
+  }, [dispatch, navigate]);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -156,7 +176,8 @@ const BasicServices = () => {
     );
     console.log(updatedServices)
     const updatedData = { ...businessData, service: updatedService };
-    dispatch(setBusinessData(updatedData));
+    setBusinessData(updatedData);
+    setServices(updatedService)
     handleCloseModal();
   };
 
@@ -170,7 +191,7 @@ const BasicServices = () => {
       service: services.filter((Servi) => Servi._id !== selectedService._id) 
     };
   
-    dispatch(setBusinessData(updatedData));
+    setBusinessData(updatedData);
   
     handleDeleteCloseModal();
   };
@@ -181,7 +202,7 @@ const BasicServices = () => {
   
       const updatedData = { ...businessData, service: updatedServices };
   
-      dispatch(setBusinessData(updatedData));
+      setBusinessData(updatedData);
       handleCloseModal();
       return updatedServices;   
     });
