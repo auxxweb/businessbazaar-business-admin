@@ -8,9 +8,6 @@ const BasicServices = () => {
   const dispatch = useDispatch();
   const businessData = useSelector((state) => state.business.data);
 
-  console.log(businessData)
-
-  const service = businessData.service
 
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);

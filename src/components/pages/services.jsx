@@ -9,9 +9,8 @@ const Participants = () => {
   const dispatch = useDispatch();
   const businessData = useSelector((state) => state.business.data);
 
-  console.log(businessData)
+  
 
-  const specialServices = businessData.specialServices
 
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -37,7 +36,7 @@ const Participants = () => {
 
   useEffect(() => {
     if (businessData) {
-      setServices(businessData.specialServices || []);
+      setServices(businessData.specialServices.data || []);
     }
   }, [businessData]);
 
@@ -157,8 +156,14 @@ const Participants = () => {
     const updatedService = services.map(Servi =>
       Servi._id === updatedServices._id ? updatedServices : Servi
     );
-    console.log(updatedServices)
-    const updatedData = { ...businessData, specialServices: updatedService };
+    console.log(updatedService)
+    const updatedData = { 
+      ...businessData, 
+      specialServices: { 
+        ...businessData.specialServices, 
+        data: updatedService 
+      } 
+    };
     dispatch(setBusinessData(updatedData));
     handleCloseModal();
   };
@@ -170,19 +175,26 @@ const Participants = () => {
   
     const updatedData = { 
       ...businessData, 
-      specialServices: services.filter((Servi) => Servi._id !== selectedService._id) 
+      specialServices:{
+        data:services.filter((Servi) => Servi._id !== selectedService._id) 
+      }
     };
   
     dispatch(setBusinessData(updatedData));
   
     handleDeleteCloseModal();
   };
-  
   const handleCreateService = () => {
     setServices((prevServices) => {
       const updatedServices = Array.isArray(prevServices) ? [...prevServices, newService] : [newService];
   
-      const updatedData = { ...businessData, specialServices: updatedServices };
+      const updatedData = { 
+        ...businessData, 
+        specialServices: { 
+          ...businessData.specialServices, 
+          data: updatedServices 
+        } 
+      };
   
       dispatch(setBusinessData(updatedData));
       handleCloseModal();

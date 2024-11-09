@@ -29,6 +29,7 @@ const Login = () => {
         password,
       };
       const res = await login?.(body);
+      console.log(res);
       if (res?.data?.success) {
         localStorage.setItem(
           "userCredential",
