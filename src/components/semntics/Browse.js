@@ -3,7 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import ContentArea from "./ContentArea";
-import { getUserCredential, publicRoutes } from "../../common/utils";
+import {
+  getUserCredential,
+  publicRoutes,
+  previewRoutes,
+} from "../../common/utils";
 
 function Browse() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -22,6 +26,8 @@ function Browse() {
       } else {
         navigate(location.pathname);
       }
+    } else if (previewRoutes.includes(basePath) && userData) {
+      navigate(location.pathname);
     } else {
       if (!userData) {
         navigate("/login");
@@ -29,7 +35,6 @@ function Browse() {
     }
     //eslint-disable-next-line
   }, []);
-
 
   useEffect(() => {
     // Function to detect language and apply appropriate classes
@@ -40,11 +45,11 @@ function Browse() {
         // Arabic character range
         if (/[ء-ي]/.test(text)) {
           element.classList.add("arabic-text");
-        } 
+        }
         // Malayalam character range
         else if (/[\u0D00-\u0D7F]/.test(text)) {
           element.classList.add("malayalam-text");
-        } 
+        }
         // Default to English
         else {
           element.classList.add("english-text");
@@ -63,10 +68,10 @@ function Browse() {
     return () => observer.disconnect();
   }, []);
 
-  if (publicRoutes.includes(basePath)) {
+  if (publicRoutes.includes(basePath) || previewRoutes.includes(basePath)) {
     return (
       <div className="flex-1 flex flex-col">
-        <ContentArea /> 
+        <ContentArea />
       </div>
     );
   } else {
