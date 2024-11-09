@@ -21,6 +21,8 @@ import PrivacyPolicies from "../pages/PrivacyPolicies"
 import BasicServices from "../pages/basicServices";
 import LandingPage from "../pages/LandingPage";
 import WelcomePage from "../pages/WelcomePage";
+import PremiumPreview from "../pages/PremiumPreview";
+import Preview from "../pages/Preview";
 
 function ContentArea() {
   const [token, setToken] = useState([]);
@@ -60,6 +62,9 @@ function ContentArea() {
       <Route path="/businessDetails" element={token?<BusinessDetails />:<Login />} />
       <Route path="/terms-and-conditions" element={ token?<TermsAndConditions />:<Login />} />
       <Route path="/privacy-policies" element={token?<PrivacyPolicies />:<Login />} />
+      <Route path="/preview" element={token? <Preview />:<Login/>} />
+      <Route path="/preview/premium" element={token? <PremiumPreview />:<Login/>} />
+
     </Routes>
   );
 }
