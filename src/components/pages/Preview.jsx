@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
-import "../../assets/css/template.css";
+
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -13,6 +13,8 @@ import ContactForm from "../preview/common/contactForm";
 import { useNavigate } from "react-router-dom";
 import { Box, IconButton } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+
+import '../../assets/css/template.css';
 
 export default function Preview() {
   const { businessData, colorTheme, closeDays, loading, isPremium } =
@@ -246,45 +248,45 @@ export default function Preview() {
       <style>
         {" "}
         {`
-                    ::-webkit-scrollbar {
-                        width: 12px; /* Width of the entire scrollbar */
-                    }
-
-                    /* Scrollbar track */
-                    ::-webkit-scrollbar-track {
-                        background: rgb(243, 243, 244); /* Background of the scrollbar track */
-                    }::-webkit-scrollbar-thumb {
-                        background-color: ${colorTheme}; /* Color of the scrollbar thumb */
-                        border-radius: 10px;     /* Rounded edges of the thumb */
-                        border: 3px solid  ${colorTheme}; /* Padding around the thumb */
-                    }
-                .theme
-                {
-                    background-color: ${colorTheme};
-                    color: white;
-                    border: none;
-                }.service-design.active{
-                    background-color: ${colorTheme};
-                }.address-section{
-                background-color:${colorTheme};
-                }.address-logo i{
-                color: ${colorTheme};
-                }.cat-option{
-                    border-right: 1px dashed ${colorTheme};
-                }.text-orange{
-                        color: ${colorTheme};
-                    }.dish-div:hover{
-                        background-color: ${colorTheme};
-                        color:white;
-                    }.product-section{
-                    padding:20px;
-                    border:1px solid ${colorTheme};
-                    border-radius:16px;
-                        }.slick-dots .slick-active button{
-                            background-color: ${colorTheme};
-                            border-radius: 16px;
+                      ::-webkit-scrollbar {
+                            width: 12px; /* Width of the entire scrollbar */
                         }
-                    `}
+    
+                        /* Scrollbar track */
+                        ::-webkit-scrollbar-track {
+                            background: rgb(243, 243, 244); /* Background of the scrollbar track */
+                        }::-webkit-scrollbar-thumb {
+                            background-color: ${colorTheme}; /* Color of the scrollbar thumb */
+                            border-radius: 10px;     /* Rounded edges of the thumb */
+                            border: 3px solid  ${colorTheme}; /* Padding around the thumb */
+                        }
+                    .theme
+                    {
+                        background-color: ${colorTheme};
+                        color: white;
+                        border: none;
+                    }.service-design.active{
+                        background-color: ${colorTheme};
+                    }.address-section{
+                    background-color:${colorTheme};
+                    }.address-logo i{
+                    color: ${colorTheme};
+                    }.cat-option{
+                        border-right: 1px dashed ${colorTheme};
+                    }.text-orange{
+                            color: ${colorTheme};
+                        }.dish-div:hover{
+                            background-color: ${colorTheme};
+                            color:white;
+                        }.product-section{
+                        padding:20px;
+                        border:1px solid ${colorTheme};
+                        border-radius:16px;
+                            }.slick-dots .slick-active button{
+                                background-color: ${colorTheme};
+                                border-radius: 16px;
+                            }
+                        `}
       </style>
       <Navbar
         expand="lg"
@@ -300,7 +302,7 @@ export default function Preview() {
           {/* Align Brand to the start (left side) */}
           <Navbar.Brand
             href="#"
-            className="fw-bold w-50 nav-logo"
+            className="fw-bold w-50 nav-logo d-flex"
             style={{ fontSize: "36px" }}
           >
             <img src={businessData?.logo} alt="" />
@@ -584,7 +586,9 @@ export default function Preview() {
                             width: "300px",
                             height: "300px",
                             objectFit: "cover",
+                            marginInline:"auto",
                           }}
+                            className="mb-3"
                         />
                       </div>
                       <div className="col-12">
@@ -611,7 +615,9 @@ export default function Preview() {
                           height: "auto",
                           maxWidth: "300px",
                           objectFit: "cover",
+                          marginInline:"auto",
                         }}
+                        className="mb-3"
                       />
                     </div>
                     <div className="col-12">
@@ -676,34 +682,65 @@ export default function Preview() {
           <div className="col-12 mt-5 text-center text-lg-start">
             <h1 className="fw-bold text-center">Services We Provide</h1>
           </div>
-          <div className="col-12 mb-5">
-            <Slider {...setting2} className="mb-5">
-              {businessData?.service?.map((service, index) => (
-                <div
-                  key={index}
-                  className={`col-12 col-lg-4 service-design ${
-                    index === currentSlide ? "active" : "bg-white"
-                  }  mt-5 mb-5 text-center`}
-                >
-                  <div className="col-12 text-center">
-                    <h3>{service.title}</h3>
-                  </div>
-                  <div className="col-12 mt-5">
-                    <p className="text-center">{service.description}</p>
-                  </div>
+          <div className="col-12 row justify-content-center mb-5">
+          {businessData?.service?.length > 3 ? (
+                <Slider {...setting2} className="mb-5">
+                  {businessData?.service?.map((service, index) => (
+                    <div
+                      key={index}
+                      className={`col-12 col-lg-4 service-design ${
+                        index === currentSlide ? 'active' : ''
+                      } mt-5 mb-5 text-center`}
+                    >
+                      <div className="col-12 text-center">
+                        <h3>{service.title}</h3>
+                      </div>
+                      <div className="col-12 mt-5">
+                        <p className="text-center">{service.description}</p>
+                      </div>
+                      <div
+                        className="col-12 text-center"
+                        style={{ height: '100px' }}
+                      >
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          className="h-100"
+                          style={{marginInline:'auto',borderRadius: '8px'}}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </Slider>
+              ) : (
+                businessData?.service?.map((service, index) => (
                   <div
-                    className="col-12 text-center"
-                    style={{ height: "100px" }}
+                    key={index}
+                    className={`col-12 col-lg-4 service-design ${
+                      index === currentSlide ? 'active' : ''
+                    } mt-5 mb-5 text-center`}
                   >
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="h-100"
-                    />
+                    <div className="col-12 text-center">
+                      <h3>{service.title}</h3>
+                    </div>
+                    <div className="col-12 mt-5">
+                      <p className="text-center">{service.description}</p>
+                    </div>
+
+                    <div
+                      className="col-12 text-center"
+                      style={{ height: '100px' }}
+                    >
+                      <img
+                        src={service.image}
+                        alt={service.title}
+                        className="h-100"
+                          style={{marginInline:'auto',borderRadius: '8px'}}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </Slider>
+                ))
+              )}
           </div>
 
           <div className="col-12 mb-5" id="gallery">
@@ -765,6 +802,7 @@ export default function Preview() {
           </div>
         </div>
       </section>
+      
       <section className="" style={{ backgroundColor: "#F3F3F4" }}>
         <div className="container david-font p-top">
           <div className="col-12 text-center">
@@ -882,9 +920,8 @@ export default function Preview() {
           </div>
         </div>
       </Dialog>
-      <ContactForm businessData={businessData} />
 
-      <section className="h-auto david-font" id="contact">
+      <section className="david-font" id="contact">
         <div className="container p-top">
           <div className="col-12 newsletter position-relative">
             <img
@@ -938,6 +975,11 @@ export default function Preview() {
           </div>
         </div>
       </section>
+
+
+      <ContactForm businessData={businessData} />
+
+     
 
       <footer className="h-auto">
         <div className="container pjs  p-top">

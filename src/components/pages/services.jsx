@@ -5,6 +5,8 @@ import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getApi } from "../../api/api";
+import useBusiness from "../../api/useBusiness";
+import useImageUpload from "../../api/imageUpload/useImageUpload";
 
 const Participants = () => {
   const dispatch = useDispatch();
@@ -16,21 +18,31 @@ const Participants = () => {
   const [services, setServices] = useState([]);
 
   const navigate = useNavigate();
+  const { imageLoading, uploadImage } = useImageUpload()
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      await getBusiness()
+    }
+    fetchBusiness()
+  }, [])
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const businessDetails = await getApi(`api/v1/business/profile`, true, dispatch, navigate);
+        
        
-        setBusinessData(businessDetails.data);
-
-        setServices(businessDetails.data.specialServices.data);
+        if (businesses){
+          setBusinessData(businesses);
+          console.log(businesses)
+          setServices(businesses.specialServices.data);
+        }
         
       } catch (error) {
         console.error("Error fetching business details:", error.message || error);
       } 
     };
     fetchData();
-  }, [dispatch, navigate]);
+  }, [businesses]);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -134,16 +146,12 @@ const Participants = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
           setUpdatedServices(prevServices => ({
             ...prevServices,
-            image: preReq.accessLink, // Remove quotes here
+            image: file, // Remove quotes here
           }));
           setImagePreview(URL.createObjectURL(file)); 
-        } else {
-          console.error("Access link not found in response.");
-        }
+       
       }
     } else {
       setUpdatedServices(prevServices => ({ ...prevServices, [name]: value }));
@@ -156,30 +164,34 @@ const Participants = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
-          setNewService(prevServices => ({ ...prevServices, image: preReq.accessLink }));
+          setNewService(prevServices => ({ ...prevServices, image: file }));
           setImageCreatePreview(URL.createObjectURL(file));
       
-        }
+        
       }
     } else {
       setNewService(prevServices => ({ ...prevServices, [name]: value }));
     }
   };
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    var imageAccessUrl = updatedService.image
+    if (imageAccessUrl) {
+      const data = await uploadImage(imageAccessUrl, 'Services')
+      imageAccessUrl = data?.accessLink
+      setUpdatedServices(prevService => ({
+        ...prevService,
+        image: imageAccessUrl, // Remove quotes here
+      }));
+      updatedServices.image = imageAccessUrl
+    }
     const updatedService = services.map(Servi =>
       Servi._id === updatedServices._id ? updatedServices : Servi
     );
     setServices(updatedService)
     const updatedData = { 
-      ...businessData, 
-      specialServices: { 
-        ...businessData.specialServices, 
-        data: updatedService 
-      } 
+      specialServices: updatedServices
     };
-    setBusinessData(updatedData);
+    await  updateBusiness(updatedData)
     handleCloseModal();
   };
 

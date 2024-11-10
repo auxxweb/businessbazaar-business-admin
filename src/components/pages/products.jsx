@@ -4,26 +4,39 @@ import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
 import { getApi } from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import useImageUpload from '../../api/imageUpload/useImageUpload'
+import useBusiness from "../../api/useBusiness";
 
 const Judges = () => {
   const dispatch = useDispatch();
   const [businessData,setBusinessData] = useState([]);
   const navigate = useNavigate();
+  const { imageLoading, uploadImage } = useImageUpload()
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      await getBusiness()
+    }
+    fetchBusiness()
+  }, [])
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const businessDetails = await getApi(`api/v1/business/profile`, true, dispatch, navigate);
+        
        
-        setBusinessData(businessDetails.data);
-
-        setProducts(businessDetails.data.productSection);
+        if (businesses){
+          setBusinessData(businesses);
+          console.log(businesses)
+          setProducts(businesses.productSection);
+        }
         
       } catch (error) {
         console.error("Error fetching business details:", error.message || error);
       } 
     };
     fetchData();
-  }, [dispatch, navigate]);
+  }, [businesses]);
+
 
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -131,17 +144,14 @@ const Judges = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
           setUpdatedProduct(prevProduct => ({
             ...prevProduct,
-            image: preReq.accessLink, // Remove quotes here
+            image: file, // Remove quotes here
           }));
           setImagePreview(URL.createObjectURL(file)); 
         } else {
           console.error("Access link not found in response.");
         }
-      }
     } else {
       setUpdatedProduct(prevProduct => ({ ...prevProduct, [name]: value }));
     }
@@ -153,59 +163,88 @@ const Judges = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
-          setNewProduct(prevProduct => ({ ...prevProduct, image: preReq.accessLink }));
+          setNewProduct(prevProduct => ({ ...prevProduct, image: file }));
           setImageCreatePreview(URL.createObjectURL(file));
-      
-        }
+        
       }
     } else {
       setNewProduct(prevProduct => ({ ...prevProduct, [name]: value }));
     }
   };
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    var imageAccessUrl = updatedProduct.image
+    if (updatedProduct.image) {
+      const data = await uploadImage(updatedProduct.image, 'products')
+      imageAccessUrl = data?.accessLink
+      setUpdatedProduct(prevProduct => ({
+        ...prevProduct,
+        image: imageAccessUrl, // Remove quotes here
+      }));
+      updatedProduct.image = imageAccessUrl
+    }
     const updatedProducts = products.map(product =>
       product._id === updatedProduct._id ? updatedProduct : product
     );
+    const updateData = {
+      productSection:updatedProducts
+    }
     setProducts(updatedProducts);
-    console.log(updatedProducts)
-    const updatedData = { ...businessData, productSection: updatedProducts };
-    setBusinessData(updatedData);
 
+    await updateBusiness(updateData)
     handleCloseModal();
   };
 
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = async () => {
     setProducts((prevProducts) => 
       prevProducts.filter((product) => product._id !== selectedProduct._id)
     );
   
     const updatedData = { 
-      ...businessData, 
       productSection: products.filter((product) => product._id !== selectedProduct._id) 
     };
+    const updateData = {
+      productSection:updatedData
+    }
+    console.log(updateData)
   
-    setBusinessData(updatedData);
+    await updateBusiness(updatedData)
   
     handleDeleteCloseModal();
   };
   
 
-  const handleCreateProduct = () => {
-    setProducts((prevProducts) => {
-      const updatedProducts = [...prevProducts, newProduct];
-      
-      const updatedData = { ...businessData, productSection: updatedProducts };
-      
-      setBusinessData(updatedData);
-      handleCloseModal();
-      return updatedProducts;   
-      
+  const handleCreateProduct = async () => {
+    let imageAccessUrl = newProduct.image;
 
-    });
-    
+    console.log(imageAccessUrl)
+  
+    if (imageAccessUrl) {
+      const data = await uploadImage(imageAccessUrl, 'products');
+      imageAccessUrl = data?.accessLink;
+      console.log(imageAccessUrl);
+  
+      setNewProduct(prevProduct => ({
+        ...prevProduct,
+        image: imageAccessUrl,
+      }));
+      newProduct.image = imageAccessUrl
+    }
+  
+    setProducts(prevProducts => [...prevProducts, newProduct]);
+  
+    const updatedProducts = [...products, newProduct];
+    const updateData = {
+      productSection:updatedProducts
+    }
+    console.log(updateData.productSection)
+  
+    await updateBusiness(updateData);
+    handleCloseModal();
+
+
+
   };
+  
   
   return (
     <>

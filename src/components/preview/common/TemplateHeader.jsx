@@ -3,6 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import '../../../assets/css/template.css';
 
 const TemplateHeader = ({ businessData }) => {
   const navigate = useNavigate();

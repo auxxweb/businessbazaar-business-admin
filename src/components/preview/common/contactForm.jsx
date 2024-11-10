@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 // import 'src/ContactForm.css'; // Import the CSS file
 import "react-phone-input-2/lib/style.css";
+import '../../../assets/css/template.css';
+
 function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
@@ -27,8 +29,9 @@ function ContactForm() {
   };
 
   return (
-    <div className="contact-form-container bg-light w-lg mx-10">
-      <form onSubmit={handleSubmit} className="contact-form">
+    <div className="contact-form-container bg-white p-5 w-lg mx-10">
+      <div className="container">
+      <form onSubmit={handleSubmit} className="contact-form bg-white">
         <h2 className="form-title">Contact Us</h2>
         <div className="form-group">
           <div className="row">
@@ -82,7 +85,7 @@ function ContactForm() {
           ></textarea>
         </div>
         <div  className="d-flex justify-content-center align-items-center mt-4">
-        <button type="submit" className="submit-button"         style={{
+        <button type="submit" className="submit-button btn text-white"         style={{
                       backgroundColor: "black",
                       borderRadius: "10px",
                     //   borderBottomLeftRadius: "50px",
@@ -93,6 +96,7 @@ function ContactForm() {
     </div>
 
       </form>
+      </div>
     </div>
   );
 }
