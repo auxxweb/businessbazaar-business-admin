@@ -7,7 +7,6 @@ import DashBoard from "../pages/DashBoard";
 import Zones from "../pages/leads";
 import Login from "../pages/Login";
 import Judges from "../pages/products";
-import Participants from "../pages/services";
 import Bundles from "../pages/Bundles";
 import ParticipantDetails from "../pages/businessDetails";
 import QuestionDetails from "../pages/questionDetails";
@@ -23,6 +22,7 @@ import LandingPage from "../pages/LandingPage";
 import WelcomePage from "../pages/WelcomePage";
 import PremiumPreview from "../pages/PremiumPreview";
 import Preview from "../pages/Preview";
+import SpecialServices from "../pages/SpecialServices";
 
 function ContentArea() {
   const [token, setToken] = useState([]);
@@ -50,7 +50,7 @@ function ContentArea() {
       <Route path="/welcome-page" element={ token?<WelcomePage />:<Login />} />
       <Route path="/products" element={ token?<Judges />:<Login />} />
       <Route path="/judges/:id" element={ token?<JudgeDetails />:<Login />} />
-      <Route path="/special-services" element={ token?<Participants />:<Login />} />
+      <Route path="/special-services" element={ token?<SpecialServices />:<Login />} />
       <Route path="/services" element={ token?<BasicServices />:<Login />} />
       <Route path="/participants/:id" element={ token?<ParticipantDetails />:<Login />} />
       <Route path="/questions/:id" element={token?<QuestionDetails />:<Login />} />
