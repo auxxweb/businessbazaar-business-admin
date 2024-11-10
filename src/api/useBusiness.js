@@ -1,11 +1,11 @@
 import { toast } from "sonner";
-import { getApi, patchApi } from "./api";
+import { getApi, patchApi, postApi } from "./api";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const useBusiness = () => {
-  const [businesses, setBusinesses] = useState([]);
+  const [businesses, setBusinesses] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -54,10 +54,9 @@ const useBusiness = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            textAlign: "center",
+            textAlign: "center"
           }
         });
-        
       }
     } catch (error) {
       setLoading(false);
@@ -69,11 +68,49 @@ const useBusiness = () => {
     }
   };
 
+  const businessLogin = async (businessData) => {
+    setLoading(true);
+    try {
+      const response = await postApi(
+        `api/v1/business/login`,
+        { ...businessData },
+        false,
+        dispatch,
+        navigate
+      );
+      if (response?.data) {
+        console.log(response?.data, "response dataaa");
+        setBusinesses(response?.data);
+        localStorage.setItem(
+          "userCredential",
+          JSON.stringify(response?.data?.token)
+        );
+        navigate("/");
+        return response?.data;
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error(
+        error?.response?.data?.message ?? "Something went wrong ,try again!!"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setBusinesses(null);
+    localStorage.removeItem("userCredential");
+    navigate("/login");
+  };
+
   return {
     getBusiness,
     loading,
     businesses,
-    updateBusiness
+    updateBusiness,
+    businessLogin,
+    logout
   };
 };
 export default useBusiness;
