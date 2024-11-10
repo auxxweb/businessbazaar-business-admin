@@ -1,14 +1,10 @@
-import axios from 'axios'
 import { useState, useEffect } from 'react'
-import { useDispatch, } from 'react-redux'
-import useBusiness, { useGetBusinessQuery } from '../../api/useBusiness'
+import useBusiness from '../../api/useBusiness'
 import { toast } from 'sonner'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import FullPageLoader from '../FullPageLoader/FullPageLoader'
 
 const LandingPage = () => {
-  const [title, setTitle] = useState()
-  const [description, setDescription] = useState()
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState()
 
@@ -18,7 +14,6 @@ const LandingPage = () => {
     coverImage: '',
   })
 
-  const dispatch = useDispatch()
 
   const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
   const { imageLoading, uploadImage } = useImageUpload()
@@ -83,7 +78,7 @@ const LandingPage = () => {
       }
       await updateBusiness(updatedData)
     } catch (error) {
-      toast.error('Something went wrong , please try againsss!')
+      toast.error('Something went wrong , please try again!')
     }
   }
 
