@@ -47,6 +47,7 @@ const SpecialServices = () => {
   });
   const [imageCreatePreview, setImageCreatePreview] = useState("");
   const [imageCreateFile, setImageCreateFile] = useState(null);
+  const [imageFile,setImageFile] = useState(null)
 
   const [updatedServices, setUpdatedServices] = useState({
     _id: "",
@@ -110,6 +111,7 @@ const SpecialServices = () => {
           ...prevServices,
           image: file, // Remove quotes here
         }));
+        setImageFile(file);
         setImagePreview(URL.createObjectURL(file));
       }
     } else {
@@ -135,9 +137,9 @@ const SpecialServices = () => {
     }
   };
   const handleSaveChanges = async () => {
-    var imageAccessUrl = updatedServices.image;
-    if (imageAccessUrl) {
-      const data = await uploadImage(imageAccessUrl, "Services");
+    var imageAccessUrl = selectedService.image;
+    if (imageFile) {
+      const data = await uploadImage(imageFile, "SpecialServices");
       imageAccessUrl = data?.accessLink;
       setUpdatedServices((prevService) => ({
         ...prevService,
@@ -150,9 +152,15 @@ const SpecialServices = () => {
     );
     setServices(updatedService);
     const updatedData = {
-      specialServices: updatedServices,
+      specialServices: {
+        ...businesses?.specialServices,
+        data: [
+          ...updatedService
+        ],
+      },
     };
     await updateBusiness(updatedData);
+    console.log(updatedData, "updatedData");
     handleCloseModal();
   };
 
@@ -176,7 +184,7 @@ const SpecialServices = () => {
     try {
       let imgAccessUrl;
       if (imageCreateFile) {
-        const data = await uploadImage(imageCreateFile, "specialServices");
+        const data = await uploadImage(imageCreateFile, "SpecialServices");
         imgAccessUrl = data?.accessLink;
       }
       // Prepare updated business data immutably
