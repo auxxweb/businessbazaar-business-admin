@@ -4,9 +4,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { postApi } from "../api";
 import axios from "axios";
+import useBusiness from "../useBusiness";
 
 const useImageUpload = () => {
   const [imageLoading, setLoading] = useState(false);
+  const { logout } = useBusiness();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ const useImageUpload = () => {
         `api/v1/s3url`,
         requestBody,
         true,
-        dispatch,
+        logout,
         navigate
       );
       const preReq = response?.data[0];
@@ -42,7 +44,7 @@ const useImageUpload = () => {
       return preReq;
     } catch (error) {
       setLoading(false);
-      console.log(error,"123456789")
+      console.log(error, "123456789");
       toast.error(
         error?.response?.data?.message ?? "Something went wrong ,try again!!"
       );

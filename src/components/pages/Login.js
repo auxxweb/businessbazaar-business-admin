@@ -34,7 +34,7 @@ const Login = () => {
         password
       };
 
-      const loginData = await businessLogin(body);
+       await businessLogin(body);
     } catch (error) {
       console.log("error", error);
     }

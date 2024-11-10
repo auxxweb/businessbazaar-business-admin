@@ -11,13 +11,19 @@ const useBusiness = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const logout = async () => {
+    setBusinesses(null);
+    localStorage.removeItem("userCredential");
+    navigate("/login");
+  };
+
   const getBusiness = async () => {
     setLoading(true);
     try {
       const response = await getApi(
         `api/v1/business/profile`,
         true,
-        dispatch,
+        logout,
         navigate
       );
       setBusinesses(response?.data);
@@ -38,7 +44,7 @@ const useBusiness = () => {
         `api/v1/business`,
         { ...updateData },
         true,
-        dispatch,
+        logout,
         navigate
       );
       if (response?.data) {
@@ -75,20 +81,35 @@ const useBusiness = () => {
         `api/v1/business/login`,
         { ...businessData },
         false,
-        dispatch,
+        logout,
         navigate
       );
       if (response?.data) {
-        console.log(response?.data, "response dataaa");
         setBusinesses(response?.data);
         localStorage.setItem(
           "userCredential",
           JSON.stringify(response?.data?.token)
         );
+        toast.success("Logged in  successfully", {
+          theme: "colored",
+          position: "top-right",
+          style: {
+            backgroundColor: "green",
+            color: "#FFFFFF",
+            height: "60px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center"
+          }
+        });
         navigate("/");
         return response?.data;
       }
     } catch (error) {
+      console.log(error, "errorrororororo");
+
       setLoading(false);
       toast.error(
         error?.response?.data?.message ?? "Something went wrong ,try again!!"
@@ -96,12 +117,6 @@ const useBusiness = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = async () => {
-    setBusinesses(null);
-    localStorage.removeItem("userCredential");
-    navigate("/login");
   };
 
   return {
