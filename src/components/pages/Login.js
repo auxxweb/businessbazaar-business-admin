@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../api/auth";
 import { getUserCredential } from "../../common/utils";
@@ -6,15 +6,20 @@ import { PiEyeFill, PiEyeSlashFill } from "react-icons/pi";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setBusinessData } from "../../api/slices/business";
+import useBusiness from "../../api/useBusiness";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const userData = getUserCredential();
-  const [login, { isLoading }] = useLoginMutation();
+  const { loading, businessLogin, businesses } = useBusiness();
 
-  if (userData) return <>Loading</>;
+  useEffect(() => {
+    if (businesses) {
+      navigate("/");
+    }
+  }, [businesses]);
+
 
   const onSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission
@@ -25,34 +30,10 @@ const Login = () => {
 
       const body = {
         email,
-        password,
+        password
       };
-      console.log(body,'aaaabody');
-      const res = await login?.(body);
-      console.log(res,'resssssssssssssssssss')
-      if (res?.data?.success) {
-        localStorage.setItem(
-          "userCredential",
-          JSON.stringify(res?.data?.data?.token)
-        );
-        const businessProfile = {
-          'logo':res?.data?.data?.logo,
-          'businessName':res?.data?.data?.businessName
-        }
-        dispatch(setBusinessData(businessProfile));
-        navigate("/"); // Redirect after form submission
-      } else {
-        console.log(res)
-        toast.error(res?.data?.message, {
-          position: "top-right",
-          duration: 2000,
-          style: {
-            backgroundColor: "#fb0909", // Custom green color for success
-            color: "#FFFFFF", // Text color
-          },
-          dismissible: true,
-        });
-      }
+
+      const loginData = await businessLogin(body);
     } catch (error) {
       console.log("error", error);
     }
@@ -62,8 +43,7 @@ const Login = () => {
     <>
       <div
         className="relative min-h-screen bg-cover bg-[#e7edf4] "
-        style={{ color: "grey" }}
-      >
+        style={{ color: "grey" }}>
         <div className="relative z-10 flex flex-col h-full items-center space-y-4 justify-center p-3 ">
           <div className="flex flex-row w-28 h-auto justify-center ">
             {/* <img
@@ -76,8 +56,7 @@ const Login = () => {
           <div className="w-full max-w-lg ">
             <form
               onSubmit={onSubmit}
-              className="bg-white border-grey space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full"
-            >
+              className="bg-white border-grey space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full">
               <div className="flex justify-center mb-6">
                 <img
                   src="/logo.jpeg"
@@ -85,7 +64,9 @@ const Login = () => {
                   className="h-24 object-contain"
                 />
               </div>
-              <h1 className="text-3xl font-semibold text-center text-[#333]">Welcome back</h1>
+              <h1 className="text-3xl font-semibold text-center text-[#333]">
+                Welcome back
+              </h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
                 Sign in to your account to continue!
               </h3>
@@ -95,8 +76,7 @@ const Login = () => {
                 {/* Increased margin for spacing */}
                 <label
                   className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium  bg-transparent m-auto" // Increased padding and adjusted label positioning
-                  htmlFor="name"
-                >
+                  htmlFor="name">
                   Email address
                 </label>
                 <input
@@ -113,8 +93,7 @@ const Login = () => {
               <div className="relative  group  space-y-1">
                 <label
                   className=" px-2 sm:px-3 py-1 text-base sm:text-lg font-medium  bg-transparent m-auto" // Increased padding and adjusted label positioning
-                  htmlFor="password"
-                >
+                  htmlFor="password">
                   Password
                 </label>
                 <div className="relative">
@@ -129,8 +108,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    class="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   "
-                  >
+                    class="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   ">
                     {showPassword ? <PiEyeSlashFill /> : <PiEyeFill />}
                   </button>
                 </div>
@@ -155,10 +133,9 @@ const Login = () => {
               {/* Sign In Button */}
               <div className="pt-3">
                 <button
-                  disabled={isLoading}
+                  disabled={loading}
                   className="w-full py-3 bg-gradient-to-r from-[#105193] to-[#107D93] text-white font-semibold rounded-lg hover:translate-y-1 transform transition duration-300 "
-                  type="submit"
-                >
+                  type="submit">
                   Log In
                 </button>
               </div>

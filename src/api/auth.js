@@ -8,6 +8,7 @@ export const authApi = tagInjection.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (body) => {
+        console.log(body,"body---body")
         return {
           body,
           url: "/api/v1/business/login",
