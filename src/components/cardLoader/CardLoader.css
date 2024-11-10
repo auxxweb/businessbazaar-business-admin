@@ -1,0 +1,71 @@
+:root {
+  /* Loader Colors */
+  --loader-background: #e0e0e0;
+  --shimmer-color: #f0f0f0;
+  --shimmer-opacity: 0.5;
+  --shimmer-duration: 1.5s;
+}
+
+/* Card Loader Container */
+.card-loader {
+  width: 300px; /* Adjust card size as needed */
+  padding: 16px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image Placeholder */
+.image-placeholder {
+  width: 100%;
+  height: 180px;
+  background: var(--loader-background);
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  animation: shimmer var(--shimmer-duration) infinite linear;
+}
+
+/* Text Placeholder */
+.text-placeholder {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.text-placeholder .line {
+  height: 14px;
+  background: var(--loader-background);
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  animation: shimmer var(--shimmer-duration) infinite linear;
+}
+
+.text-placeholder .line.short {
+  width: 60%;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.image-placeholder,
+.text-placeholder .line {
+  background: linear-gradient(
+    90deg,
+    var(--loader-background),
+    var(--shimmer-color) var(--shimmer-opacity),
+    var(--loader-background)
+  );
+  background-size: 200% 100%;
+}
