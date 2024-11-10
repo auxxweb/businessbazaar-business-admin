@@ -22,13 +22,14 @@ const Login = () => {
     const email = formData.get("email"); // Get email input value
     const password = formData.get("password");
     try {
-      // navigate("/"); // Redirect after form submission
 
       const body = {
         email,
         password,
       };
+      console.log(body,'aaaabody');
       const res = await login?.(body);
+      console.log(res,'resssssssssssssssssss')
       if (res?.data?.success) {
         localStorage.setItem(
           "userCredential",
@@ -41,7 +42,8 @@ const Login = () => {
         dispatch(setBusinessData(businessProfile));
         navigate("/"); // Redirect after form submission
       } else {
-        toast.error(res.data.message, {
+        console.log(res)
+        toast.error(res?.data?.message, {
           position: "top-right",
           duration: 2000,
           style: {
