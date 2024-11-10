@@ -73,7 +73,7 @@ export const deleteApi = async (url, authToken = true, dispatch, navigate) => {
 }
 };
 
-export const getApi = async (url, authToken = true, dispatch, navigate) => {
+export const  getApi = async (url, authToken = true, dispatch, navigate) => {
   const token = localStorage.getItem("userCredential");
   const parsedToken = JSON.parse(token);
 

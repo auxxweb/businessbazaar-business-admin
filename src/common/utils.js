@@ -20,6 +20,7 @@ export const getUserCredential = () => {
 };
 
 export const publicRoutes = ["/login", "/forgotPassword", "/changePassword"];
+export const previewRoutes = ["/preview", "/preview/premium"]
 
 const formatOptions = {
   day: "2-digit",
