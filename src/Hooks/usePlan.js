@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { getApi } from "../api/api";
+import useBusiness from "../api/useBusiness";
 
 const usePlan = () => {
-  const { selectedPlan } = useSelector((state) => state.business.data);
 
   const [plan, setPlan] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const {logout}=useBusiness()
+
   const fetchPlanDetails = async () => {
     setLoading(true);
     try {
-      const response = await getApi(`api/v1/plans/${selectedPlan}`, false);
+      const response = await getApi(`api/v1/payment/current-plan`, true,logout);
       setPlan(response?.data);
     } catch (e) {
       console.log(e, "error");
@@ -20,13 +21,8 @@ const usePlan = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedPlan) {
-      fetchPlanDetails();
-    }
-  }, [selectedPlan]);
 
-  return { plan, loading };
+  return { plan, loading ,fetchPlanDetails };
 };
 
 export default usePlan;

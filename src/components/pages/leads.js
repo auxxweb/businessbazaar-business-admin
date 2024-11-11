@@ -3,24 +3,17 @@ import { useDebouncedCallback } from "use-debounce";
 import useLeads from "../../Hooks/useLeads";
 import BackdropLoader from "../reUsableCmponent/BackdropLoader";
 
-import { getApi } from "../../api/api";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
 import Loader from "../Loader/Loader";
+import Pagination from "../Pagination";
 
 const Zones = () => {
-  const { leads, loading } = useLeads();
+  const { leads, loading, totalLeads, fetchLeads } = useLeads();
 
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10; 
 
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
   const handleSearchChange = useDebouncedCallback(
     // function
     (value) => {
@@ -31,6 +24,13 @@ const Zones = () => {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchLeads({ page: currentPage, limit, searchTerm: searchValue });
+    };
+    fetchData();
+  }, [currentPage, searchValue]);
 
   return (
     <>
@@ -48,11 +48,11 @@ const Zones = () => {
             }}
           />
         </span>
-        <span className="flex items-center ">
+        {/* <span className="flex items-center ">
           <span className="cursor-pointer bg-[#105193] hover:bg-[#107D93] text-white p-2 lg:w-[100px] text-center rounded-3xl">
             Search
           </span>
-        </span>
+        </span> */}
       </div>
 
       <table className="min-w-full table-auto mt-6 border-collapse">
@@ -107,7 +107,7 @@ const Zones = () => {
                   <div className="flex -space-x-2">{lead?.email}</div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  <div className="flex -space-x-2">{"+91000000000"}</div>
+                  <div className="flex -space-x-2">{lead?.phoneNumber}</div>
                 </td>
 
                 <td className="px-4 py-2 border-r border-gray-400">
@@ -119,14 +119,14 @@ const Zones = () => {
         </tbody>
       </table>
 
-      {/* <div className="m-auto flex justify-end">
+      <div className="m-auto flex justify-end">
         <Pagination
-          itemsPerPage={limit}
+          itemsPerPage={10}
           currentPage={currentPage}
           onPageChange={handlePageChange}
-          totalPages={leads?.totalPages}
+          totalPages={Math.ceil(totalLeads / limit)}
         />
-      </div> */}
+      </div>
     </>
   );
 };
