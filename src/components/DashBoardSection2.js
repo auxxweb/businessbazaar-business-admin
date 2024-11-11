@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useGetDashboardDetailQuery } from "../api/dashboard";
 import participats from "../assets/images/participats.png";
 import judges from "../assets/images/judges.png";
 import zones from "../assets/images/zones.png";
-const DashBoardSection2 = () => {
+const DashBoardSection2 = ({ dashboardData }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const { data,refetch} = useGetDashboardDetailQuery();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -15,16 +13,13 @@ const DashBoardSection2 = () => {
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
-  
-  useEffect(() => {
-    refetch();
-  }, []);
+
   // Format the time as HH:MM:SS AM/PM
   const formattedTime = currentTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true,
+    hour12: true
   });
 
   // Function to add the suffix to the day (st, nd, rd, th)
@@ -48,24 +43,6 @@ const DashBoardSection2 = () => {
   const month = currentDate.toLocaleString("default", { month: "long" });
   const year = currentDate.getFullYear();
 
-  const dashboardData = [
-    {
-      logo: zones,
-      count: data?.data?.zones,
-      title: "Leads",
-    },
-    {
-      logo: judges,
-      count: data?.data?.judges,
-      title: "Category",
-    },
-    {
-      logo: participats,
-      count: data?.data?.participants,
-      title: "Plan",
-    },
-  ];
-
   return (
     <>
       <div className="flex flex-col space-y-4 ">
@@ -82,18 +59,36 @@ const DashBoardSection2 = () => {
 
         {/* Right Column (Grid of 6 items in 2 rows, 3 columns) */}
         <div className="w-full grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {dashboardData?.map((ele, index) => (
-            <div className="bg-white p-6 rounded-2xl flex items-center space-x-3 justify-between shadow-md border border-gray-300">
-              <div className="flex flex-col ">
-                <h2 className="text-3xl font-semibold">{ele?.count}</h2>
+          <div className="bg-white p-6 rounded-2xl flex items-center space-x-3 justify-between shadow-md border border-gray-300">
+            <div className="flex flex-col ">
+              <h2 className="text-3xl font-semibold">{dashboardData?.totalServiceCount ?? 0}</h2>
 
-                <p className=" text-black ">{ele?.title}</p>
-              </div>{" "}
-              <div>
-                <img src={ele?.logo} className="h-12 w-12 object-contain" />
-              </div>
+              <p className=" text-black ">Total Services</p>
+            </div>{" "}
+            <div>
+              <img src={judges} className="h-12 w-12 object-contain" />
             </div>
-          ))}
+          </div>{" "}
+          <div className="bg-white p-6 rounded-2xl flex items-center space-x-3 justify-between shadow-md border border-gray-300">
+            <div className="flex flex-col ">
+              <h2 className="text-3xl font-semibold">{dashboardData?.totalLeads ?? 0}</h2>
+
+              <p className=" text-black ">Total Leads</p>
+            </div>{" "}
+            <div>
+              <img src={participats} className="h-12 w-12 object-contain" />
+            </div>
+          </div>{" "}
+          <div className="bg-white p-6 rounded-2xl flex items-center space-x-3 justify-between shadow-md border border-gray-300">
+            <div className="flex flex-col ">
+              <h2 className="text-3xl font-semibold">{dashboardData?.totalReviews}</h2>
+
+              <p className=" text-black ">Rating</p>
+            </div>{" "}
+            <div>
+              <img src={zones} className="h-12 w-12 object-contain" />
+            </div>
+          </div>
         </div>
       </div>
     </>

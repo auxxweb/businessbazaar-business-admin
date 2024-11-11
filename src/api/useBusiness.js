@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { getApi, patchApi, postApi } from "./api";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -8,7 +7,6 @@ const useBusiness = () => {
   const [businesses, setBusinesses] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const logout = async () => {
@@ -119,13 +117,40 @@ const useBusiness = () => {
     }
   };
 
+  const getBusinessDashboardData = async () => {
+    setLoading(false);
+    try {
+      const response = await getApi(`api/v1/business/dashboard`);
+      return response?.data;
+    } catch (error) {
+      setLoading(false);
+      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     getBusiness,
     loading,
     businesses,
     updateBusiness,
     businessLogin,
-    logout
+    logout,
+    getBusinessDashboardData
   };
 };
 export default useBusiness;
