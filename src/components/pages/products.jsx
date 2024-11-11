@@ -5,7 +5,13 @@ import useBusiness from '../../api/useBusiness'
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
-  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
+  const {
+    businesses,
+    loading,
+    getBusiness,
+    updateBusiness,
+    addProduct,
+  } = useBusiness()
   useEffect(() => {
     const fetchBusiness = async () => {
       await getBusiness()
@@ -18,13 +24,13 @@ const Judges = () => {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newProduct, setNewProduct] = useState({
-    _id: '',
     title: '',
     description: '',
-    price: '',
+    price: null,
     image: null,
   })
   const [imageCreatePreview, setImageCreatePreview] = useState('')
+  const [imageFile, setImageFile] = useState(null)
 
   const [updatedProduct, setUpdatedProduct] = useState({
     _id: '',
@@ -36,6 +42,10 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  useEffect(() => {
+    setProducts(businesses?.productSection)
+  }, [businesses])
 
   const handleShowModal = (product) => {
     setSelectedProduct(product)
@@ -86,10 +96,7 @@ const Judges = () => {
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
-        setUpdatedProduct((prevProduct) => ({
-          ...prevProduct,
-          image: file, // Remove quotes here
-        }))
+        setImageFile(file)
         setImagePreview(URL.createObjectURL(file))
       } else {
         console.error('Access link not found in response.')
@@ -105,7 +112,7 @@ const Judges = () => {
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
-        setNewProduct((prevProduct) => ({ ...prevProduct, image: file }))
+        setImageFile(file)
         setImageCreatePreview(URL.createObjectURL(file))
       }
     } else {
@@ -113,25 +120,23 @@ const Judges = () => {
     }
   }
   const handleSaveChanges = async () => {
-    var imageAccessUrl = updatedProduct.image
-    if (updatedProduct.image) {
-      const data = await uploadImage(updatedProduct.image, 'products')
-      imageAccessUrl = data?.accessLink
-      setUpdatedProduct((prevProduct) => ({
-        ...prevProduct,
-        image: imageAccessUrl, // Remove quotes here
-      }))
-      updatedProduct.image = imageAccessUrl
+    let accessLink = null
+    if (imageFile) {
+      const data = await uploadImage(imageFile, 'products')
+      accessLink = data?.accessLink
     }
     const updatedProducts = products.map((product) =>
-      product._id === updatedProduct._id ? updatedProduct : product,
+      product._id === updatedProduct._id
+        ? { ...updatedProduct, image: accessLink }
+        : product,
     )
     const updateData = {
       productSection: updatedProducts,
     }
-    setProducts(updatedProducts)
+    console.log(updateData, 'updated-data')
 
     await updateBusiness(updateData)
+    setImageFile(null)
     handleCloseModal()
   }
 
@@ -151,31 +156,21 @@ const Judges = () => {
     console.log(updateData)
 
     await updateBusiness(updatedData)
+    setImageFile(null)
 
     handleDeleteCloseModal()
   }
 
   const handleCreateProduct = async () => {
-
-    if (newProduct?.image) {
-      const data = await uploadImage(newProduct?.image, 'products')
-
-      setNewProduct((prevProduct) => ({
-        ...prevProduct,
-        image: data?.accessLink,
-      }))
+    let accessLink = null
+    if (imageFile) {
+      const data = await uploadImage(imageFile, 'products')
+      console.log(data?.accessLink, 'data-accessLink')
+      accessLink = data?.accessLink
     }
 
-    // setProducts(prevProducts => [...prevProducts, newProduct]);
-
-    const updatedProducts = [...products, newProduct]
-    const updateData = {
-      productSection: updatedProducts,
-    }
-    console.log(updateData.productSection,"productSEction-section")
-
-    await updateBusiness(updateData)
-    handleCloseModal()
+    await addProduct({ ...newProduct, image: accessLink })
+    handleCreateCloseModal()
   }
 
   return (
@@ -357,9 +352,9 @@ const Judges = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product, index) => (
+          {products?.map((product, index) => (
             <tr
-              key={product._id}
+              key={product?._id}
               className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
             >
               <td className="px-4 py-4 text-left border-r border-gray-400">
@@ -367,19 +362,19 @@ const Judges = () => {
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
                 <img
-                  src={product.image || 'default-image.png'}
+                  src={product?.image || 'default-image.png'}
                   alt="Product"
                   className="w-12 h-12 object-cover"
                 />
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product.title}
+                {product?.title}
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product._id}
+                {product?._id}
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product.price}
+                {product?.price}
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
                 <button variant="info" onClick={() => handleShowModal(product)}>
@@ -392,8 +387,8 @@ const Judges = () => {
                 <button
                   variant="danger"
                   onClick={() => {
-                    setShowDeleteModal(true)
                     setSelectedProduct(product)
+                    setShowDeleteModal(true)
                   }}
                 >
                   <img
@@ -467,9 +462,6 @@ const Judges = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="dark" onClick={handleCloseModal}>
-            Close
-          </Button>
           <Button variant="success" onClick={handleSaveChanges}>
             Save changes
           </Button>

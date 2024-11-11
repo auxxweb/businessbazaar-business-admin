@@ -143,6 +143,39 @@ const useBusiness = () => {
     }
   };
 
+  const addProduct = async (formData) => {
+    setLoading(false);
+    try {
+      const response = await postApi(
+        `api/v1/business/product`,
+        { ...formData },
+        true,
+        logout,
+        navigate
+      );
+      await getBusiness()
+      return response?.data;
+    } catch (error) {
+      setLoading(false);
+      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     getBusiness,
     loading,
@@ -150,7 +183,8 @@ const useBusiness = () => {
     updateBusiness,
     businessLogin,
     logout,
-    getBusinessDashboardData
+    getBusinessDashboardData,
+    addProduct
   };
 };
 export default useBusiness;
