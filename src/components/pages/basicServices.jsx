@@ -5,6 +5,7 @@ import axios from "axios";
 import { setBusinessData } from "../../api/slices/business";
 import { useNavigate } from "react-router-dom";
 import { getApi } from "../../api/api";
+import Pagination from "../Pagination";
 
 const BasicServices = () => {
   const dispatch = useDispatch();
@@ -56,7 +57,9 @@ const BasicServices = () => {
   const [imagePreview, setImagePreview] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+  const [page, setPage] = useState(1);
+  const [reFetch, SetReFetch] = useState(false);
+  const limit = 10;
   useEffect(() => {
     if (businessData) {
       setServices(businessData.service || []);
@@ -75,6 +78,9 @@ const BasicServices = () => {
     setShowModal(true);
   };
 
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedService(null);
@@ -225,7 +231,7 @@ const BasicServices = () => {
     <>
       <div className="flex rounded-lg p-4">
         <h2 className="text-2xl font-semibold text-gray-700">
-          Special Services
+          Services
         </h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
@@ -464,6 +470,14 @@ const BasicServices = () => {
           </Modal>
         </tbody>
       </table>
+      <div className="m-auto flex justify-end mt-8">
+        <Pagination
+          totalItems={services?.totalCount}
+          itemsPerPage={limit}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </>
   );
 };

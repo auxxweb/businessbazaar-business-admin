@@ -3,6 +3,7 @@ import { Button, Modal, Form } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import { toast } from "sonner";
+import Pagination from "../Pagination";
 
 const SpecialServices = () => {
   const [businessData, setBusinessData] = useState([]);
@@ -11,7 +12,9 @@ const SpecialServices = () => {
 
   const { imageLoading, uploadImage } = useImageUpload();
   const { businesses, loading, getBusiness, updateBusiness } = useBusiness();
-
+  const [page, setPage] = useState(1);
+  const [reFetch, SetReFetch] = useState(false);
+  const limit = 10;
   useEffect(() => {
     const fetchBusiness = async () => {
       await getBusiness();
@@ -82,6 +85,10 @@ const SpecialServices = () => {
       image: null,
     });
     setImagePreview("");
+  };
+  
+  const handlePageChange = (page) => {
+    setPage(page);
   };
 
   const handleCreateCloseModal = () => {
@@ -465,6 +472,14 @@ const SpecialServices = () => {
           </Modal>
         </tbody>
       </table>
+      <div className="m-auto flex justify-end mt-8">
+        <Pagination
+          totalItems={services?.totalCount}
+          itemsPerPage={limit}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </>
   );
 };

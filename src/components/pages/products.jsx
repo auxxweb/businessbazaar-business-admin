@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, Modal, Form } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
+import Pagination from "../Pagination";
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
@@ -42,7 +43,9 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-
+  const [page, setPage] = useState(1);
+  const [reFetch, SetReFetch] = useState(false);
+  const limit = 10;
   useEffect(() => {
     setProducts(businesses?.productSection)
   }, [businesses])
@@ -160,6 +163,10 @@ const Judges = () => {
 
     handleDeleteCloseModal()
   }
+  
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
 
   const handleCreateProduct = async () => {
     let accessLink = null
@@ -483,6 +490,14 @@ const Judges = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <div className="m-auto flex justify-end mt-8">
+        <Pagination
+          totalItems={products?.totalCount}
+          itemsPerPage={limit}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </>
   )
 }
