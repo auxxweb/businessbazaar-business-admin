@@ -103,6 +103,7 @@ const useTermsAndConditions = () => {
     loading,
     createTermsAndConditions,
     deleteTermsAndConditions,
+    fetchTermsAndConditions,
     updateTermsAndConditions
   };
 };

@@ -10,6 +10,7 @@ const TermsAndConditions = () => {
     deleteTermsAndConditions,
     createTermsAndConditions,
     updateTermsAndConditions,
+    fetchTermsAndConditions,
   } = useTermsAndConditions()
 
   const [data, setData] = useState(termsAndConditions?.data)
@@ -17,6 +18,13 @@ const TermsAndConditions = () => {
   useEffect(() => {
     setData(termsAndConditions?.data)
   }, [termsAndConditions])
+
+  useEffect(() => {
+    const fetchTerms = async () => {
+      await fetchTermsAndConditions()
+    }
+    fetchTerms()
+  }, [])
 
   const handleCreate = async (createData) => {
     await createTermsAndConditions({ data: createData })

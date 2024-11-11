@@ -1,0 +1,185 @@
+.pjs{
+    font-family: 'Plus Jakarta Sans';
+}.nav-logo img {
+    width: 70px;
+    object-fit: cover;
+}.david-font{
+    font-family: "David Libre", serif;
+}.banner-title{
+    color: '#101A24';
+    font-size: 70px;
+    font-weight: '700';
+    line-height: 70px;
+}.radius-theme{
+    border-radius: 10px 0px;
+}.box-shadow{
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.15);
+}.contact-banner{
+    border-radius: 50%;
+    border: 1px solid black;
+    width: fit-content;
+    padding: 5px 10px;
+}.banner-image{
+    border-radius: 100px 40px;
+    max-height: 400px;
+    object-fit: cover;
+}.banner-image-2{
+    position: absolute;
+    top: 60%;
+}.about-image img{
+    width: 80%;
+    border-radius: 8px;
+}.dish-div {
+    padding: 20px 30px;
+    border-radius: 100px 8px 50px 8px;
+    border: 2px solid rgb(255, 255, 255);
+    /* width: 90% !important; */
+    transition: .5s ease-in-out;
+}
+.w-80{
+    width: 80%;
+}.service-design{
+    border-radius: 90px 30px 90px 30px;
+    padding: 20px;
+    /* width: 90% !important; */
+}.service-design.active{
+    color: white;
+    transition: 0.5s ease-in-out;
+}.test-button-img-div{
+    position: relative;
+    /* bottom: 60%; */
+    bottom: 15%;
+}.test-div-bottom{
+    border-radius: 80px 30px 80px 30px ; 
+    width: 90% !important;
+}.newsletter-content{
+    bottom: 35%;
+    left: 27%;
+    /* right: 50%; */
+}.newsletter-content input{
+    border: none;
+}.news-button{
+    top: 2px;
+}footer{
+    height: 50vh;
+    background-color: black;
+}.chef-div{
+    height: 500px;
+    object-fit: contain;
+}.social-media{
+    display: flex;
+    justify-content: start;
+}.banner-section{
+    margin-top: 100px;
+}.fs-20{
+    font-size: 20px;
+}
+@media screen and (max-width: 768px) {
+    .navbar-brand span{
+        font-size: 16px !important;
+    }.banner-title{
+        color: '#101A24';
+        font-size: 40px;
+        font-weight: '700';
+        /* line-height: 70px; */
+    }.banner-image{
+        width: 100%;
+    }.banner-image-2 img{
+        width: 50%;
+    }.banner-image-2{
+        position: absolute;
+    top: 0%;
+    bottom: -21%;
+    }.chef-div{
+        width: 300px !important;
+    }.fs-sm-16{
+        font-size: 16px !important;
+    }
+    .newsletter-content {
+        bottom: 0%;
+        left: 50%;
+        right: -30%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }.newsletter img{
+        height: 100%;
+        object-fit: cover;
+        border-radius: 30px;
+    }.newsletter{
+        height: 200px;
+    }.p-sm-0{
+        padding: 0 !important;
+    }.social-media{
+        display: flex;
+        justify-content: center ;
+    }
+}
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .jcc-md{
+        justify-content: center;
+    }
+}
+
+.address-section {
+    border-radius: 16px !important;
+    
+    padding: 20px;
+    color: white !important;
+}
+
+.address-logo i {
+    padding: 10px;
+    background-color: white;
+    
+    border-radius: 50%;
+    height: auto;
+    font-size: 1.5rem; 
+}
+
+.fs-13 {
+    font-size: 0.9rem; 
+}
+
+.fs-16 {
+    font-size: 1rem; 
+}
+
+@media (max-width: 576px) {
+    .address-section {
+        padding: 20px; 
+    }
+
+    .fs-13 {
+        font-size: 0.8rem; 
+    }
+
+    .fs-16 {
+        font-size: 0.9rem;
+    }
+
+    .address-logo i {
+        font-size: 1.25rem;
+    }
+}
+.gallery-img{
+
+    height: 300px;
+    object-fit: cover;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}.width-fit{
+    width: fit-content;
+}.book-a-table{
+    width: 250px !important;
+}.menu-button{
+    width: 70px;
+}.p-rating{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+.about-image{
+    height: 400px;
+    object-fit: cover;
+}.dish-div{
+    height: 500px;
+}

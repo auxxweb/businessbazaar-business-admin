@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, Form } from "react-bootstrap";
-import axios from "axios";
-import { setBusinessData } from "../../api/slices/business";
-import { useNavigate } from "react-router-dom";
-import { getApi } from "../../api/api";
+import useBusiness from "../../api/useBusiness";
+import useImageUpload from "../../api/imageUpload/useImageUpload";
+import { toast } from "sonner";
 
-const BasicServices = () => {
-  const dispatch = useDispatch();
+const SpecialServices = () => {
   const [businessData, setBusinessData] = useState([]);
 
   const [services, setServices] = useState([]);
 
-  const navigate = useNavigate();
+  const { imageLoading, uploadImage } = useImageUpload();
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness();
+
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      await getBusiness();
+    };
+    fetchBusiness();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const businessDetails = await getApi(
-          `api/v1/business/profile`,
-          true,
-          dispatch,
-          navigate
-        );
-
-        setBusinessData(businessDetails.data);
-
-        setServices(businessDetails.data.specialServices.data);
+        if (businesses) {
+          setBusinessData(businesses);
+          console.log(businesses);
+          setServices(businesses.specialServices.data);
+        }
       } catch (error) {
         console.error(
           "Error fetching business details:",
@@ -34,18 +35,19 @@ const BasicServices = () => {
       }
     };
     fetchData();
-  }, [dispatch, navigate]);
+  }, [businesses]);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newService, setNewService] = useState({
-    _id: "",
     title: "",
     description: "",
     image: null,
   });
   const [imageCreatePreview, setImageCreatePreview] = useState("");
+  const [imageCreateFile, setImageCreateFile] = useState(null);
+  const [imageFile,setImageFile] = useState(null)
 
   const [updatedServices, setUpdatedServices] = useState({
     _id: "",
@@ -56,12 +58,6 @@ const BasicServices = () => {
   const [imagePreview, setImagePreview] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  useEffect(() => {
-    if (businessData) {
-      setServices(businessData.service || []);
-    }
-  }, [businessData]);
 
   const handleShowModal = (Servi) => {
     setSelectedService(Servi);
@@ -104,37 +100,6 @@ const BasicServices = () => {
     setShowDeleteModal(false);
   };
 
-  const preRequestFun = async (file, position) => {
-    const url = `${process.env.REACT_APP_BE_API_KEY}/api/v1/s3url`;
-    const requestBody = {
-      files: [
-        {
-          position: position,
-          file_type: file.type,
-        },
-      ],
-    };
-
-    try {
-      const response = await axios.post(url, requestBody, {
-        headers: { "Content-Type": "application/json" },
-      });
-      const preReq = response.data.data[0];
-
-      if (!preReq.url) {
-        throw new Error("The URL is not defined in the response.");
-      }
-      await axios.put(preReq.url, file, {
-        headers: { "Content-Type": file.type },
-      });
-
-      return preReq;
-    } catch (error) {
-      console.error("Error uploading file:", error.message || error);
-      throw new Error("File upload failed");
-    }
-  };
-
   const handleShowCreateModal = () => setShowCreateModal(true);
 
   const handleInputChange = async (e) => {
@@ -142,16 +107,12 @@ const BasicServices = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
-          setUpdatedServices((prevServices) => ({
-            ...prevServices,
-            image: preReq.accessLink, // Remove quotes here
-          }));
-          setImagePreview(URL.createObjectURL(file));
-        } else {
-          console.error("Access link not found in response.");
-        }
+        setUpdatedServices((prevServices) => ({
+          ...prevServices,
+          image: file, // Remove quotes here
+        }));
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
       }
     } else {
       setUpdatedServices((prevServices) => ({
@@ -167,28 +128,39 @@ const BasicServices = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        console.log(preReq);
-        if (preReq && preReq.accessLink) {
-          setNewService((prevServices) => ({
-            ...prevServices,
-            image: preReq.accessLink,
-          }));
-          setImageCreatePreview(URL.createObjectURL(file));
-        }
+        setNewService((prevServices) => ({ ...prevServices, image: file }));
+        setImageCreateFile(file);
+        setImageCreatePreview(URL.createObjectURL(file));
       }
     } else {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }));
     }
   };
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    var imageAccessUrl = selectedService.image;
+    if (imageFile) {
+      const data = await uploadImage(imageFile, "SpecialServices");
+      imageAccessUrl = data?.accessLink;
+      setUpdatedServices((prevService) => ({
+        ...prevService,
+        image: imageAccessUrl, // Remove quotes here
+      }));
+      updatedServices.image = imageAccessUrl;
+    }
     const updatedService = services.map((Servi) =>
       Servi._id === updatedServices._id ? updatedServices : Servi
     );
-    console.log(updatedServices);
-    const updatedData = { ...businessData, service: updatedService };
-    setBusinessData(updatedData);
     setServices(updatedService);
+    const updatedData = {
+      specialServices: {
+        ...businesses?.specialServices,
+        data: [
+          ...updatedService
+        ],
+      },
+    };
+    await updateBusiness(updatedData);
+    console.log(updatedData, "updatedData");
     handleCloseModal();
   };
 
@@ -199,26 +171,55 @@ const BasicServices = () => {
 
     const updatedData = {
       ...businessData,
-      service: services.filter((Servi) => Servi._id !== selectedService._id),
+      specialServices: {
+        data: services.filter((Servi) => Servi._id !== selectedService._id),
+      },
     };
 
     setBusinessData(updatedData);
 
     handleDeleteCloseModal();
   };
+  const handleCreateService = async () => {
+    try {
+      let imgAccessUrl;
+      if (imageCreateFile) {
+        const data = await uploadImage(imageCreateFile, "SpecialServices");
+        imgAccessUrl = data?.accessLink;
+      }
+      // Prepare updated business data immutably
+      const updatedData = {
+        specialServices: {
+          ...businesses?.specialServices,
+          data: [
+            ...businesses?.specialServices?.data,
+            {
+              ...newService,
+              image: imgAccessUrl,
+            },
+          ],
+        },
+      };
+      await updateBusiness(updatedData);
+    } catch (error) {
+      toast.error("Something went wrong , please try again!");
+    }
+    // setServices((prevServices) => {
+    //   const updatedServices = Array.isArray(prevServices)
+    //     ? [...prevServices, newService]
+    //     : [newService];
 
-  const handleCreateService = () => {
-    setServices((prevServices) => {
-      const updatedServices = Array.isArray(prevServices)
-        ? [...prevServices, newService]
-        : [newService];
+    //   const updatedData = {
+    //     specialServices: {
+    //       ...businessData.specialServices,
+    //       data: updatedServices,
+    //     },
+    //   };
 
-      const updatedData = { ...businessData, service: updatedServices };
-
-      setBusinessData(updatedData);
-      handleCloseModal();
-      return updatedServices;
-    });
+    //   setBusinessData(updatedData);
+    //   handleCloseModal();
+    //   return updatedServices;
+    // });
   };
 
   return (
@@ -237,7 +238,7 @@ const BasicServices = () => {
           </button>
           <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Add Services</Modal.Title>
+              <Modal.Title>Add Servi</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -391,7 +392,7 @@ const BasicServices = () => {
           {/* Edit Servi Modal */}
           <Modal show={showModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Edit Services</Modal.Title>
+              <Modal.Title>Edit Special Services</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -468,4 +469,4 @@ const BasicServices = () => {
   );
 };
 
-export default BasicServices;
+export default SpecialServices;
