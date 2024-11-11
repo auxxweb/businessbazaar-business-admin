@@ -1,16 +1,9 @@
-import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Button, Modal, Form } from "react-bootstrap";
-import axios from "axios";
-import { getApi } from "../../api/api";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react'
+import { Button, Modal, Form } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
-import useBusiness from "../../api/useBusiness";
+import useBusiness from '../../api/useBusiness'
 
 const Judges = () => {
-  const dispatch = useDispatch();
-  const [businessData,setBusinessData] = useState([]);
-  const navigate = useNavigate();
   const { imageLoading, uploadImage } = useImageUpload()
   const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
   useEffect(() => {
@@ -19,235 +12,175 @@ const Judges = () => {
     }
     fetchBusiness()
   }, [])
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        
-       
-        if (businesses){
-          setBusinessData(businesses);
-          console.log(businesses)
-          setProducts(businesses.productSection);
-        }
-        
-      } catch (error) {
-        console.error("Error fetching business details:", error.message || error);
-      } 
-    };
-    fetchData();
-  }, [businesses]);
 
-
-  const [products, setProducts] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [products, setProducts] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [newProduct, setNewProduct] = useState({
-    _id: "",
-    title: "",
-    description: "",
-    price: "",
+    _id: '',
+    title: '',
+    description: '',
+    price: '',
     image: null,
-  });
-  const [imageCreatePreview, setImageCreatePreview] = useState("");
+  })
+  const [imageCreatePreview, setImageCreatePreview] = useState('')
 
   const [updatedProduct, setUpdatedProduct] = useState({
-    _id: "",
-    title: "",
-    description: "",
-    price: "",
+    _id: '',
+    title: '',
+    description: '',
+    price: '',
     image: null,
-  });
-  const [imagePreview, setImagePreview] = useState("");
+  })
+  const [imagePreview, setImagePreview] = useState('')
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const handleShowModal = (product) => {
-    setSelectedProduct(product);
+    setSelectedProduct(product)
     setUpdatedProduct({
       _id: product._id,
       title: product.title,
       description: product.description,
       price: product.price,
       image: product.image,
-    });
-    setImagePreview(product.image); // Initialize preview with current image
-    setShowModal(true);
-  };
+    })
+    setImagePreview(product.image) // Initialize preview with current image
+    setShowModal(true)
+  }
 
   const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedProduct(null);
+    setShowModal(false)
+    setSelectedProduct(null)
     setUpdatedProduct({
-      _id: "",
-      title: "",
-      description: "",
-      price: "",
+      _id: '',
+      title: '',
+      description: '',
+      price: '',
       image: null,
-    });
-    setImagePreview("");
-  };
+    })
+    setImagePreview('')
+  }
 
   const handleCreateCloseModal = () => {
-    setShowCreateModal(false);
+    setShowCreateModal(false)
     setNewProduct({
-      _id: "",
-      title: "",
-      description: "",
-      price: "",
+      _id: '',
+      title: '',
+      description: '',
+      price: '',
       image: null,
-    });
-    setImageCreatePreview("");
-  };
+    })
+    setImageCreatePreview('')
+  }
 
   const handleDeleteCloseModal = () => {
-    setShowDeleteModal(false);
-  };
+    setShowDeleteModal(false)
+  }
 
-  const preRequestFun = async (file, position) => {
-    const url = `${process.env.REACT_APP_BE_API_KEY}/api/v1/s3url`;
-    const requestBody = {
-      files: [
-        {
-          position: position,
-          file_type: file.type,
-        },
-      ],
-    };
-
-    try {
-      const response = await axios.post(url, requestBody, {
-        headers: { "Content-Type": "application/json" },
-      });
-      const preReq = response.data.data[0];
-
-      if (!preReq.url) {
-        throw new Error("The URL is not defined in the response.");
-      }
-      await axios.put(preReq.url, file, {
-        headers: { "Content-Type": file.type },
-      });
-
-      return preReq;
-    } catch (error) {
-      console.error("Error uploading file:", error.message || error);
-      throw new Error("File upload failed");
-    }
-  };
-
-  const handleShowCreateModal = () => setShowCreateModal(true);
+  const handleShowCreateModal = () => setShowCreateModal(true)
 
   const handleInputChange = async (e) => {
-    const { name, value, type } = e.target;
-    if (type === "file") {
-      const file = e.target.files[0];
+    const { name, value, type } = e.target
+    if (type === 'file') {
+      const file = e.target.files[0]
       if (file) {
-          setUpdatedProduct(prevProduct => ({
-            ...prevProduct,
-            image: file, // Remove quotes here
-          }));
-          setImagePreview(URL.createObjectURL(file)); 
-        } else {
-          console.error("Access link not found in response.");
-        }
-    } else {
-      setUpdatedProduct(prevProduct => ({ ...prevProduct, [name]: value }));
-    }
-  };
-  
-  // Fix handleCreateInputChange similarly
-  const handleCreateInputChange = async (e) => {
-    const { name, value, type } = e.target;
-    if (type === "file") {
-      const file = e.target.files[0];
-      if (file) {
-          setNewProduct(prevProduct => ({ ...prevProduct, image: file }));
-          setImageCreatePreview(URL.createObjectURL(file));
-        
+        setUpdatedProduct((prevProduct) => ({
+          ...prevProduct,
+          image: file, // Remove quotes here
+        }))
+        setImagePreview(URL.createObjectURL(file))
+      } else {
+        console.error('Access link not found in response.')
       }
     } else {
-      setNewProduct(prevProduct => ({ ...prevProduct, [name]: value }));
+      setUpdatedProduct((prevProduct) => ({ ...prevProduct, [name]: value }))
     }
-  };
+  }
+
+  // Fix handleCreateInputChange similarly
+  const handleCreateInputChange = async (e) => {
+    const { name, value, type } = e.target
+    if (type === 'file') {
+      const file = e.target.files[0]
+      if (file) {
+        setNewProduct((prevProduct) => ({ ...prevProduct, image: file }))
+        setImageCreatePreview(URL.createObjectURL(file))
+      }
+    } else {
+      setNewProduct((prevProduct) => ({ ...prevProduct, [name]: value }))
+    }
+  }
   const handleSaveChanges = async () => {
     var imageAccessUrl = updatedProduct.image
     if (updatedProduct.image) {
       const data = await uploadImage(updatedProduct.image, 'products')
       imageAccessUrl = data?.accessLink
-      setUpdatedProduct(prevProduct => ({
+      setUpdatedProduct((prevProduct) => ({
         ...prevProduct,
         image: imageAccessUrl, // Remove quotes here
-      }));
+      }))
       updatedProduct.image = imageAccessUrl
     }
-    const updatedProducts = products.map(product =>
-      product._id === updatedProduct._id ? updatedProduct : product
-    );
+    const updatedProducts = products.map((product) =>
+      product._id === updatedProduct._id ? updatedProduct : product,
+    )
     const updateData = {
-      productSection:updatedProducts
+      productSection: updatedProducts,
     }
-    setProducts(updatedProducts);
+    setProducts(updatedProducts)
 
     await updateBusiness(updateData)
-    handleCloseModal();
-  };
+    handleCloseModal()
+  }
 
   const handleDeleteProduct = async () => {
-    setProducts((prevProducts) => 
-      prevProducts.filter((product) => product._id !== selectedProduct._id)
-    );
-  
-    const updatedData = { 
-      productSection: products.filter((product) => product._id !== selectedProduct._id) 
-    };
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product._id !== selectedProduct._id),
+    )
+
+    const updatedData = {
+      productSection: products.filter(
+        (product) => product._id !== selectedProduct._id,
+      ),
+    }
     const updateData = {
-      productSection:updatedData
+      productSection: updatedData,
     }
     console.log(updateData)
-  
+
     await updateBusiness(updatedData)
-  
-    handleDeleteCloseModal();
-  };
-  
+
+    handleDeleteCloseModal()
+  }
 
   const handleCreateProduct = async () => {
-    let imageAccessUrl = newProduct.image;
 
-    console.log(imageAccessUrl)
-  
-    if (imageAccessUrl) {
-      const data = await uploadImage(imageAccessUrl, 'products');
-      imageAccessUrl = data?.accessLink;
-      console.log(imageAccessUrl);
-  
-      setNewProduct(prevProduct => ({
+    if (newProduct?.image) {
+      const data = await uploadImage(newProduct?.image, 'products')
+
+      setNewProduct((prevProduct) => ({
         ...prevProduct,
-        image: imageAccessUrl,
-      }));
-      newProduct.image = imageAccessUrl
+        image: data?.accessLink,
+      }))
     }
-  
-    setProducts(prevProducts => [...prevProducts, newProduct]);
-  
-    const updatedProducts = [...products, newProduct];
+
+    // setProducts(prevProducts => [...prevProducts, newProduct]);
+
+    const updatedProducts = [...products, newProduct]
     const updateData = {
-      productSection:updatedProducts
+      productSection: updatedProducts,
     }
-    console.log(updateData.productSection)
-  
-    await updateBusiness(updateData);
-    handleCloseModal();
+    console.log(updateData.productSection,"productSEction-section")
 
+    await updateBusiness(updateData)
+    handleCloseModal()
+  }
 
-
-  };
-  
-  
   return (
     <>
+      {/* {(imageLoading || loading)&&} */}
       <div className="flex rounded-lg p-4">
         <h2 className="text-2xl font-semibold text-gray-700">Products</h2>
         <div className="ml-auto flex items-center space-x-4">
@@ -263,76 +196,148 @@ const Judges = () => {
       </div>
 
       {/* Add Product Modal */}
-      <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="formTitle">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                name="title"
-                value={newProduct.title}
-                onChange={handleCreateInputChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="formDescription" className="mt-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                type="text"
-                name="description"
-                value={newProduct.description}
-                onChange={handleCreateInputChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="formPrice" className="mt-3">
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type="number"
-                name="price"
-                value={newProduct.price}
-                onChange={handleCreateInputChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image</Form.Label>
-              <Form.Control
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleCreateInputChange}
-              />
-              {imageCreatePreview && (
-                <img
-                  src={imageCreatePreview}
-                  alt="Image Preview"
-                  className="mt-3"
+      <Modal
+        show={showCreateModal}
+        onHide={handleCreateCloseModal}
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+            overflow: 'hidden',
+            width: '500px',
+          }}
+        >
+          <Modal.Header
+            closeButton
+            style={{
+              borderBottom: '1px solid #eaeaea',
+              padding: '16px 24px',
+            }}
+          >
+            <Modal.Title style={{ fontWeight: '500', fontSize: '1.25rem' }}>
+              Add Product
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            style={{
+              padding: '24px',
+            }}
+          >
+            <Form>
+              <Form.Group controlId="formTitle">
+                <Form.Label style={{ fontWeight: '500' }}>Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="title"
+                  required
+                  value={newProduct.title}
+                  onChange={handleCreateInputChange}
                   style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    marginInline: "auto",
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    padding: '10px',
                   }}
                 />
-              )}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="dark" onClick={handleCreateCloseModal}>
-            Close
-          </Button>
-          <Button variant="success" onClick={handleCreateProduct}>
-            Save changes
-          </Button>
-        </Modal.Footer>
+              </Form.Group>
+              <Form.Group controlId="formDescription" className="mt-3">
+                <Form.Label style={{ fontWeight: '500' }}>
+                  Description
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="description"
+                  required
+                  value={newProduct.description}
+                  onChange={handleCreateInputChange}
+                  style={{
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    padding: '10px',
+                  }}
+                />
+              </Form.Group>
+              <Form.Group controlId="formPrice" className="mt-3">
+                <Form.Label style={{ fontWeight: '500' }}>Price</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="price"
+                  value={newProduct.price}
+                  onChange={handleCreateInputChange}
+                  style={{
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    padding: '10px',
+                  }}
+                />
+              </Form.Group>
+              <Form.Group controlId="formImage" className="mt-3">
+                <Form.Label style={{ fontWeight: '500' }}>Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  name="image"
+                  required
+                  accept="image/*"
+                  onChange={handleCreateInputChange}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                  }}
+                />
+                {imageCreatePreview && (
+                  <img
+                    src={imageCreatePreview}
+                    alt="Image Preview"
+                    className="mt-3"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                      display: 'block',
+                      borderRadius: '8px',
+                      border: '1px solid #ddd',
+                      margin: '10px auto',
+                    }}
+                  />
+                )}
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer
+            style={{
+              borderTop: '1px solid #eaeaea',
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '16px',
+            }}
+          >
+            <Button
+              onClick={handleCreateProduct}
+              style={{
+                fontWeight: '500',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                border: 'none',
+              }}
+            >
+              Submit
+            </Button>
+          </Modal.Footer>
+        </div>
       </Modal>
 
       <table className="min-w-full table-auto mt-6">
         <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
-          <tr >
+          <tr>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Sl No
             </th>
@@ -362,7 +367,7 @@ const Judges = () => {
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
                 <img
-                  src={product.image || "default-image.png"}
+                  src={product.image || 'default-image.png'}
                   alt="Product"
                   className="w-12 h-12 object-cover"
                 />
@@ -383,20 +388,20 @@ const Judges = () => {
                     src="/icons/edit.svg"
                     className="w-6 h-6 rounded-full mr-2"
                   />
-                </button>{" "}
+                </button>{' '}
                 <button
-                variant="danger"
-                onClick={() => {
-                  setShowDeleteModal(true);
-                  setSelectedProduct(product);
-                }}
-              >
-                <img
-                  alt="pics"
-                  src="/icons/delete.svg"
-                  className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                />
-              </button>
+                  variant="danger"
+                  onClick={() => {
+                    setShowDeleteModal(true)
+                    setSelectedProduct(product)
+                  }}
+                >
+                  <img
+                    alt="pics"
+                    src="/icons/delete.svg"
+                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                  />
+                </button>
               </td>
             </tr>
           ))}
@@ -451,10 +456,10 @@ const Judges = () => {
                   alt="Image Preview"
                   className="mt-3"
                   style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    marginInline: "auto",
+                    width: '100px',
+                    height: '100px',
+                    objectFit: 'cover',
+                    marginInline: 'auto',
                   }}
                 />
               )}
@@ -487,7 +492,7 @@ const Judges = () => {
         </Modal.Footer>
       </Modal>
     </>
-  );
-};
+  )
+}
 
-export default Judges;
+export default Judges
