@@ -1,9 +1,8 @@
-// import React from "react";
+
 import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
 import Modal from "../reUsableCmponent/modal/Modal";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { resetLogin } from "../../Features/Authority";
 import { useDispatch } from "react-redux";
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -11,7 +10,6 @@ function Sidebar({ isOpen, setIsOpen }) {
   const dispatch = useDispatch();
   const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-    // navigate('/browse');
     const toggleModal = () => {
       setIsModalVisible(!isModalVisible);
     };
