@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import usePlan from "../Hooks/usePlan";
 import BackdropLoader from "./reUsableCmponent/BackdropLoader";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
+import { Razorpay } from "./Razorpay/Razorpay";
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
@@ -13,7 +14,19 @@ const Subscription = () => {
     fetchPlan();
   }, []);
 
-  console.log(plan, "plan details");
+  // const handlePaymentResponse = async (responseData) => {
+  //   var paymentDetails = {
+  //     plan: paymentData?.selectedPlan,
+  //     paymentId: response?.razorpay_payment_id,
+  //     date: new Date()
+  //   };
+  //   const response = await createPayment(paymentDetails)
+  // };
+
+  // const handlePaymentStart = async (e) => {
+  //   e.preventDefault();
+  //   return <Razorpay handlePaymentResponse={handlePaymentResponse} />;
+  // };
   return (
     <>
       <BackdropLoader isLoading={loading} />
@@ -44,9 +57,15 @@ const Subscription = () => {
             <p className="text-gray-700">Amount</p>
             <p className="text-gray-700 ml-2">₹ {plan?.amount}</p>
           </div>
-          <button disabled className="text-green-600 border-2 border-green-600 px-4 py-2 rounded-lg">
-            {isDateLessThanToday(plan?.expiryDate) ? "Active":"Renew now"}
-            
+          <button
+            // onSubmit={handlePaymentStart}
+            disabled={isDateLessThanToday(plan?.expiryDate)}
+            className={`border-2 px-4 py-2 rounded-lg ${
+              isDateLessThanToday(plan?.expiryDate)
+                ? `text-green-600 border-green-600`
+                : `text-red-600 border-red-600`
+            }`}>
+            {isDateLessThanToday(plan?.expiryDate) ? "Active" : "Renew now"}
           </button>
         </div>
       </div>
