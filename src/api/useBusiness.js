@@ -153,7 +153,7 @@ const useBusiness = () => {
         logout,
         navigate
       );
-      await getBusiness()
+      await getBusiness();
       return response?.data;
     } catch (error) {
       setLoading(false);
@@ -175,6 +175,18 @@ const useBusiness = () => {
       setLoading(false);
     }
   };
+  const changePassword = async (passwordData) => {
+    setLoading(true);
+    try {
+      await patchApi("api/v1/business/password", passwordData, true, logout); // Replace "admin/change-password" with your actual endpoint
+      toast.success("Password changed successfully");
+    } catch (error) {
+      toast.error("Failed to change password");
+      console.error("Error changing password:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     getBusiness,
@@ -184,7 +196,8 @@ const useBusiness = () => {
     businessLogin,
     logout,
     getBusinessDashboardData,
-    addProduct
+    addProduct,
+    changePassword
   };
 };
 export default useBusiness;
