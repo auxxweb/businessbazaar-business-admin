@@ -59,13 +59,13 @@ const Subscription = () => {
           </div>
           <button
             // onSubmit={handlePaymentStart}
-            disabled={isDateLessThanToday(plan?.expiryDate)}
+            disabled={!isDateLessThanToday(plan?.expiryDate)}
             className={`border-2 px-4 py-2 rounded-lg ${
-              isDateLessThanToday(plan?.expiryDate)
+              !isDateLessThanToday(plan?.expiryDate)
                 ? `text-green-600 border-green-600`
                 : `text-red-600 border-red-600`
             }`}>
-            {isDateLessThanToday(plan?.expiryDate) ? "Active" : "Renew now"}
+            {!isDateLessThanToday(plan?.expiryDate) ? "Active" : "Renew now"}
           </button>
         </div>
       </div>
