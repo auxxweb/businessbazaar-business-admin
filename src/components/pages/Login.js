@@ -68,7 +68,7 @@ const Login = () => {
                 Welcome back
               </h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
-                Sign in to your account to continue!
+                Sign in to your business dashboard to continue!
               </h3>
 
               {/* Email Input Field */}
