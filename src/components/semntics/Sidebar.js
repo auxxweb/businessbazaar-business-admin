@@ -52,11 +52,10 @@ function Sidebar({ isOpen, setIsOpen }) {
         </button>
         {/* Links */}
         <div
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === ""
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === ""
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}
           onClick={() => navigate("/")}>
           <span className="flex items-center ml-2">
             <svg
@@ -85,11 +84,10 @@ function Sidebar({ isOpen, setIsOpen }) {
         </div>
         <div
           onClick={() => navigate("/zones")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "zones"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "zones"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2 ">
             <svg
               width="24"
@@ -115,12 +113,41 @@ function Sidebar({ isOpen, setIsOpen }) {
         </div>
 
         <div
+          onClick={() => navigate("/news")}
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "news"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
+          <span className="flex items-center ml-2 ">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname?.split("/")[1] === "zones"
+                  ? "#107D93"
+                  : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                fill={
+                  location?.pathname?.split("/")[1] === "zones"
+                    ? "#107D93"
+                    : "currentColor"
+                }
+              />
+            </svg>
+            <span className={`text-custom-16 ml-4`}>News & Articles</span>
+          </span>
+        </div>
+
+        <div
           onClick={() => navigate("/landing-page")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "landing-page"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "landing-page"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -149,11 +176,10 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         <div
           onClick={() => navigate("/welcome-page")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "welcome-page"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "welcome-page"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -182,11 +208,10 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         <div
           onClick={() => navigate("/products")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "products"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "products"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -214,11 +239,10 @@ function Sidebar({ isOpen, setIsOpen }) {
         </div>
         <div
           onClick={() => navigate("/special-services")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "special-services"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "special-services"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -247,11 +271,10 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         <div
           onClick={() => navigate("/services")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "services"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "services"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -280,11 +303,10 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         <div
           onClick={() => navigate("/subscription")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "subscription"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "subscription"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -312,11 +334,10 @@ function Sidebar({ isOpen, setIsOpen }) {
         </div>
         <div
           onClick={() => navigate("/businessDetails")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "businessDetails"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "businessDetails"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -344,11 +365,10 @@ function Sidebar({ isOpen, setIsOpen }) {
         </div>
         <div
           onClick={() => navigate("/settings")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "settings"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "settings"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="20"
@@ -377,11 +397,10 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         <div
           onClick={() => navigate("/terms-and-conditions")}
-          className={`cursor-pointer flex items-center ${
-            location?.pathname?.split("/")[1] === "terms-and-conditions"
-              ? "text-[#d4e0ec]"
-              : "text-[#909294]"
-          }  hover:text-[#d4e0ec]`}>
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "terms-and-conditions"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
           <span className="flex items-center ml-2">
             <svg
               width="22"

@@ -5,6 +5,7 @@ import SettingAndConfi from "../pages/SettingAndConfi";
 import JudgeDetails from "../pages/JudgeDetails";
 import DashBoard from "../pages/DashBoard";
 import Zones from "../pages/leads";
+import News from "../pages/News";
 import Login from "../pages/Login";
 import Judges from "../pages/products";
 import Bundles from "../pages/Bundles";
@@ -37,33 +38,34 @@ function ContentArea() {
       navigate("/login");
     }
   }, [navigate]);
-  
+
   return (
     <Routes>
       {/* Use Routes to define all your app routes */}
-      <Route path="/" element={token?<DashBoard />:<Login />} />
+      <Route path="/" element={token ? <DashBoard /> : <Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/changePassword/:forgotId" element={<ChangePassword />} />
-      <Route path="/zones" element={token?<Zones />:<Login />} />
-      <Route path="/landing-page" element={ token?<LandingPage />:<Login />} />
-      <Route path="/welcome-page" element={ token?<WelcomePage />:<Login />} />
-      <Route path="/products" element={ token?<Judges />:<Login />} />
-      <Route path="/judges/:id" element={ token?<JudgeDetails />:<Login />} />
-      <Route path="/special-services" element={ token?<SpecialServices />:<Login />} />
-      <Route path="/services" element={ token?<BasicServices />:<Login />} />
-      <Route path="/participants/:id" element={ token?<ParticipantDetails />:<Login />} />
-      <Route path="/questions/:id" element={token?<QuestionDetails />:<Login />} />
-      <Route path="/bundles" element={token?<Bundles /> :<Login />} />
-      <Route path="/bundles/:id" element={token?<BundleDetails />:<Login />} />
-      <Route path="/result" element={token?<ResponseAndResult /> :<Login />} />
-      <Route path="/subscription" element={ token?<Subscription />:<Login />} />
-      <Route path="/settings" element={token?<SettingAndConfi />:<Login />} />
-      <Route path="/businessDetails" element={token?<BusinessDetails />:<Login />} />
-      <Route path="/terms-and-conditions" element={ token?<TermsAndConditions />:<Login />} />
-      <Route path="/privacy-policies" element={token?<PrivacyPolicies />:<Login />} />
-      <Route path="/preview" element={token? <Preview />:<Login/>} />
-      <Route path="/preview/premium" element={token? <PremiumPreview />:<Login/>} />
+      <Route path="/zones" element={token ? <Zones /> : <Login />} />
+      <Route path="/news" element={token ? <News /> : <Login />} />
+      <Route path="/landing-page" element={token ? <LandingPage /> : <Login />} />
+      <Route path="/welcome-page" element={token ? <WelcomePage /> : <Login />} />
+      <Route path="/products" element={token ? <Judges /> : <Login />} />
+      <Route path="/judges/:id" element={token ? <JudgeDetails /> : <Login />} />
+      <Route path="/special-services" element={token ? <SpecialServices /> : <Login />} />
+      <Route path="/services" element={token ? <BasicServices /> : <Login />} />
+      <Route path="/participants/:id" element={token ? <ParticipantDetails /> : <Login />} />
+      <Route path="/questions/:id" element={token ? <QuestionDetails /> : <Login />} />
+      <Route path="/bundles" element={token ? <Bundles /> : <Login />} />
+      <Route path="/bundles/:id" element={token ? <BundleDetails /> : <Login />} />
+      <Route path="/result" element={token ? <ResponseAndResult /> : <Login />} />
+      <Route path="/subscription" element={token ? <Subscription /> : <Login />} />
+      <Route path="/settings" element={token ? <SettingAndConfi /> : <Login />} />
+      <Route path="/businessDetails" element={token ? <BusinessDetails /> : <Login />} />
+      <Route path="/terms-and-conditions" element={token ? <TermsAndConditions /> : <Login />} />
+      <Route path="/privacy-policies" element={token ? <PrivacyPolicies /> : <Login />} />
+      <Route path="/preview" element={token ? <Preview /> : <Login />} />
+      <Route path="/preview/premium" element={token ? <PremiumPreview /> : <Login />} />
 
     </Routes>
   );
