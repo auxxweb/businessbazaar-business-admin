@@ -268,7 +268,7 @@ const SpecialServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image</Form.Label>
+                  <Form.Label>Image <span style={{color:'grey'}}>(Ratio 4 : 3)</span></Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
@@ -328,7 +328,7 @@ const SpecialServices = () => {
               Sl No
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Image
+              Image 
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Title
@@ -422,7 +422,7 @@ const SpecialServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image</Form.Label>
+                  <Form.Label>Image<span style={{color:'grey'}}>(Ratio 4 : 3)</span></Form.Label>
                   <Form.Control
                     type="file"
                     name="image"

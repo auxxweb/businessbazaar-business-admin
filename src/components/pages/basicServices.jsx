@@ -266,7 +266,7 @@ const BasicServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image</Form.Label>
+                  <Form.Label>Image <span>(Ratio  16 : 8)</span></Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
@@ -420,7 +420,7 @@ const BasicServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image</Form.Label>
+                  <Form.Label>Image<span>(Ratio  16 : 8)</span></Form.Label>
                   <Form.Control
                     type="file"
                     name="image"

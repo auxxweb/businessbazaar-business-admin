@@ -281,7 +281,7 @@ const Judges = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formImage" className="mt-3">
-                <Form.Label style={{ fontWeight: '500' }}>Image</Form.Label>
+                <Form.Label style={{ fontWeight: '500' }}>Image<span>(Ratio 1 : 1)</span></Form.Label>
                 <Form.Control
                   type="file"
                   name="image"
@@ -402,7 +402,7 @@ const Judges = () => {
                     alt="pics"
                     src="/icons/delete.svg"
                     className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  />
+                  /> 
                 </button>
               </td>
             </tr>
@@ -445,7 +445,7 @@ const Judges = () => {
               />
             </Form.Group>
             <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image</Form.Label>
+              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
               <Form.Control
                 type="file"
                 name="image"

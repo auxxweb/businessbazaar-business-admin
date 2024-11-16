@@ -137,7 +137,7 @@ export default function WelcomePage() {
           htmlFor="image"
           className="block text-gray-700 text-sm font-medium mb-1"
         >
-          Image
+          Image<span style={{color:'grey'}}>(Ratio  5 : 7)</span>
         </label>
         <input
           type="file"
