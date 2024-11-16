@@ -41,7 +41,7 @@ const useNewsArticles = () => {
         setLoading(true);
         try {
             const response = await patchApi(
-                `api/v1/business-news`,
+                `api/v1/business-news/${updateData?._id}`,
                 { ...updateData },
                 true,
                 logout,

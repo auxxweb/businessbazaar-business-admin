@@ -37,7 +37,7 @@ const News = () => {
     const [imageCreatePreview, setImageCreatePreview] = useState('')
     const [imageFile, setImageFile] = useState(null)
 
-    const [updatedProduct, setUpdatedProduct] = useState({
+    const [updatedNews, setUpdatedNews] = useState({
         _id: '',
         title: '',
         description: '',
@@ -56,12 +56,12 @@ const News = () => {
 
     const handleShowModal = (newsData) => {
         setSelectedProduct(newsData)
-        setUpdatedProduct({
+        setUpdatedNews({
             _id: newsData._id,
             title: newsData.title,
             description: newsData.description,
             link: newsData.link,
-            isBanner: false
+            isBanner: newsData.isBanner
         })
         setShowModal(true)
     }
@@ -69,14 +69,13 @@ const News = () => {
     const handleCloseModal = () => {
         setShowModal(false)
         setSelectedProduct(null)
-        setUpdatedProduct({
+        setUpdatedNews({
             _id: '',
             title: '',
             description: '',
             link: '',
             isBanner: false
         })
-        setImagePreview('')
     }
 
     const handleCreateCloseModal = () => {
@@ -98,17 +97,11 @@ const News = () => {
     const handleShowCreateModal = () => setShowCreateModal(true)
 
     const handleInputChange = async (e) => {
-        const { name, value, type } = e.target
-        if (type === 'file') {
-            const file = e.target.files[0]
-            if (file) {
-                setImageFile(file)
-                setImagePreview(URL.createObjectURL(file))
-            } else {
-                console.error('Access link not found in response.')
-            }
+        const { name, value, type, checked } = e.target
+        if (type === 'checkbox') {
+            setUpdatedNews((prevNewsData) => ({ ...prevNewsData, isBanner: checked }))
         } else {
-            setUpdatedProduct((prevNewsData) => ({ ...prevNewsData, [name]: value }))
+            setUpdatedNews((prevNewsData) => ({ ...prevNewsData, [name]: value }))
         }
     }
 
@@ -116,54 +109,26 @@ const News = () => {
     const handleCreateInputChange = async (e) => {
         const { name, value, type, checked } = e.target
 
-
-        if (type === 'file') {
-            const file = e.target.files[0]
-            if (file) {
-                setImageFile(file)
-                setImageCreatePreview(URL.createObjectURL(file))
-            }
-        } else if (type === 'checkbox') {
-
+        if (type === 'checkbox') {
             setNewNewsArticle((prevNewsData) => ({ ...prevNewsData, isBanner: checked }))
         } else {
             setNewNewsArticle((prevNewsData) => ({ ...prevNewsData, [name]: value }))
         }
     }
     const handleSaveChanges = async () => {
-        let accessLink = null
 
-        const updatedProducts = news.map((product) =>
-            product._id === updatedProduct._id
-                ? { ...updatedProduct, image: accessLink }
-                : product,
-        )
-        const updateData = {
-            productSection: updatedProducts,
-        }
-        console.log(updateData, 'updated-data')
-
-        await updateNewsArticles(updateData)
+        await updateNewsArticles(updatedNews)
         handleCloseModal()
     }
 
-    const handleDeleteProduct = async () => {
-        setNews((prevProducts) =>
-            prevProducts.filter((product) => product._id !== selectedProduct._id),
+    const handleDeleteNews = async () => {
+        setNews((prevNews) =>
+            prevNews.filter((data) => data._id !== selectedProduct._id),
         )
-
-        const updatedData = {
-            productSection: news.filter(
-                (product) => product._id !== selectedProduct._id,
-            ),
-        }
-        const updateData = {
-            productSection: updatedData,
-        }
-        console.log(updateData)
-
-        await updateNewsArticles(updatedData)
-        setImageFile(null)
+        await updateNewsArticles({
+            ...updatedNews,
+            isDeleted: !updatedNews?.isDeleted
+        })
 
         handleDeleteCloseModal()
     }
@@ -348,7 +313,7 @@ const News = () => {
                             </td>
                         </tr>
                     ) : (
-                        news?.map((news, index) => (
+                        news?.map((data, index) => (
                             <tr
                                 className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
                                 key={index}>
@@ -358,33 +323,28 @@ const News = () => {
                                 <td
                                     style={{ cursor: "pointer" }}
                                     className="px-4 py-2 border-r border-gray-400">
-                                    <u
-                                        style={{ cursor: "pointer" }}
-                                        onMouseOver={({ target }) => (target.style.color = "blue")}
-                                        onMouseOut={({ target }) => (target.style.color = "black")}>
-                                        {news?.title}
-                                    </u>
+                                    <p>{data?.title}</p>
                                 </td>
 
                                 <td className="px-4 py-2 border-r border-gray-400">
                                     <div className="flex -space-x-2">
-                                        {showMore?.index === index && showMore?.status ? news?.description.substring(0) : news?.description.substring(0, 100)}
+                                        {showMore?.index === index && showMore?.status ? data?.description.substring(0) : data?.description.substring(0, 100)}
                                         <a onClick={(() => setShowMore({ index: index, status: !showMore?.status }))} className="font-light text-xs ">{showMore?.status && showMore?.index === index ? "Show Less.." : "Show More..."}
                                         </a>
                                     </div>
                                 </td>
                                 <td className="px-4 py-2 border-r border-gray-400">
                                     <div className="flex -space-x-2">
-                                        <img className={`${news?.isBanner ? " border-green-600 border-2" : ""} rounded`} src="https://images.indianexpress.com/2024/11/Elon-Musk-2.jpg?w=640" />
+                                        <img className={`${data?.isBanner ? " border-green-600 border-2" : ""} rounded`} src="https://images.indianexpress.com/2024/11/Elon-Musk-2.jpg?w=640" />
                                     </div>
                                 </td>
                                 <td className="px-4 py-2 border-r border-gray-400">
-                                    <div className="flex -space-x-2"><a target='_blank' href={news?.link}>Url</a> </div>
+                                    <div className="flex -space-x-2"><a target='_blank' href={data?.link}>Url</a> </div>
                                 </td>
 
                                 <td className="px-4 py-2 border-r border-gray-400">
                                     <button variant="info"
-                                    //  onClick={() => handleShowModal(product)}
+                                        onClick={() => handleShowModal(data)}
                                     >
                                         <img
                                             alt="pics"
@@ -395,8 +355,8 @@ const News = () => {
                                     <button
                                         variant="danger"
                                         onClick={() => {
-                                            // setSelectedProduct(product)
-                                            // setShowDeleteModal(true)
+                                            setUpdatedNews(data)
+                                            setShowDeleteModal(true)
                                         }}
                                     >
                                         <img
@@ -415,7 +375,7 @@ const News = () => {
             {/* Edit Product Modal */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Product</Modal.Title>
+                    <Modal.Title>Edit News Article</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -424,7 +384,7 @@ const News = () => {
                             <Form.Control
                                 type="text"
                                 name="title"
-                                value={updatedProduct.title}
+                                value={updatedNews.title}
                                 onChange={handleInputChange}
                             />
                         </Form.Group>
@@ -433,40 +393,34 @@ const News = () => {
                             <Form.Control
                                 type="text"
                                 name="description"
-                                value={updatedProduct.description}
-                                onChange={handleInputChange}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formPrice" className="mt-3">
-                            <Form.Label>Price</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="price"
-                                value={updatedProduct.price}
+                                value={updatedNews.description}
                                 onChange={handleInputChange}
                             />
                         </Form.Group>
                         <Form.Group controlId="formImage" className="mt-3">
-                            <Form.Label>Image</Form.Label>
+                            <Form.Label style={{ fontWeight: '500' }}>Link</Form.Label>
                             <Form.Control
-                                type="file"
-                                name="image"
-                                accept="image/*"
-                                onChange={handleInputChange}
+                                type="link"
+                                name="link"
+                                required
+                                value={updatedNews.link}
+                                onChange={handleCreateInputChange}
+                                style={{
+                                    borderRadius: '8px',
+                                    padding: '8px',
+                                    border: '1px solid #ddd',
+                                }}
                             />
-                            {imagePreview && (
-                                <img
-                                    src={imagePreview}
-                                    alt="Image Preview"
-                                    className="mt-3"
-                                    style={{
-                                        width: '100px',
-                                        height: '100px',
-                                        objectFit: 'cover',
-                                        marginInline: 'auto',
-                                    }}
-                                />
-                            )}
+                        </Form.Group>
+                        <Form.Group controlId="formImage" className="mt-3">
+                            <Form.Label style={{ fontWeight: '500' }}>Make it a banner</Form.Label>
+                            <Form.Check
+                                name="isBanner"
+                                required
+                                value={updatedNews?.isBanner ? true : false}
+                                onChange={handleCreateInputChange}
+                            />
+
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -482,12 +436,12 @@ const News = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Deletion</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Are you sure you want to delete this product?</Modal.Body>
+                <Modal.Body>Are you sure you want to delete this News?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="dark" onClick={handleDeleteCloseModal}>
                         Cancel
                     </Button>
-                    <Button variant="danger" onClick={handleDeleteProduct}>
+                    <Button variant="danger" onClick={handleDeleteNews}>
                         Delete
                     </Button>
                 </Modal.Footer>
