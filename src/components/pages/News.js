@@ -4,6 +4,7 @@ import useImageUpload from '../../api/imageUpload/useImageUpload'
 import Pagination from "../Pagination";
 import Loader from '../Loader/Loader';
 import useNewsArticles from '../../api/news';
+import { getLinkPreview } from 'link-preview-js';
 
 const News = () => {
     const { imageLoading, uploadImage } = useImageUpload()
@@ -334,9 +335,7 @@ const News = () => {
                                     </div>
                                 </td>
                                 <td className="px-4 py-2 border-r border-gray-400">
-                                    <div className="flex -space-x-2">
-                                        <img className={`${data?.isBanner ? " border-green-600 border-2" : ""} rounded`} src="https://images.indianexpress.com/2024/11/Elon-Musk-2.jpg?w=640" />
-                                    </div>
+                                <LinkPreviewComponent preview={data?.link}/>
                                 </td>
                                 <td className="px-4 py-2 border-r border-gray-400">
                                     <div className="flex -space-x-2"><a target='_blank' href={data?.link}>Url</a> </div>
@@ -454,6 +453,27 @@ const News = () => {
                     onPageChange={handlePageChange}
                 />
             </div>
+        </>
+    )
+}
+
+const LinkPreviewComponent = ({preview})=>{
+    const [result,setResult] = useState(null)
+    useEffect(()=>{
+        getLinkPreview(preview).then((response)=>{
+            console.log({response});
+        setResult(response)
+        }).catch((err)=>{
+            console.log(err);
+            
+        })
+
+    },[preview])
+    return (
+        <>
+         <div className="flex -space-x-2">
+        <img src={result?.img} alt={result?.title}/>
+        </div>
         </>
     )
 }
