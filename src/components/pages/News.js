@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Button, Modal, Form } from 'react-bootstrap'
-import useImageUpload from '../../api/imageUpload/useImageUpload'
 import Pagination from "../Pagination";
 import Loader from '../Loader/Loader';
 import useNewsArticles from '../../api/news';
 import { getLinkPreview } from 'link-preview-js';
 
 const News = () => {
-    const { imageLoading, uploadImage } = useImageUpload()
     const {
         newsArticles,
         loading,
@@ -22,7 +20,6 @@ const News = () => {
         }
         getNews()
     }, [])
-    console.log(totalNews);
 
     const [news, setNews] = useState([])
     const [showModal, setShowModal] = useState(false)
@@ -35,9 +32,6 @@ const News = () => {
         isBanner: false,
     })
     const [showMore, setShowMore] = useState({ index: -1, status: false })
-    const [imageCreatePreview, setImageCreatePreview] = useState('')
-    const [imageFile, setImageFile] = useState(null)
-
     const [updatedNews, setUpdatedNews] = useState({
         _id: '',
         title: '',
@@ -45,7 +39,6 @@ const News = () => {
         link: "",
         isBanner: false,
     })
-    const [imagePreview, setImagePreview] = useState('')
 
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [page, setPage] = useState(1);
@@ -88,7 +81,6 @@ const News = () => {
             link: '',
             isBanner: false
         })
-        setImageCreatePreview('')
     }
 
     const handleDeleteCloseModal = () => {
