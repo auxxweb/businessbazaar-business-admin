@@ -12,7 +12,8 @@ const News = () => {
         totalNews,
         getNewsArticles,
         updateNewsArticles,
-        addNewsArticles
+        addNewsArticles,
+        deleteNewsArticles
     } = useNewsArticles()
     useEffect(() => {
         const getNews = async () => {
@@ -116,12 +117,9 @@ const News = () => {
 
     const handleDeleteNews = async () => {
         setNews((prevNews) =>
-            prevNews.filter((data) => data._id !== selectedProduct._id),
+            prevNews.filter((data) => data._id !== updatedNews._id),
         )
-        await updateNewsArticles({
-            ...updatedNews,
-            isDeleted: !updatedNews?.isDeleted
-        })
+        await deleteNewsArticles(updatedNews._id)
 
         handleDeleteCloseModal()
     }

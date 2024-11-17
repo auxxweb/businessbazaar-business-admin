@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { getApi, patchApi, postApi } from "./api";
+import { deleteApi, getApi, patchApi, postApi } from "./api";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -74,6 +74,41 @@ const useNewsArticles = () => {
         }
     };
 
+    
+    const deleteNewsArticles = async (id) => {
+        setLoading(true);
+        try {
+            const response = await deleteApi(
+                `api/v1/business-news/${id}`,
+                true,
+                logout,
+                navigate
+            );
+            if (response?.data) {
+                toast.success("News Removed successfully!", {
+                    theme: "colored",
+                    position: "top-right", // Position the toast at the top-center of the screen
+                    style: {
+                        backgroundColor: "green", // Custom green background color for success
+                        color: "#FFFFFF", // White text
+                        height: "60px", // Set a higher height for the toast
+                        fontSize: "14px", // Increase font size for better readability
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center"
+                    }
+                });
+            }
+        } catch (error) {
+            setLoading(false);
+            toast.error(
+                error?.response?.data?.message ?? "Something went wrong ,try again!!"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const addNewsArticles = async (formData) => {
         setLoading(false);
@@ -116,6 +151,7 @@ const useNewsArticles = () => {
         totalNews,
         updateNewsArticles,
         addNewsArticles,
+        deleteNewsArticles
     };
 };
 export default useNewsArticles;
