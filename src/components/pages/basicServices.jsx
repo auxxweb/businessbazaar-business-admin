@@ -8,8 +8,10 @@ import { useNavigate } from "react-router-dom";
 import { getApi } from "../../api/api";
 import Pagination from "../Pagination";
 import getCroppedImg from "../../utils/cropper.utils";
+import useBusiness from "../../api/useBusiness";
 
 const BasicServices = () => {
+  const { updateBusiness } = useBusiness();
   const dispatch = useDispatch();
   const [businessData, setBusinessData] = useState([]);
 
@@ -224,18 +226,19 @@ const BasicServices = () => {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }));
     }
   };
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     const updatedService = services.map((Servi) =>
       Servi._id === updatedServices._id ? updatedServices : Servi
     );
     console.log(updatedServices);
     const updatedData = { ...businessData, service: updatedService };
+    await updateBusiness({ service: updatedService });
     setBusinessData(updatedData);
     setServices(updatedService);
     handleCloseModal();
   };
 
-  const handleDeleteServices = () => {
+  const handleDeleteServices = async () => {
     setServices((prevServices) =>
       prevServices.filter((Servi) => Servi._id !== selectedService._id)
     );
@@ -246,18 +249,20 @@ const BasicServices = () => {
     };
 
     setBusinessData(updatedData);
-
+    await updateBusiness({
+      service: services.filter((Servi) => Servi._id !== selectedService._id),
+    });
     handleDeleteCloseModal();
   };
 
   const handleCreateService = () => {
-    setServices((prevServices) => {
+    setServices(async (prevServices) => {
       const updatedServices = Array.isArray(prevServices)
         ? [...prevServices, newService]
         : [newService];
 
       const updatedData = { ...businessData, service: updatedServices };
-
+      await updateBusiness({ service: updatedServices });
       setBusinessData(updatedData);
       handleCloseModal();
       return updatedServices;
