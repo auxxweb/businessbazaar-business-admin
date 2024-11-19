@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import Cropper from "react-easy-crop";
+import { Button, Form, Modal } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
-import { Button, Form, Modal } from "react-bootstrap";
+import getCroppedImg from "../../utils/cropper.utils";
 
 const Gallery = () => {
   const { businesses, getBusiness, updateBusiness } = useBusiness();
@@ -22,6 +24,10 @@ const Gallery = () => {
     image: null,
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isCropping, setIsCropping] = useState(false);
 
   const handleShowModal = (index, imgUrl) => {
     setSelectedImage(imgUrl);
@@ -58,6 +64,7 @@ const Gallery = () => {
       if (file) {
         setImageFile(file);
         setImgPreview(URL.createObjectURL(file));
+        setIsCropping(true); // Open the crop modal
       } else {
         console.error("Access link not found in response.");
       }
@@ -72,6 +79,7 @@ const Gallery = () => {
       if (file) {
         setImageFile(file);
         setImageCreatePreview(URL.createObjectURL(file));
+        setIsCropping(true); // Open the crop modal
       }
     }
   };
@@ -341,6 +349,47 @@ const Gallery = () => {
           </Button>
           <Button variant="danger" onClick={handleDeleteGallery}>
             Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={isCropping} onHide={() => setIsCropping(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Crop Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div
+            className="crop-container position-relative"
+            style={{ height: "400px" }}
+          >
+            <Cropper
+              image={imgPreview || imageCreatePreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={4 / 5} // Adjust aspect ratio as needed
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) => {
+                setCroppedAreaPixels(croppedAreaPixels);
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={async () => {
+              const { blob, fileUrl } = await getCroppedImg(
+                imgPreview || imageCreatePreview,
+                croppedAreaPixels
+              );
+              // Convert the croppedImage blob to a URL for preview or upload
+              imgPreview && setImgPreview(fileUrl);
+              imageCreatePreview && setImageCreatePreview(fileUrl);
+              setImageFile(blob);
+              setIsCropping(false);
+            }}
+          >
+            Crop & Save
           </Button>
         </Modal.Footer>
       </Modal>
