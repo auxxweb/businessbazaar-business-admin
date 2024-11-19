@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Cropper from "react-easy-crop";
 import { Button, Modal, Form } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import { toast } from "sonner";
 import Pagination from "../Pagination";
+import getCroppedImg from "../../utils/cropper.utils";
 
 const SpecialServices = () => {
   const [businessData, setBusinessData] = useState([]);
@@ -50,7 +52,7 @@ const SpecialServices = () => {
   });
   const [imageCreatePreview, setImageCreatePreview] = useState("");
   const [imageCreateFile, setImageCreateFile] = useState(null);
-  const [imageFile,setImageFile] = useState(null)
+  const [imageFile, setImageFile] = useState(null);
 
   const [updatedServices, setUpdatedServices] = useState({
     _id: "",
@@ -61,6 +63,11 @@ const SpecialServices = () => {
   const [imagePreview, setImagePreview] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isCropping, setIsCropping] = useState(false);
 
   const handleShowModal = (Servi) => {
     setSelectedService(Servi);
@@ -86,7 +93,7 @@ const SpecialServices = () => {
     });
     setImagePreview("");
   };
-  
+
   const handlePageChange = (page) => {
     setPage(page);
   };
@@ -120,6 +127,7 @@ const SpecialServices = () => {
         }));
         setImageFile(file);
         setImagePreview(URL.createObjectURL(file));
+        setIsCropping(true);
       }
     } else {
       setUpdatedServices((prevServices) => ({
@@ -138,6 +146,7 @@ const SpecialServices = () => {
         setNewService((prevServices) => ({ ...prevServices, image: file }));
         setImageCreateFile(file);
         setImageCreatePreview(URL.createObjectURL(file));
+        setIsCropping(true);
       }
     } else {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }));
@@ -161,9 +170,7 @@ const SpecialServices = () => {
     const updatedData = {
       specialServices: {
         ...businesses?.specialServices,
-        data: [
-          ...updatedService
-        ],
+        data: [...updatedService],
       },
     };
     await updateBusiness(updatedData);
@@ -245,7 +252,7 @@ const SpecialServices = () => {
           </button>
           <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Add Servi</Modal.Title>
+              <Modal.Title>Add Service</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -268,7 +275,9 @@ const SpecialServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image <span style={{color:'grey'}}>(Ratio 4 : 3)</span></Form.Label>
+                  <Form.Label>
+                    Image <span style={{ color: "grey" }}>(Ratio 4 : 3)</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
@@ -328,7 +337,7 @@ const SpecialServices = () => {
               Sl No
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
-              Image 
+              Image
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Title
@@ -422,7 +431,9 @@ const SpecialServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image<span style={{color:'grey'}}>(Ratio 4 : 3)</span></Form.Label>
+                  <Form.Label>
+                    Image<span style={{ color: "grey" }}>(Ratio 4 : 3)</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
@@ -480,6 +491,47 @@ const SpecialServices = () => {
           onPageChange={handlePageChange}
         />
       </div>
+      <Modal show={isCropping} onHide={() => setIsCropping(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Crop Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div
+            className="crop-container position-relative"
+            style={{ height: "400px" }}
+          >
+            <Cropper
+              image={imagePreview || imageCreatePreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={4 / 5} // Adjust aspect ratio as needed
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) => {
+                setCroppedAreaPixels(croppedAreaPixels);
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={async () => {
+              const { blob, fileUrl } = await getCroppedImg(
+                imagePreview || imageCreatePreview,
+                croppedAreaPixels
+              );
+              // Convert the croppedImage blob to a URL for preview or upload
+              imagePreview && setImagePreview(fileUrl);
+              imageCreatePreview && setImageCreatePreview(fileUrl);
+              imagePreview && setImageFile(blob);
+              imageCreatePreview && setImageCreateFile(blob);
+              setIsCropping(false);
+            }}
+          >
+            Crop & Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
