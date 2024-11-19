@@ -47,7 +47,7 @@ const useBusiness = () => {
       );
       if (response?.data) {
         await getBusiness();
-        toast.success("Landing Page Updated successfully", {
+        toast.success("Business Updated successfully", {
           theme: "colored",
           position: "top-right", // Position the toast at the top-center of the screen
           style: {
