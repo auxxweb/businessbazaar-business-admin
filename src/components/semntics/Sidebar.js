@@ -364,6 +364,37 @@ function Sidebar({ isOpen, setIsOpen }) {
           </span>
         </div>
         <div
+          onClick={() => navigate("/gallery")}
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "gallery"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
+          <span className="flex items-center ml-2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname?.split("/")[1] === "gallery"
+                  ? "#107D93"
+                  : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg"
+              className="transition-colors duration-200">
+              <path
+                d="M3 3h18v18H3V3zm3 2v3h3V5H6zm5 0v3h3V5h-3zm5 0v3h3V5h-3zM5 10v3h3v-3H5zm5 0v3h3v-3h-3zm5 0v3h3v-3h-3zm-10 5v3h3v-3H5zm5 0v3h3v-3h-3zm5 0v3h3v-3h-3z"
+                fill={
+                  location?.pathname?.split("/")[1] === "gallery"
+                    ? "#107D93"
+                    : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Gallery</span>
+          </span>
+        </div>
+        <div
           onClick={() => navigate("/settings")}
           className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "settings"
             ? "text-[#d4e0ec]"

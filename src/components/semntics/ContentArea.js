@@ -24,6 +24,7 @@ import WelcomePage from "../pages/WelcomePage";
 import PremiumPreview from "../pages/PremiumPreview";
 import Preview from "../pages/Preview";
 import SpecialServices from "../pages/SpecialServices";
+import Gallery from "../pages/Gallery";
 
 function ContentArea() {
   const [token, setToken] = useState([]);
@@ -62,6 +63,7 @@ function ContentArea() {
       <Route path="/subscription" element={token ? <Subscription /> : <Login />} />
       <Route path="/settings" element={token ? <SettingAndConfi /> : <Login />} />
       <Route path="/businessDetails" element={token ? <BusinessDetails /> : <Login />} />
+      <Route path="/gallery" element={token ? <Gallery /> : <Login />} />
       <Route path="/terms-and-conditions" element={token ? <TermsAndConditions /> : <Login />} />
       <Route path="/privacy-policies" element={token ? <PrivacyPolicies /> : <Login />} />
       <Route path="/preview" element={token ? <Preview /> : <Login />} />
