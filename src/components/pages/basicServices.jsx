@@ -9,6 +9,7 @@ import { getApi } from '../../api/api'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
 import useBusiness from '../../api/useBusiness'
+import { useDebouncedCallback } from 'use-debounce';
 
 const BasicServices = () => {
   const { updateBusiness } = useBusiness()
@@ -16,6 +17,7 @@ const BasicServices = () => {
   const [businessData, setBusinessData] = useState([])
 
   const [services, setServices] = useState([])
+  const [filteredServices, setFilteredServices] = useState([])
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -70,12 +72,25 @@ const BasicServices = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
   const [imageFileToCrop, setImageFileToCrop] = useState(null)
-  const limit = 10
+  const limit = 1
   useEffect(() => {
     if (businessData) {
       setServices(businessData.service || [])
     }
   }, [businessData])
+
+
+  useEffect(() => {
+    if (!services?.length) {
+      setFilteredServices([])
+      return
+    }
+
+    const startIndex = (page - 1) * limit
+    const paginatedServices = services.slice(startIndex, startIndex + limit)
+
+    setFilteredServices(paginatedServices)
+  }, [services, page, limit])
 
   const handleShowModal = (Servi) => {
     setSelectedService(Servi)
@@ -271,6 +286,23 @@ const BasicServices = () => {
     setServices(updatedServices) // Update services only at the end
   }
 
+
+  const handleSearchChange = useDebouncedCallback((value) => {
+    if (!value?.trim()) {
+      setFilteredServices(services)
+      return
+    } // Exit if value is empty or only whitespace
+
+    const filteredServices = services?.filter(
+      (ser) =>
+        ser?.title?.toLowerCase().includes(value.toLowerCase()) ||
+        ser?.description?.toLowerCase().includes(value.toLowerCase()),
+    )
+
+    // Assuming you have a state or method to handle filtered results
+    setFilteredServices(filteredServices)
+  }, 500)
+
   return (
     <>
       <div className="flex rounded-lg p-4">
@@ -386,19 +418,19 @@ const BasicServices = () => {
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
           {/* Parent div for span elements */}
           <span className="flex items-center justify-center">
-            <input
+          <input
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
-              placeholder="Search by name"
-              // onChange={(e) => {
-              //   handleSearchChange(e.target.value);
-              // }}
+              placeholder="Search by title,description"
+              onChange={(e) => {
+                handleSearchChange(e.target.value)
+              }}
             />
           </span>
-          <span className="flex items-center">
+          {/* <span className="flex items-center">
             <span className="cursor-pointer bg-[#105193] hover:bg-[#107D93] text-white p-2 lg:w-[100px] text-center rounded-3xl">
               Search
             </span>
-          </span>
+          </span> */}
         </div>
       </div>
       <table className="min-w-full table-auto mt-6">
@@ -421,7 +453,7 @@ const BasicServices = () => {
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
-          {services?.map((splServices, index) => (
+          {filteredServices?.map((splServices, index) => (
             <tr
               className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
               key={index}
@@ -558,7 +590,7 @@ const BasicServices = () => {
       </table>
       <div className="m-auto flex justify-end mt-8">
         <Pagination
-          totalItems={services?.totalCount}
+          totalItems={services?.length}
           itemsPerPage={limit}
           currentPage={page}
           onPageChange={handlePageChange}

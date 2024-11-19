@@ -1,205 +1,220 @@
-import { useCallback, useEffect, useState } from "react";
-import Cropper from "react-easy-crop";
-import { Button, Modal, Form } from "react-bootstrap";
-import useBusiness from "../../api/useBusiness";
-import useImageUpload from "../../api/imageUpload/useImageUpload";
-import { toast } from "sonner";
-import Pagination from "../Pagination";
-import getCroppedImg from "../../utils/cropper.utils";
+import { useCallback, useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
+import Cropper from 'react-easy-crop'
+import { Button, Modal, Form } from 'react-bootstrap'
+import useBusiness from '../../api/useBusiness'
+import useImageUpload from '../../api/imageUpload/useImageUpload'
+import { toast } from 'sonner'
+import Pagination from '../Pagination'
+import getCroppedImg from '../../utils/cropper.utils'
 
 const SpecialServices = () => {
-  const [businessData, setBusinessData] = useState([]);
+  const [businessData, setBusinessData] = useState([])
 
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState([])
+  const [filteredServices, setFilteredServices] = useState([])
 
-  const { imageLoading, uploadImage } = useImageUpload();
-  const { businesses, loading, getBusiness, updateBusiness } = useBusiness();
-  const [page, setPage] = useState(1);
-  const [reFetch, SetReFetch] = useState(false);
-  const limit = 10;
+  const { imageLoading, uploadImage } = useImageUpload()
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
+  const [page, setPage] = useState(1)
+  const [reFetch, SetReFetch] = useState(false)
+  const limit = 10
   useEffect(() => {
     const fetchBusiness = async () => {
-      await getBusiness();
-    };
-    fetchBusiness();
-  }, []);
+      await getBusiness()
+    }
+    fetchBusiness()
+  }, [])
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (businesses) {
-          setBusinessData(businesses);
-          console.log(businesses);
-          setServices(businesses.specialServices.data);
+          setBusinessData(businesses)
+          console.log(businesses)
+          setServices(businesses.specialServices.data)
         }
       } catch (error) {
         console.error(
-          "Error fetching business details:",
-          error.message || error
-        );
+          'Error fetching business details:',
+          error.message || error,
+        )
       }
-    };
-    fetchData();
-  }, [businesses]);
+    }
+    fetchData()
+  }, [businesses])
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  useEffect(() => {
+    if (!services?.length) {
+      setFilteredServices([])
+      return
+    }
+
+    const startIndex = (page - 1) * limit
+    const paginatedServices = services.slice(startIndex, startIndex + limit)
+
+    setFilteredServices(paginatedServices)
+  }, [services, page, limit])
+
+  const [showModal, setShowModal] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [newService, setNewService] = useState({
-    title: "",
-    description: "",
+    title: '',
+    description: '',
     image: null,
-  });
-  const [imageCreatePreview, setImageCreatePreview] = useState("");
-  const [imageCreateFile, setImageCreateFile] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
+  })
+  const [imageCreatePreview, setImageCreatePreview] = useState('')
+  const [imageCreateFile, setImageCreateFile] = useState(null)
+  const [imageFile, setImageFile] = useState(null)
 
   const [updatedServices, setUpdatedServices] = useState({
-    _id: "",
-    title: "",
-    description: "",
+    _id: '',
+    title: '',
+    description: '',
     image: null,
-  });
-  const [imagePreview, setImagePreview] = useState("");
+  })
+  const [imagePreview, setImagePreview] = useState('')
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [isCropping, setIsCropping] = useState(false)
 
   const handleShowModal = (Servi) => {
-    setSelectedService(Servi);
+    setSelectedService(Servi)
     setUpdatedServices({
       _id: Servi._id,
       title: Servi.title,
       description: Servi.description,
       image: Servi.image,
-    });
-    setImagePreview(Servi.image); // Initialize preview with current image
-    setShowModal(true);
-  };
+    })
+    setImagePreview(Servi.image) // Initialize preview with current image
+    setShowModal(true)
+  }
 
   const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedService(null);
+    setShowModal(false)
+    setSelectedService(null)
     setUpdatedServices({
-      _id: "",
-      title: "",
-      description: "",
-      price: "",
+      _id: '',
+      title: '',
+      description: '',
+      price: '',
       image: null,
-    });
-    setImagePreview("");
-  };
+    })
+    setImagePreview('')
+  }
 
   const handlePageChange = (page) => {
-    setPage(page);
-  };
+    setPage(page)
+  }
 
   const handleCreateCloseModal = () => {
-    setShowCreateModal(false);
+    setShowCreateModal(false)
     setNewService({
-      _id: "",
-      title: "",
-      description: "",
-      price: "",
+      _id: '',
+      title: '',
+      description: '',
+      price: '',
       image: null,
-    });
-    setImageCreatePreview("");
-  };
+    })
+    setImageCreatePreview('')
+  }
 
   const handleDeleteCloseModal = () => {
-    setShowDeleteModal(false);
-  };
+    setShowDeleteModal(false)
+  }
 
-  const handleShowCreateModal = () => setShowCreateModal(true);
+  const handleShowCreateModal = () => setShowCreateModal(true)
 
   const handleInputChange = async (e) => {
-    const { name, value, type } = e.target;
-    if (type === "file") {
-      const file = e.target.files[0];
+    const { name, value, type } = e.target
+    if (type === 'file') {
+      const file = e.target.files[0]
       if (file) {
         setUpdatedServices((prevServices) => ({
           ...prevServices,
           image: file, // Remove quotes here
-        }));
-        setImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
-        setIsCropping(true);
+        }))
+        setImageFile(file)
+        setImagePreview(URL.createObjectURL(file))
+        setIsCropping(true)
       }
     } else {
       setUpdatedServices((prevServices) => ({
         ...prevServices,
         [name]: value,
-      }));
+      }))
     }
-  };
+  }
 
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
-    const { name, value, type } = e.target;
-    if (type === "file") {
-      const file = e.target.files[0];
+    const { name, value, type } = e.target
+    if (type === 'file') {
+      const file = e.target.files[0]
       if (file) {
-        setNewService((prevServices) => ({ ...prevServices, image: file }));
-        setImageCreateFile(file);
-        setImageCreatePreview(URL.createObjectURL(file));
-        setIsCropping(true);
+        setNewService((prevServices) => ({ ...prevServices, image: file }))
+        setImageCreateFile(file)
+        setImageCreatePreview(URL.createObjectURL(file))
+        setIsCropping(true)
       }
     } else {
-      setNewService((prevServices) => ({ ...prevServices, [name]: value }));
+      setNewService((prevServices) => ({ ...prevServices, [name]: value }))
     }
-  };
+  }
   const handleSaveChanges = async () => {
-    var imageAccessUrl = selectedService.image;
+    var imageAccessUrl = selectedService.image
     if (imageFile) {
-      const data = await uploadImage(imageFile, "SpecialServices");
-      imageAccessUrl = data?.accessLink;
+      const data = await uploadImage(imageFile, 'SpecialServices')
+      imageAccessUrl = data?.accessLink
       setUpdatedServices((prevService) => ({
         ...prevService,
         image: imageAccessUrl, // Remove quotes here
-      }));
-      updatedServices.image = imageAccessUrl;
+      }))
+      updatedServices.image = imageAccessUrl
     }
     const updatedService = services.map((Servi) =>
-      Servi._id === updatedServices._id ? updatedServices : Servi
-    );
-    setServices(updatedService);
+      Servi._id === updatedServices._id ? updatedServices : Servi,
+    )
+    setServices(updatedService)
     const updatedData = {
       specialServices: {
         ...businesses?.specialServices,
         data: [...updatedService],
       },
-    };
-    await updateBusiness(updatedData);
-    console.log(updatedData, "updatedData");
-    handleCloseModal();
-  };
+    }
+    await updateBusiness(updatedData)
+    console.log(updatedData, 'updatedData')
+    handleCloseModal()
+  }
 
   const handleDeleteServices = () => {
     setServices((prevServices) =>
-      prevServices.filter((Servi) => Servi._id !== selectedService._id)
-    );
+      prevServices.filter((Servi) => Servi._id !== selectedService._id),
+    )
 
     const updatedData = {
       ...businessData,
       specialServices: {
         data: services.filter((Servi) => Servi._id !== selectedService._id),
       },
-    };
+    }
 
-    setBusinessData(updatedData);
+    setBusinessData(updatedData)
 
-    handleDeleteCloseModal();
-  };
+    handleDeleteCloseModal()
+  }
   const handleCreateService = async () => {
     try {
-      let imgAccessUrl;
+      let imgAccessUrl
       if (imageCreateFile) {
-        const data = await uploadImage(imageCreateFile, "SpecialServices");
-        imgAccessUrl = data?.accessLink;
+        const data = await uploadImage(imageCreateFile, 'SpecialServices')
+        imgAccessUrl = data?.accessLink
       }
       // Prepare updated business data immutably
       const updatedData = {
@@ -213,10 +228,10 @@ const SpecialServices = () => {
             },
           ],
         },
-      };
-      await updateBusiness(updatedData);
+      }
+      await updateBusiness(updatedData)
     } catch (error) {
-      toast.error("Something went wrong , please try again!");
+      toast.error('Something went wrong , please try again!')
     }
     // setServices((prevServices) => {
     //   const updatedServices = Array.isArray(prevServices)
@@ -234,7 +249,23 @@ const SpecialServices = () => {
     //   handleCloseModal();
     //   return updatedServices;
     // });
-  };
+  }
+
+  const handleSearchChange = useDebouncedCallback((value) => {
+    if (!value?.trim()) {
+      setFilteredServices(services)
+      return
+    } // Exit if value is empty or only whitespace
+
+    const filteredServices = services?.filter(
+      (ser) =>
+        ser?.title?.toLowerCase().includes(value.toLowerCase()) ||
+        ser?.description?.toLowerCase().includes(value.toLowerCase()),
+    )
+
+    // Assuming you have a state or method to handle filtered results
+    setFilteredServices(filteredServices)
+  }, 500)
 
   return (
     <>
@@ -243,7 +274,7 @@ const SpecialServices = () => {
           Special Services
         </h2>
         <div className="ml-auto flex items-center space-x-4">
-          {" "}
+          {' '}
           <button
             onClick={handleShowCreateModal}
             className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
@@ -276,7 +307,7 @@ const SpecialServices = () => {
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image <span style={{ color: "grey" }}>(Ratio 4 : 3)</span>
+                    Image <span style={{ color: 'grey' }}>(Ratio 4 : 3)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -290,10 +321,10 @@ const SpecialServices = () => {
                       alt="Image Preview"
                       className="mt-3"
                       style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                        marginInline: "auto",
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        marginInline: 'auto',
                       }}
                     />
                   )}
@@ -317,17 +348,17 @@ const SpecialServices = () => {
           <span className="flex items-center justify-center">
             <input
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
-              placeholder="Search by name"
-              // onChange={(e) => {
-              //   handleSearchChange(e.target.value);
-              // }}
+              placeholder="Search by title,description"
+              onChange={(e) => {
+                handleSearchChange(e.target.value)
+              }}
             />
           </span>
-          <span className="flex items-center">
+          {/* <span className="flex items-center">
             <span className="cursor-pointer bg-[#105193] hover:bg-[#107D93] text-white p-2 lg:w-[100px] text-center rounded-3xl">
               Search
             </span>
-          </span>
+          </span> */}
         </div>
       </div>
       <table className="min-w-full table-auto mt-6">
@@ -342,7 +373,7 @@ const SpecialServices = () => {
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Title
             </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
+            {/* <th className="px-4 py-4 text-left border-r border-gray-400">ID</th> */}
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Description
             </th>
@@ -350,7 +381,7 @@ const SpecialServices = () => {
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
-          {services?.map((splServices, index) => (
+          {filteredServices?.map((splServices, index) => (
             <tr
               className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
               key={index}
@@ -362,16 +393,16 @@ const SpecialServices = () => {
               <td className="px-4 py-2 border-r border-gray-400">
                 <img
                   alt="img"
-                  src={splServices?.image ?? "t"}
+                  src={splServices?.image ?? 't'}
                   className="w-14 h-14 rounded-full mr-2 mt-2"
                 />
               </td>
               <td className="px-4 py-2 border-r border-gray-400">
                 {splServices?.title}
               </td>
-              <td className="px-4 py-2 border-r border-gray-400">
+              {/* <td className="px-4 py-2 border-r border-gray-400">
                 {splServices?._id}
-              </td>
+              </td> */}
               <td className="px-4 py-2 border-r border-gray-400">
                 <div className="flex -space-x-2">
                   {splServices?.description}
@@ -380,7 +411,7 @@ const SpecialServices = () => {
               <td className="px-4 py-2 border-r border-gray-400">
                 <button
                   onClick={(e) => {
-                    handleShowModal(splServices);
+                    handleShowModal(splServices)
                   }}
                 >
                   <img
@@ -391,8 +422,8 @@ const SpecialServices = () => {
                 </button>
                 <button
                   onClick={() => {
-                    setShowDeleteModal(true);
-                    setSelectedService(splServices);
+                    setShowDeleteModal(true)
+                    setSelectedService(splServices)
                   }}
                 >
                   <img
@@ -432,7 +463,7 @@ const SpecialServices = () => {
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image<span style={{ color: "grey" }}>(Ratio 4 : 3)</span>
+                    Image<span style={{ color: 'grey' }}>(Ratio 4 : 3)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -446,10 +477,10 @@ const SpecialServices = () => {
                       alt="Image Preview"
                       className="mt-3"
                       style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                        marginInline: "auto",
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        marginInline: 'auto',
                       }}
                     />
                   )}
@@ -485,7 +516,7 @@ const SpecialServices = () => {
       </table>
       <div className="m-auto flex justify-end mt-8">
         <Pagination
-          totalItems={services?.totalCount}
+          totalItems={services?.length}
           itemsPerPage={limit}
           currentPage={page}
           onPageChange={handlePageChange}
@@ -498,7 +529,7 @@ const SpecialServices = () => {
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
+            style={{ height: '400px' }}
           >
             <Cropper
               image={imagePreview || imageCreatePreview}
@@ -508,7 +539,7 @@ const SpecialServices = () => {
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {
-                setCroppedAreaPixels(croppedAreaPixels);
+                setCroppedAreaPixels(croppedAreaPixels)
               }}
             />
           </div>
@@ -518,14 +549,14 @@ const SpecialServices = () => {
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
                 imagePreview || imageCreatePreview,
-                croppedAreaPixels
-              );
+                croppedAreaPixels,
+              )
               // Convert the croppedImage blob to a URL for preview or upload
-              imagePreview && setImagePreview(fileUrl);
-              imageCreatePreview && setImageCreatePreview(fileUrl);
-              imagePreview && setImageFile(blob);
-              imageCreatePreview && setImageCreateFile(blob);
-              setIsCropping(false);
+              imagePreview && setImagePreview(fileUrl)
+              imageCreatePreview && setImageCreatePreview(fileUrl)
+              imagePreview && setImageFile(blob)
+              imageCreatePreview && setImageCreateFile(blob)
+              setIsCropping(false)
             }}
           >
             Crop & Save
@@ -533,7 +564,7 @@ const SpecialServices = () => {
         </Modal.Footer>
       </Modal>
     </>
-  );
-};
+  )
+}
 
-export default SpecialServices;
+export default SpecialServices
