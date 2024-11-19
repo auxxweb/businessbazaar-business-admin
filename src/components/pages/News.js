@@ -406,11 +406,11 @@ const News = () => {
                   </div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  <LinkPreviewComponent url={data?.link} />
+                  <LinkPreviewComponent url={data?.link} image={data?.image} />
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
                   <div className="flex -space-x-2">
-                    <a target="_blank" href={data?.link}>
+                    <a target="_blank" href={data?.link} rel="noreferrer">
                       Url
                     </a>{" "}
                   </div>
@@ -553,7 +553,7 @@ const News = () => {
   );
 };
 
-const LinkPreviewComponent = ({ url }) => {
+const LinkPreviewComponent = ({ url,image }) => {
  
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -622,7 +622,7 @@ const LinkPreviewComponent = ({ url }) => {
 
   return (
       <div className='overflow-hidden  rounded' onClick={handleClick} style={{ cursor: 'pointer' }}>
-          {previewData.image && <img src={previewData?.image} alt="Link Preview" className='w-100 h-100' />}
+          {(previewData.image ||image )&& <img src={image ?? previewData?.image} alt="Link Preview" className='w-100 h-100' />}
       </div>
   );
 };
