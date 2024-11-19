@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Cropper from "react-easy-crop";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
@@ -6,6 +7,7 @@ import { setBusinessData } from "../../api/slices/business";
 import { useNavigate } from "react-router-dom";
 import { getApi } from "../../api/api";
 import Pagination from "../Pagination";
+import getCroppedImg from "../../utils/cropper.utils";
 
 const BasicServices = () => {
   const dispatch = useDispatch();
@@ -59,6 +61,13 @@ const BasicServices = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [page, setPage] = useState(1);
   const [reFetch, SetReFetch] = useState(false);
+  // Cropper state
+  const [showCropperModal, setShowCropperModal] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [imageFileToCrop, setImageFileToCrop] = useState(null);
   const limit = 10;
   useEffect(() => {
     if (businessData) {
@@ -143,21 +152,51 @@ const BasicServices = () => {
 
   const handleShowCreateModal = () => setShowCreateModal(true);
 
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleCropImage = async () => {
+    try {
+      const { blob, fileUrl } = await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels
+      );
+      if (blob) {
+        // Update the state with the cropped image URL
+        const preReq = await preRequestFun(blob, imageFileToCrop?.name);
+        if (showCreateModal) {
+          setNewService((prevServices) => ({
+            ...prevServices,
+            image: preReq?.accessLink,
+          }));
+          setImageCreatePreview(fileUrl);
+        } else if (showModal) {
+          setUpdatedServices((prevServices) => ({
+            ...prevServices,
+            image: preReq?.accessLink,
+          }));
+          setImagePreview(fileUrl);
+        }
+      }
+      setShowCropperModal(false);
+    } catch (error) {
+      console.error("Error cropping the image:", error);
+    }
+  };
+
   const handleInputChange = async (e) => {
     const { name, value, type } = e.target;
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        if (preReq && preReq.accessLink) {
-          setUpdatedServices((prevServices) => ({
-            ...prevServices,
-            image: preReq.accessLink, // Remove quotes here
-          }));
-          setImagePreview(URL.createObjectURL(file));
-        } else {
-          console.error("Access link not found in response.");
-        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          setImageSrc(reader.result);
+          setImageFileToCrop(file);
+          setShowCropperModal(true);
+        };
       }
     } else {
       setUpdatedServices((prevServices) => ({
@@ -173,15 +212,13 @@ const BasicServices = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        const preReq = await preRequestFun(file, name);
-        console.log(preReq);
-        if (preReq && preReq.accessLink) {
-          setNewService((prevServices) => ({
-            ...prevServices,
-            image: preReq.accessLink,
-          }));
-          setImageCreatePreview(URL.createObjectURL(file));
-        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          setImageSrc(reader.result);
+          setImageFileToCrop(file);
+          setShowCropperModal(true);
+        };
       }
     } else {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }));
@@ -230,9 +267,45 @@ const BasicServices = () => {
   return (
     <>
       <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">
-          Services
-        </h2>
+        {/* Cropper Modal */}
+        <Modal
+          show={showCropperModal}
+          onHide={() => setShowCropperModal(false)}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Crop Image</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div
+              className="crop-container position-relative"
+              style={{ height: "400px" }}
+            >
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={16 / 8} // Adjust the aspect ratio as needed
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCropperModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleCropImage}>
+              Crop Image
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <h2 className="text-2xl font-semibold text-gray-700">Services</h2>
         <div className="ml-auto flex items-center space-x-4">
           {" "}
           <button
@@ -266,7 +339,9 @@ const BasicServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image <span>(Ratio  16 : 8)</span></Form.Label>
+                  <Form.Label>
+                    Image <span>(Ratio 16 : 8)</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
@@ -420,7 +495,9 @@ const BasicServices = () => {
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
-                  <Form.Label>Image<span>(Ratio  16 : 8)</span></Form.Label>
+                  <Form.Label>
+                    Image<span>(Ratio 16 : 8)</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
                     name="image"
