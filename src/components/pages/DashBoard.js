@@ -3,6 +3,7 @@ import DashBoardSection2 from "../DashBoardSection2";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import useBusiness from "../../api/useBusiness";
+import Zones from "./leads";
 
 const DashBoard = () => {
   const navigate = useNavigate();
@@ -28,14 +29,18 @@ const DashBoard = () => {
       <div className=" w-full">
         <DashBoardSection2 dashboardData={dashboardData} />
       </div>
+      <div className=" w-full">
+        <Zones/>
+        {/* <DashBoardSection2 dashboardData={dashboardData} /> */}
+      </div>
       {/* <DashBoard3Chart /> */}
-      <Button
+      {/* <Button
         sx={{ mt: "2rem" }}
         variant="contained"
         fullWidth
         onClick={() => navigate("/preview")}>
         Template Preview
-      </Button>
+      </Button> */}
     </div>
   );
 };

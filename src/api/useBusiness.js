@@ -188,6 +188,88 @@ const useBusiness = () => {
     }
   };
 
+  const forgotPassword = async (email) => {
+    setLoading(true);
+    try {
+      const response = await postApi(
+        `api/v1/business/forgot-password`,
+        { email },
+        false,
+        logout,
+        navigate
+      );
+      if (response?.data){
+        toast.success("Email send successfully", {
+          theme: "colored",
+          position: "top-right",
+          style: {
+            backgroundColor: "green",
+            color: "#07eb38",
+            height: "60px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center"
+          }
+        });
+        // navigate("/")
+      }
+    } catch (error) {
+      toast.error("Failed to send mail");
+      console.error("Error sending mail:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const resetpassword = async (body) => {
+    setLoading(true);
+    try {
+      const response = await postApi(
+        `api/v1/business/reset-password`,
+        { ...body },
+        false,
+        logout,
+        navigate
+      );
+      if (response?.data){
+        toast.success("Password reset successfully", {
+          theme: "colored",
+          position: "top-right",
+          style: {
+            backgroundColor: "green",
+            color: "#07eb38",
+            height: "60px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center"
+          }
+        });
+        navigate("/")
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message ??" password reset failed", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#ffffff",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
+      console.error("Error sending mail:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     getBusiness,
     loading,
@@ -197,7 +279,9 @@ const useBusiness = () => {
     logout,
     getBusinessDashboardData,
     addProduct,
-    changePassword
+    changePassword,
+    forgotPassword,
+    resetpassword
   };
 };
 export default useBusiness;
