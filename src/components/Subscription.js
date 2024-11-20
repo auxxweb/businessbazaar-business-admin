@@ -4,6 +4,7 @@ import BackdropLoader from "./reUsableCmponent/BackdropLoader";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
 import { Razorpay } from "./Razorpay/Razorpay";
 import useBusiness from "../api/useBusiness";
+import FullPageLoader from '../../src/components/FullPageLoader/FullPageLoader';
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
@@ -34,7 +35,7 @@ const Subscription = () => {
   // };
   return (
     <>
-      <BackdropLoader isLoading={loading} />
+       {(loading) && <FullPageLoader />}
 
       <div className="p-2 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Subscription</h1>
