@@ -457,7 +457,7 @@ function Sidebar({ isOpen, setIsOpen }) {
           </span>
         </div>
 
-        <div
+        {/* <div
           onClick={toggleModal}
           className="cursor-pointer flex items-center text-[#909294] hover:text-[#dc554e]">
           <span className="flex items-center ml-2 ">
@@ -475,8 +475,8 @@ function Sidebar({ isOpen, setIsOpen }) {
             </svg>
             <span className="text-custom-16 ml-4">Logout</span>
           </span>
-        </div>
-        <Modal
+        </div> */}
+        {/* <Modal
           isVisible={isModalVisible}
           onClose={toggleModal}
           modalHeader={"Are you you want to logout?"}>
@@ -486,7 +486,7 @@ function Sidebar({ isOpen, setIsOpen }) {
             className="bg-gray-200 p-3 w-full flex justify-center items-center mb-4 border border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white">
             Logout
           </button>
-        </Modal>
+        </Modal> */}
       </div>
     </Transition>
   );
