@@ -75,7 +75,7 @@ const ForgotPassword = () => {
               {/* Sign In Button */}
               <div className="flex justify-end mb-8 text-sm text-[#C19D5C] ">
                 <span
-                  onClick={() => navigate("/forgotPassword")}
+                  onClick={() => navigate("/")}
                   className="hover:underline cursor-pointer"
                 >
                   Back to Login?

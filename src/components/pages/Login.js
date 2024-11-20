@@ -122,12 +122,12 @@ const Login = () => {
                     Remember me
                   </span>
                 </span>
-                {/* <span
+                <span
                   onClick={() => navigate("/forgotPassword")}
                   className="hover:underline cursor-pointer"
                 >
                   Forgot Password?
-                </span> */}
+                </span>
               </div>
 
               {/* Sign In Button */}
