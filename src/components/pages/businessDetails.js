@@ -14,7 +14,7 @@ import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 const BusinessDetails = () => {
-  const { uploadImage ,imageLoading} = useImageUpload();
+  const { uploadImage, imageLoading } = useImageUpload();
   const [businessDetails, setBusinessDetails] = useState([]);
   const [category, setCategory] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,7 +65,8 @@ const BusinessDetails = () => {
     streetName: businessDetails?.address?.streetName || "",
     landmark: businessDetails?.address?.landMark || "",
     state: businessDetails?.address?.state || "",
-    phone: businessDetails?.contactDetails?.phone || "",
+    primaryNumber: businessDetails?.contactDetails?.primaryNumber || "",
+    secondaryNumber: businessDetails?.contactDetails?.secondaryNumber || "",
     email: businessDetails?.contactDetails?.email || "",
     website: businessDetails?.contactDetails?.website || "",
     description: businessDetails?.description || "",
@@ -90,7 +91,7 @@ const BusinessDetails = () => {
         );
         console.log(businessData.data);
         setBusinessDetails(businessData.data);
-       
+
         setSocialLinks(businessData?.data?.socialMediaLinks);
         setCategory(businessData?.data.category);
       } catch (error) {
@@ -109,7 +110,8 @@ const BusinessDetails = () => {
       streetName: businessDetails?.address?.streetName,
       landmark: businessDetails?.address?.landMark,
       state: businessDetails?.address?.state,
-      phone: businessDetails?.contactDetails?.phone,
+      primaryNumber: businessDetails?.contactDetails?.primaryNumber,
+      secondaryNumber: businessDetails?.contactDetails?.secondaryNumber,
       email: businessDetails?.contactDetails?.email,
       website: businessDetails?.contactDetails?.website,
       description: businessDetails?.description,
@@ -121,7 +123,7 @@ const BusinessDetails = () => {
     });
     setThemeData({
       theme: businessDetails?.theme,
-      secondaryTheme: businessDetails?.secondaryTheme ,
+      secondaryTheme: businessDetails?.secondaryTheme,
     });
   }, [businessDetails]);
 
@@ -162,18 +164,19 @@ const BusinessDetails = () => {
       },
       contactDetails: {
         ...businessDetails.contactDetails,
-        phone: formData.phone,
+        primaryNumber: formData.primaryNumber,
+        secondaryNumber: formData.secondaryNumber,
         email: formData.email,
+        website: formData.website,
       },
-      website: formData.website,
       description: formData.description,
     };
-console.log(updatedBusinessDetails);
+    console.log(updatedBusinessDetails);
 
     patchApi("api/v1/business", updatedBusinessDetails)
       .then((result) => {
         if (result?.success) {
-          setBusinessDetails(updatedBusinessDetails)
+          setBusinessDetails(updatedBusinessDetails);
           dispatch(setBusinessData(updatedBusinessDetails));
         }
       })
@@ -189,25 +192,25 @@ console.log(updatedBusinessDetails);
     const updatedBusinessDetails = {
       ...businessDetails,
       theme: themeData.theme,
-      secondaryTheme:themeData.secondaryTheme
+      secondaryTheme: themeData.secondaryTheme,
     };
     patchApi("api/v1/business", updatedBusinessDetails)
-    .then((result) => {
-      if (result?.success) {
-        setBusinessDetails(updatedBusinessDetails)
-        dispatch(setBusinessData(updatedBusinessDetails));
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+      .then((result) => {
+        if (result?.success) {
+          setBusinessDetails(updatedBusinessDetails);
+          dispatch(setBusinessData(updatedBusinessDetails));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     handleCloseSystemModal();
   };
 
   return (
     <>
       <div className="m-4 mx-auto bg-transparent  shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
-      { imageLoading && <FullPageLoader />}
+        {imageLoading && <FullPageLoader />}
         <div
           className="h-full w-full absolute z-0 top-0 left-0"
           style={{
@@ -274,12 +277,22 @@ console.log(updatedBusinessDetails);
                   businessDetails?.contactDetails?.email ?? "hidden"
                 }`}
               >
-                Email: {businessDetails?.contactDetails?.email || <span className="text-red-500 text-sm">Not Available</span>}
+                Email:{" "}
+                {businessDetails?.contactDetails?.email || (
+                  <span className="text-red-500 text-sm">Not Available</span>
+                )}
               </p>
-              <p
-                className={` `}
-              >
-                Phone: {businessDetails?.contactDetails?.phone || <span className="text-red-500 text-sm">Not Available</span>}
+              <p className={` `}>
+                Primary Number:{" "}
+                {businessDetails?.contactDetails?.primaryNumber || (
+                  <span className="text-red-500 text-sm">Not Available</span>
+                )}
+              </p>
+              <p className={` `}>
+                Secondary Number :{" "}
+                {businessDetails?.contactDetails?.secondaryNumber || (
+                  <span className="text-red-500 text-sm">Not Available</span>
+                )}
               </p>
               <p
                 className={`${
@@ -540,10 +553,18 @@ console.log(updatedBusinessDetails);
                 />
                 <input
                   type="text"
-                  name="phone"
-                  value={formData?.phone}
+                  name="primaryNumber"
+                  value={formData?.primaryNumber}
                   onChange={handleChange}
-                  placeholder="Phone"
+                  placeholder="Primary Number"
+                  className="border border-gray-300 p-2 w-full rounded"
+                />
+                <input
+                  type="text"
+                  name="secondaryNumber"
+                  value={formData?.secondaryNumber}
+                  onChange={handleChange}
+                  placeholder="Seconday Number"
                   className="border border-gray-300 p-2 w-full rounded"
                 />
                 <input
@@ -584,9 +605,9 @@ console.log(updatedBusinessDetails);
                   <img
                     src={currentImage.preview}
                     alt="Preview"
-                     className="mt-3 w-1/2 h-auto mx-auto "
+                    className="mt-3 w-1/2 h-auto mx-auto "
                     style={{
-                     objectFit: "cover",
+                      objectFit: "cover",
                       display: "block",
                       marginInline: "auto",
                     }}
