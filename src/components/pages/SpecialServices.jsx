@@ -7,7 +7,7 @@ import useImageUpload from '../../api/imageUpload/useImageUpload'
 import { toast } from 'sonner'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
-import FullPageLoader from '../FullPageLoader/FullPageLoader';
+import FullPageLoader from '../FullPageLoader/FullPageLoader'
 
 const SpecialServices = () => {
   const [businessData, setBusinessData] = useState([])
@@ -26,7 +26,6 @@ const SpecialServices = () => {
     }
     fetchBusiness()
   }, [])
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,44 +168,44 @@ const SpecialServices = () => {
     }
   }
   const handleSaveChanges = async () => {
-if(!newService?.title || !newService?.description){
-  toast.warning("Please enter title and description", {
-    position: "top-right",
-    duration: 2000,
-    style: {
-      backgroundColor: "yellow", // Custom yellow color for warning
-      color: "#FFFFFF" // Text color
-    },
-    dismissible: true
-  });
-}else{
-  var imageAccessUrl = selectedService.image
-  if (imageFile) {
-    const data = await uploadImage(imageFile, 'SpecialServices')
-    imageAccessUrl = data?.accessLink
-    setUpdatedServices((prevService) => ({
-      ...prevService,
-      image: imageAccessUrl, // Remove quotes here
-    }))
-    updatedServices.image = imageAccessUrl
-  }
-  const updatedService = services.map((Servi) =>
-    Servi._id === updatedServices._id ? updatedServices : Servi,
-  )
-  setServices(updatedService)
-  const updatedData = {
-    specialServices: {
-      ...businesses?.specialServices,
-      data: [...updatedService],
-    },
-  }
-  await updateBusiness(updatedData)
-  console.log(updatedData, 'updatedData')
-  handleCloseModal()
-}
+    if (!newService?.title || !newService?.description) {
+      toast.warning('Please enter title and description', {
+        position: 'top-right',
+        duration: 2000,
+        style: {
+          backgroundColor: 'yellow', // Custom yellow color for warning
+          color: '#FFFFFF', // Text color
+        },
+        dismissible: true,
+      })
+    } else {
+      var imageAccessUrl = selectedService.image
+      if (imageFile) {
+        const data = await uploadImage(imageFile, 'SpecialServices')
+        imageAccessUrl = data?.accessLink
+        setUpdatedServices((prevService) => ({
+          ...prevService,
+          image: imageAccessUrl, // Remove quotes here
+        }))
+        updatedServices.image = imageAccessUrl
+      }
+      const updatedService = services.map((Servi) =>
+        Servi._id === updatedServices._id ? updatedServices : Servi,
+      )
+      setServices(updatedService)
+      const updatedData = {
+        specialServices: {
+          ...businesses?.specialServices,
+          data: [...updatedService],
+        },
+      }
+      await updateBusiness(updatedData)
+      console.log(updatedData, 'updatedData')
+      handleCloseModal()
+    }
   }
 
-  const handleDeleteServices = () => {
+  const handleDeleteServices = async () => {
     setServices((prevServices) =>
       prevServices.filter((Servi) => Servi._id !== selectedService._id),
     )
@@ -217,24 +216,25 @@ if(!newService?.title || !newService?.description){
         data: services.filter((Servi) => Servi._id !== selectedService._id),
       },
     }
-
+    await updateBusiness({
+      specialServices: services,
+    })
     setBusinessData(updatedData)
 
     handleDeleteCloseModal()
   }
   const handleCreateService = async () => {
-    if(!newService?.title || !newService?.description){
-      toast.warning("Please enter title and description", {
-        position: "top-right",
+    if (!newService?.title || !newService?.description) {
+      toast.warning('Please enter title and description', {
+        position: 'top-right',
         duration: 2000,
         style: {
-          backgroundColor: "yellow", // Custom yellow color for warning
-          color: "#FFFFFF" // Text color
+          backgroundColor: 'yellow', // Custom yellow color for warning
+          color: '#FFFFFF', // Text color
         },
-        dismissible: true
-      });
-    }else{
-
+        dismissible: true,
+      })
+    } else {
       try {
         let imgAccessUrl
         if (imageCreateFile) {
@@ -244,9 +244,9 @@ if(!newService?.title || !newService?.description){
         // Prepare updated business data immutably
         const updatedData = {
           specialServices: {
-            ...businesses?.specialServices,
+            ...businesses?.specialServices ??[],
             data: [
-              ...businesses?.specialServices?.data,
+              ...(businesses?.specialServices?.data || []),
               {
                 ...newService,
                 image: imgAccessUrl,
@@ -257,6 +257,7 @@ if(!newService?.title || !newService?.description){
         await updateBusiness(updatedData)
         handleCreateCloseModal()
       } catch (error) {
+        console.log(error,"errorr ---------------------")
         toast.error('Something went wrong , please try again!')
       }
     }
@@ -293,7 +294,6 @@ if(!newService?.title || !newService?.description){
     // Assuming you have a state or method to handle filtered results
     setFilteredServices(filteredServices)
   }, 500)
-
 
   if (loading) {
     return (
