@@ -3,6 +3,8 @@ import { Button, Modal, Form } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
 import Pagination from "../Pagination";
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../utils/cropper.utils';
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
@@ -44,8 +46,26 @@ const Judges = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [page, setPage] = useState(1);
-  const [reFetch, SetReFetch] = useState(false);
   const limit = 10;
+  const [modalState, setModalState] = useState({
+    showEdit: false,
+    showCreate: false,
+    showDelete: false,
+    showCrop: false,
+  });
+  const [currentImage, setCurrentImage] = useState({
+    index: null,
+    image: null,
+    preview: "",
+    file: null,
+  });
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const handleModalState = (type, state) => {
+    setModalState((prev) => ({ ...prev, [type]: state }));
+  };
   useEffect(() => {
     setProducts(businesses?.productSection)
   }, [businesses])
@@ -59,7 +79,7 @@ const Judges = () => {
       price: product.price,
       image: product.image,
     })
-    setImagePreview(product.image) // Initialize preview with current image
+    setCurrentImage({preview:product.image,image:product.image}) // Initialize preview with current image
     setShowModal(true)
   }
 
@@ -109,6 +129,20 @@ const Judges = () => {
     }
   }
 
+  const handleFileChange = async (e, isCreate = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setCurrentImage((prev) => ({
+        ...prev,
+        image: previewUrl,
+        preview: previewUrl,
+        file,
+      }));
+      handleModalState("showCrop", true);
+    }
+  };
+
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
     const { name, value, type } = e.target
@@ -124,8 +158,8 @@ const Judges = () => {
   }
   const handleSaveChanges = async () => {
     let accessLink = null
-    if (imageFile) {
-      const data = await uploadImage(imageFile, 'products')
+    if (currentImage?.file) {
+      const data = await uploadImage(currentImage?.file, 'products')
       accessLink = data?.accessLink
     }
     const updatedProducts = products.map((product) =>
@@ -139,7 +173,7 @@ const Judges = () => {
     console.log(updateData, 'updated-data')
 
     await updateBusiness(updateData)
-    setImageFile(null)
+    setCurrentImage({image:null,preview:null})
     handleCloseModal()
   }
 
@@ -159,7 +193,7 @@ const Judges = () => {
     console.log(updateData)
 
     await updateBusiness(updatedData)
-    setImageFile(null)
+    setCurrentImage({image:null,preview:null})
 
     handleDeleteCloseModal()
   }
@@ -170,13 +204,14 @@ const Judges = () => {
 
   const handleCreateProduct = async () => {
     let accessLink = null
-    if (imageFile) {
-      const data = await uploadImage(imageFile, 'products')
+    if (currentImage?.file) {
+      const data = await uploadImage(currentImage?.file, 'products')
       console.log(data?.accessLink, 'data-accessLink')
       accessLink = data?.accessLink
     }
 
     await addProduct({ ...newProduct, image: accessLink })
+    setCurrentImage({image:null,preview:null})
     handleCreateCloseModal()
   }
 
@@ -281,36 +316,26 @@ const Judges = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formImage" className="mt-3">
-                <Form.Label style={{ fontWeight: '500' }}>Image<span>(Ratio 1 : 1)</span></Form.Label>
-                <Form.Control
-                  type="file"
-                  name="image"
-                  required
-                  accept="image/*"
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: '8px',
-                    padding: '8px',
-                    border: '1px solid #ddd',
-                  }}
-                />
-                {imageCreatePreview && (
-                  <img
-                    src={imageCreatePreview}
-                    alt="Image Preview"
-                    className="mt-3"
-                    style={{
-                      width: '100px',
-                      height: '100px',
-                      objectFit: 'cover',
-                      display: 'block',
-                      borderRadius: '8px',
-                      border: '1px solid #ddd',
-                      margin: '10px auto',
-                    }}
-                  />
-                )}
-              </Form.Group>
+              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
+              <Form.Control
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+{currentImage.preview && (
+            <img
+              src={currentImage.preview}
+              alt="Preview"
+              className="w-1/2 mx-auto h-auto mt-4"
+              style={{
+                objectFit: "cover",
+                display: "block",
+                marginInline: "auto",
+              }}
+            />
+          )}
+            </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer
@@ -450,21 +475,20 @@ const Judges = () => {
                 type="file"
                 name="image"
                 accept="image/*"
-                onChange={handleInputChange}
+                onChange={handleFileChange}
               />
-              {imagePreview && (
-                <img
-                  src={imagePreview}
-                  alt="Image Preview"
-                  className="mt-3"
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover',
-                    marginInline: 'auto',
-                  }}
-                />
-              )}
+             {currentImage.preview && (
+            <img
+              src={currentImage.preview}
+              alt="Preview"
+              className="w-1/2 mx-auto h-auto mt-4"
+              style={{
+                objectFit: "cover",
+                display: "block",
+                marginInline: "auto",
+              }}
+            />
+          )}
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -498,6 +522,50 @@ const Judges = () => {
           onPageChange={handlePageChange}
         />
       </div>
+      <Modal
+        show={modalState.showCrop}
+        onHide={() => handleModalState("showCrop", false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Crop Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div
+            className="crop-container position-relative"
+            style={{ height: "400px" }}
+          >
+            <Cropper
+              image={currentImage.preview}
+              crop={crop}
+              zoom={zoom}
+              aspect={1 / 1}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) => {
+                setCroppedAreaPixels(croppedAreaPixels);
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={async () => {
+              const { blob, fileUrl } = await getCroppedImg(
+                currentImage.preview,
+                croppedAreaPixels
+              );
+              setCurrentImage((prev) => ({
+                ...prev,
+                preview: fileUrl,
+                file: blob,
+              }));
+              handleModalState("showCrop", false);
+            }}
+          >
+            Crop & Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

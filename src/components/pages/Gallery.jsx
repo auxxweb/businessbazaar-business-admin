@@ -183,10 +183,8 @@ const Gallery = () => {
                 <img
                   src={currentImage.preview}
                   alt="Preview"
-                  className="mt-3"
+                   className="mt-3 w-1/2 h-auto mx-auto "
                   style={{
-                    width: "100px",
-                    height: "100px",
                     objectFit: "cover",
                     display: "block",
                     marginInline: "auto",
