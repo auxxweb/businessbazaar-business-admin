@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import usePlan from "../Hooks/usePlan";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
 import useBusiness from "../api/useBusiness";
+import FullPageLoader from "./FullPageLoader/FullPageLoader";
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
@@ -22,6 +23,10 @@ const Subscription = () => {
     };
     fetchData();
   }, []);
+
+  if(planLoading){
+    return <FullPageLoader/>
+  }
 
 
   const renderFreePlan = () => (
