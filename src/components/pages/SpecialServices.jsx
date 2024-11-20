@@ -7,6 +7,7 @@ import useImageUpload from '../../api/imageUpload/useImageUpload'
 import { toast } from 'sonner'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
+import FullPageLoader from '../FullPageLoader/FullPageLoader';
 
 const SpecialServices = () => {
   const [businessData, setBusinessData] = useState([])
@@ -266,6 +267,17 @@ const SpecialServices = () => {
     // Assuming you have a state or method to handle filtered results
     setFilteredServices(filteredServices)
   }, 500)
+
+
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>

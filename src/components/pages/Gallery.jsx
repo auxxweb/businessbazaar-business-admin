@@ -4,10 +4,11 @@ import { Button, Form, Modal } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
+import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 const Gallery = () => {
-  const { businesses, getBusiness, updateBusiness } = useBusiness();
-  const { uploadImage } = useImageUpload();
+  const { businesses, getBusiness, updateBusiness ,loading} = useBusiness();
+  const { uploadImage,imageLoading } = useImageUpload();
 
   const [gallery, setGallery] = useState([]);
   const [modalState, setModalState] = useState({
@@ -99,6 +100,16 @@ const Gallery = () => {
     setGallery(businesses?.gallery || []);
   }, [businesses?.gallery]);
 
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="container">
@@ -116,6 +127,9 @@ const Gallery = () => {
           </div>
         </div>
         <div className="row">
+          {imageLoading&&(
+            <FullPageLoader/>
+          )}
           {gallery.map((item, index) => (
             <div className="col-md-3 p-2" key={index}>
               <div className="w-fit h-full border relative rounded-md mx-auto hover:shadow-xl duration-300">

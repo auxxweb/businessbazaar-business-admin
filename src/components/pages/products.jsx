@@ -5,6 +5,8 @@ import useBusiness from '../../api/useBusiness'
 import Pagination from "../Pagination";
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/cropper.utils';
+import BackdropLoader from '../reUsableCmponent/BackdropLoader';
+import FullPageLoader from "../FullPageLoader/FullPageLoader"
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
@@ -213,6 +215,10 @@ const Judges = () => {
     await addProduct({ ...newProduct, image: accessLink })
     setCurrentImage({image:null,preview:null})
     handleCreateCloseModal()
+  }
+
+  if (loading) {
+    return <FullPageLoader />;
   }
 
   return (
