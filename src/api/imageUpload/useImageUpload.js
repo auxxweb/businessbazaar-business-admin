@@ -15,6 +15,10 @@ const useImageUpload = () => {
 
   const uploadImage = async (file, position) => {
     setLoading(true);
+    if(file?.size > 5242880){
+     return alert("Oops! file size exeeded!")
+    }
+    
     try {
       const requestBody = {
         files: [
