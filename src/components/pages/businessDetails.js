@@ -274,7 +274,7 @@ console.log(updatedBusinessDetails);
                   businessDetails?.contactDetails?.email ?? "hidden"
                 }`}
               >
-                Email: {businessDetails?.contactDetails?.email}
+                Email: {businessDetails?.contactDetails?.email || <span className="text-red-500 text-sm">Not Available</span>}
               </p>
               <p
                 className={` `}
