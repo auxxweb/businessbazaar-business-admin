@@ -10,9 +10,10 @@ import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
 import useBusiness from '../../api/useBusiness'
 import { useDebouncedCallback } from 'use-debounce';
+import FullPageLoader from '../FullPageLoader/FullPageLoader';
 
 const BasicServices = () => {
-  const { updateBusiness } = useBusiness()
+  const { updateBusiness,loading } = useBusiness()
   const dispatch = useDispatch()
   const [businessData, setBusinessData] = useState([])
 
@@ -303,6 +304,16 @@ const BasicServices = () => {
     setFilteredServices(filteredServices)
   }, 500)
 
+
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader/>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex rounded-lg p-4">

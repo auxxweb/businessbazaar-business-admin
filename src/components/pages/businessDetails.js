@@ -20,23 +20,24 @@ const BusinessDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [isSocialMedia, setSocialMediaModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [socialLinks, setSocialLinks] = useState({
     facebook: null,
     instagram: null,
-    twitter: null,
+    twitter: null
   });
 
   const [modalState, setModalState] = useState({
     showEdit: false,
     showCreate: false,
     showDelete: false,
-    showCrop: false,
+    showCrop: false
   });
   const [currentImage, setCurrentImage] = useState({
     index: null,
     image: null,
     preview: "",
-    file: null,
+    file: null
   });
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -53,7 +54,7 @@ const BusinessDetails = () => {
         ...prev,
         image: previewUrl,
         preview: previewUrl,
-        file,
+        file
       }));
       handleModalState("showCrop", true);
     }
@@ -70,18 +71,19 @@ const BusinessDetails = () => {
     email: businessDetails?.contactDetails?.email || "",
     website: businessDetails?.contactDetails?.website || "",
     description: businessDetails?.description || "",
-    socialMediaLinks: businessDetails?.socialMediaLinks || [],
+    socialMediaLinks: businessDetails?.socialMediaLinks || []
   });
 
   const [themeData, setThemeData] = useState({
     theme: businessDetails?.theme || "",
-    secondaryTheme: businessDetails?.secondaryTheme || "",
+    secondaryTheme: businessDetails?.secondaryTheme || ""
   });
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const businessData = await getApi(
           `api/v1/business/profile`,
@@ -95,10 +97,13 @@ const BusinessDetails = () => {
         setSocialLinks(businessData?.data?.socialMediaLinks);
         setCategory(businessData?.data.category);
       } catch (error) {
+        setLoading(false);
         console.error(
           "Error fetching business details:",
           error.message || error
         );
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -115,15 +120,15 @@ const BusinessDetails = () => {
       email: businessDetails?.contactDetails?.email,
       website: businessDetails?.contactDetails?.website,
       description: businessDetails?.description,
-      socialMediaLinks: businessDetails?.socialMediaLinks,
+      socialMediaLinks: businessDetails?.socialMediaLinks
     });
     setCurrentImage({
       preview: businessDetails?.logo,
-      image: businessDetails?.logo,
+      image: businessDetails?.logo
     });
     setThemeData({
       theme: businessDetails?.theme,
-      secondaryTheme: businessDetails?.secondaryTheme,
+      secondaryTheme: businessDetails?.secondaryTheme
     });
   }, [businessDetails]);
 
@@ -135,7 +140,7 @@ const BusinessDetails = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -143,7 +148,7 @@ const BusinessDetails = () => {
     console.log(e.target.name, e.target.value, "in theme");
     setThemeData({
       ...themeData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
   const handleSubmit = async () => {
@@ -160,16 +165,16 @@ const BusinessDetails = () => {
         buildingName: formData.buildingName,
         streetName: formData.streetName,
         landmark: formData.landmark,
-        state: formData.state,
+        state: formData.state
       },
       contactDetails: {
         ...businessDetails.contactDetails,
         primaryNumber: formData.primaryNumber,
         secondaryNumber: formData.secondaryNumber,
         email: formData.email,
-        website: formData.website,
+        website: formData.website
       },
-      description: formData.description,
+      description: formData.description
     };
     console.log(updatedBusinessDetails);
 
@@ -192,7 +197,7 @@ const BusinessDetails = () => {
     const updatedBusinessDetails = {
       ...businessDetails,
       theme: themeData.theme,
-      secondaryTheme: themeData.secondaryTheme,
+      secondaryTheme: themeData.secondaryTheme
     };
     patchApi("api/v1/business", updatedBusinessDetails)
       .then((result) => {
@@ -207,6 +212,16 @@ const BusinessDetails = () => {
     handleCloseSystemModal();
   };
 
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="m-4 mx-auto bg-transparent  shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
@@ -218,9 +233,8 @@ const BusinessDetails = () => {
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
             backfaceVisibility: "revert",
-            opacity: "0.2",
-          }}
-        ></div>
+            opacity: "0.2"
+          }}></div>
         {/* Business Details */}
         <div className=" block md:flex  bg-transparent relative">
           <img
@@ -249,22 +263,19 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.address?.buildingName ?? "hidden"
-                }`}
-              >
+                }`}>
                 {" "}
                 {businessDetails?.address?.buildingName}
               </p>
               <p
                 className={`${
                   businessDetails?.address?.streetName ?? "hidden"
-                }`}
-              >
+                }`}>
                 {" "}
                 {businessDetails?.address?.streetName}
               </p>
               <p
-                className={`${businessDetails?.address?.landMark ?? "hidden"}`}
-              >
+                className={`${businessDetails?.address?.landMark ?? "hidden"}`}>
                 {" "}
                 {businessDetails?.address?.landMark}
               </p>
@@ -275,8 +286,7 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.contactDetails?.email ?? "hidden"
-                }`}
-              >
+                }`}>
                 Email:{" "}
                 {businessDetails?.contactDetails?.email || (
                   <span className="text-red-500 text-sm">Not Available</span>
@@ -297,15 +307,13 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.contactDetails?.website ?? "hidden"
-                } `}
-              >
+                } `}>
                 Website:{" "}
                 <a
                   href={businessDetails?.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500"
-                >
+                  className="text-blue-500">
                   {" "}
                   {businessDetails?.contactDetails?.website}
                 </a>
@@ -320,22 +328,19 @@ const BusinessDetails = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     enable-background="new 0 0 1668.56 1221.19"
                     viewBox="0 0 1668.56 1221.19"
-                    id="twitter-x"
-                  >
+                    id="twitter-x">
                     <circle
                       cx="834.28"
                       cy="610.6"
                       r="481.33"
                       stroke="#fff"
-                      stroke-miterlimit="10"
-                    ></circle>
+                      stroke-miterlimit="10"></circle>
                     <path
                       fill="#fff"
                       d="M485.39,356.79l230.07,307.62L483.94,914.52h52.11l202.7-218.98l163.77,218.98h177.32
 			L836.82,589.6l215.5-232.81h-52.11L813.54,558.46L662.71,356.79H485.39z M562.02,395.17h81.46l359.72,480.97h-81.46L562.02,395.17
 			z"
-                      transform="translate(52.39 -25.059)"
-                    ></path>
+                      transform="translate(52.39 -25.059)"></path>
                   </svg>
                 </a>
               )}
@@ -347,8 +352,7 @@ const BusinessDetails = () => {
                     width="30px"
                     height="30px"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                    xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2.03998C6.5 2.03998 2 6.52998 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.84998C10.44 7.33998 11.93 5.95998 14.22 5.95998C15.31 5.95998 16.45 6.14998 16.45 6.14998V8.61998H15.19C13.95 8.61998 13.56 9.38998 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C15.9164 21.5878 18.0622 20.3855 19.6099 18.57C21.1576 16.7546 22.0054 14.4456 22 12.06C22 6.52998 17.5 2.03998 12 2.03998Z" />
                   </svg>
                 </a>
@@ -361,8 +365,7 @@ const BusinessDetails = () => {
                     height="27px"
                     viewBox="0 0 24 24"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                       fillRule="evenodd"
                       clipRule="evenodd"
@@ -384,8 +387,7 @@ const BusinessDetails = () => {
               )}
               <button
                 onClick={() => setSocialMediaModal(true)}
-                className="  ms-auto float-end "
-              >
+                className="  ms-auto float-end ">
                 <img
                   src="/icons/edit.svg"
                   alt="Edit"
@@ -402,15 +404,13 @@ const BusinessDetails = () => {
             <p className="font-semibold text-gray-600 p-0 m-0">Theme:</p>
             <div
               style={{ backgroundColor: themeData?.theme }}
-              className={`shadow w-10 h-10 rounded-xl border`}
-            ></div>
+              className={`shadow w-10 h-10 rounded-xl border`}></div>
             <p className="font-semibold text-gray-600 p-0 m-0">
               Secondary Theme:{" "}
             </p>
             <div
               style={{ backgroundColor: themeData?.secondaryTheme }}
-              className={` shadow w-10 h-10 rounded-xl border`}
-            ></div>
+              className={` shadow w-10 h-10 rounded-xl border`}></div>
             <button onClick={handleShowSystemModal} className=" float-end p-2">
               <img
                 src="/icons/edit.svg"
@@ -496,14 +496,12 @@ const BusinessDetails = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleCloseModal}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                >
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2">
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                   Save
                 </button>
               </div>
@@ -609,7 +607,7 @@ const BusinessDetails = () => {
                     style={{
                       objectFit: "cover",
                       display: "block",
-                      marginInline: "auto",
+                      marginInline: "auto"
                     }}
                   />
                 )}
@@ -618,14 +616,12 @@ const BusinessDetails = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleCloseModal}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                >
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2">
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                   Save
                 </button>
               </div>
@@ -663,14 +659,12 @@ const BusinessDetails = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleCloseSystemModal}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                >
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2">
                   Cancel
                 </button>
                 <button
                   onClick={handleSystemSettingsSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                   Save
                 </button>
               </div>
@@ -680,16 +674,14 @@ const BusinessDetails = () => {
       </div>
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
-      >
+        onHide={() => handleModalState("showCrop", false)}>
         <Modal.Header closeButton>
           <Modal.Title>Crop Image</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
-          >
+            style={{ height: "400px" }}>
             <Cropper
               image={currentImage.preview}
               crop={crop}
@@ -713,11 +705,10 @@ const BusinessDetails = () => {
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
-                file: blob,
+                file: blob
               }));
               handleModalState("showCrop", false);
-            }}
-          >
+            }}>
             Crop & Save
           </Button>
         </Modal.Footer>
