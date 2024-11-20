@@ -4,9 +4,12 @@ import Pagination from "../Pagination";
 import Loader from "../Loader/Loader";
 import useNewsArticles from "../../api/news";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "../../utils/cropper.utils";
+import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 const News = () => {
-  const { imageLoading, uploadImage } = useImageUpload()
+  const { imageLoading, uploadImage } = useImageUpload();
   const {
     newsArticles,
     loading,
@@ -32,6 +35,7 @@ const News = () => {
     description: "",
     link: "",
     isBanner: false,
+    image: null,
   });
   const [showMore, setShowMore] = useState({ index: -1, status: false });
   const [updatedNews, setUpdatedNews] = useState({
@@ -40,14 +44,48 @@ const News = () => {
     description: "",
     link: "",
     isBanner: false,
+    image: null,
   });
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [page, setPage] = useState(1);
-  const [imageCreatePreview, setImageCreatePreview] = useState('')
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreview, setImagePreview] = useState('')
+  const [imageCreatePreview, setImageCreatePreview] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const limit = 10;
+  const [modalState, setModalState] = useState({
+    showEdit: false,
+    showCreate: false,
+    showDelete: false,
+    showCrop: false,
+  });
+  const [currentImage, setCurrentImage] = useState({
+    index: null,
+    image: null,
+    preview: "",
+    file: null,
+  });
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const handleModalState = (type, state) => {
+    setModalState((prev) => ({ ...prev, [type]: state }));
+  };
+
+  const handleFileChange = async (e, isCreate = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setCurrentImage((prev) => ({
+        ...prev,
+        image: previewUrl,
+        preview: previewUrl,
+        file,
+      }));
+      handleModalState("showCrop", true);
+    }
+  };
 
   useEffect(() => {
     setNews(newsArticles?.data);
@@ -61,6 +99,7 @@ const News = () => {
       description: newsData.description,
       link: newsData.link,
       isBanner: newsData.isBanner,
+      image: newsData.image,
     });
     setShowModal(true);
   };
@@ -74,6 +113,7 @@ const News = () => {
       description: "",
       link: "",
       isBanner: false,
+      image: null,
     });
   };
 
@@ -85,6 +125,7 @@ const News = () => {
       description: "",
       link: "",
       isBanner: false,
+      image: null,
     });
   };
 
@@ -96,13 +137,13 @@ const News = () => {
 
   const handleInputChange = async (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'file') {
-      const file = e.target.files[0]
+    if (type === "file") {
+      const file = e.target.files[0];
       if (file) {
-        setImageFile(file)
-        setImagePreview(URL.createObjectURL(file))
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
       } else {
-        console.error('Access link not found in response.')
+        console.error("Access link not found in response.");
       }
     } else if (type === "checkbox") {
       setUpdatedNews((prevNewsData) => ({
@@ -117,16 +158,16 @@ const News = () => {
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'file') {
-      const file = e.target.files[0]
-      
+    if (type === "file") {
+      const file = e.target.files[0];
+
       if (file) {
-        setImageFile(file)
-        setImageCreatePreview(URL.createObjectURL(file))
+        setImageFile(file);
+        setImageCreatePreview(URL.createObjectURL(file));
       } else {
-        console.error('Access link not found in response.')
+        console.error("Access link not found in response.");
       }
-    }else  if (type === "checkbox") {
+    } else if (type === "checkbox") {
       setNewNewsArticle((prevNewsData) => ({
         ...prevNewsData,
         isBanner: checked,
@@ -136,13 +177,21 @@ const News = () => {
     }
   };
   const handleSaveChanges = async () => {
-    let image = null;
-    if (imageFile) {
-      const data = await uploadImage(imageFile, 'news')
-      image = data?.accessLink
+    console.log(currentImage);
+    
+    if (currentImage?.file) {
+      uploadImage(currentImage?.file, "news").then(async (response) => {
+        if (response?.accessLink) {
+          await updateNewsArticles({
+            ...updatedNews,
+            image: response?.accessLink,
+          });
+        }
+      });
+    } else {
+      await updateNewsArticles({ ...updatedNews });
     }
-    await updateNewsArticles({...updatedNews,image});
-    setImageFile(null)
+    setImageFile(null);
     handleCloseModal();
   };
 
@@ -160,18 +209,25 @@ const News = () => {
   };
 
   const handleCreateNewsArticle = async () => {
-    let image = null;
-    if (imageFile) {
-      const data = await uploadImage(imageFile, 'news')
-      image = data?.accessLink
+    if (currentImage?.file) {
+      uploadImage(currentImage?.file, "news").then(async (response) => {
+        if (response?.accessLink) {
+          await addNewsArticles({
+            ...newNewsArticle,
+            image: response?.accessLink,
+          });
+        }
+      });
+    } else {
+      await addNewsArticles({ ...newNewsArticle });
     }
-    await addNewsArticles({ ...newNewsArticle,image });
+    setImageFile(null);
     handleCreateCloseModal();
   };
 
   return (
     <>
-      {/* {(imageLoading || loading)&&} */}
+      {imageLoading && <FullPageLoader />}
       <div className="flex rounded-lg p-4">
         <h2 className="text-2xl font-semibold text-gray-700">
           News & Articles
@@ -273,32 +329,24 @@ const News = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formImage" className="mt-3">
-                <Form.Label style={{ fontWeight: '500' }}>Image</Form.Label>
+                <Form.Label>
+                  Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
+                </Form.Label>
                 <Form.Control
                   type="file"
                   name="image"
-                  required
                   accept="image/*"
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: '8px',
-                    padding: '8px',
-                    border: '1px solid #ddd',
-                  }}
+                  onChange={handleFileChange}
                 />
-                {imageCreatePreview && (
+                {currentImage.preview && (
                   <img
-                    src={imageCreatePreview}
-                    alt="Image Preview"
-                    className="mt-3"
+                    src={currentImage.preview}
+                    alt="Preview"
+                    className="w-1/2 mx-auto h-auto mt-4"
                     style={{
-                      width: '100px',
-                      height: '100px',
-                      objectFit: 'cover',
-                      display: 'block',
-                      borderRadius: '8px',
-                      border: '1px solid #ddd',
-                      margin: '10px auto',
+                      objectFit: "cover",
+                      display: "block",
+                      marginInline: "auto",
                     }}
                   />
                 )}
@@ -485,23 +533,24 @@ const News = () => {
               />
             </Form.Group>
             <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image</Form.Label>
+              <Form.Label>
+                Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
+              </Form.Label>
               <Form.Control
                 type="file"
                 name="image"
                 accept="image/*"
-                onChange={handleInputChange}
+                onChange={handleFileChange}
               />
-              {imagePreview && (
+              {currentImage.preview && (
                 <img
-                  src={imagePreview}
-                  alt="Image Preview"
-                  className="mt-3"
+                  src={currentImage.preview}
+                  alt="Preview"
+                  className="w-1/2 mx-auto h-auto mt-4"
                   style={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover',
-                    marginInline: 'auto',
+                    objectFit: "cover",
+                    display: "block",
+                    marginInline: "auto",
                   }}
                 />
               )}
@@ -549,81 +598,139 @@ const News = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {/* Crop Modal */}
+      <Modal
+        show={modalState.showCrop}
+        onHide={() => handleModalState("showCrop", false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Crop Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div
+            className="crop-container position-relative"
+            style={{ height: "400px" }}
+          >
+            <Cropper
+              image={currentImage.preview}
+              crop={crop}
+              zoom={zoom}
+              aspect={16 / 9}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) => {
+                setCroppedAreaPixels(croppedAreaPixels);
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={async () => {
+              const { blob, fileUrl } = await getCroppedImg(
+                currentImage.preview,
+                croppedAreaPixels
+              );
+              setCurrentImage((prev) => ({
+                ...prev,
+                preview: fileUrl,
+                file: blob,
+              }));
+              handleModalState("showCrop", false);
+            }}
+          >
+            Crop & Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
 
-const LinkPreviewComponent = ({ url,image }) => {
- 
+const LinkPreviewComponent = ({ url, image }) => {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-      const isYouTubeVideo = isYouTubeURL(url);
-      if (isYouTubeVideo) {
+    const isYouTubeVideo = isYouTubeURL(url);
+    if (isYouTubeVideo) {
+      setPreviewData({
+        youtube: true,
+      });
+      setLoading(false);
+    }
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
+        const data = await response.text();
+
+        if (!isYouTubeVideo) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "text/html");
+          const image =
+            doc
+              .querySelector('meta[property="og:image"]')
+              ?.getAttribute("content") || "";
+
           setPreviewData({
-              youtube: true
+            image,
+            youtube: false,
           });
           setLoading(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
       }
-      const fetchData = async () => {
-          try {
-
-              const response = await fetch(url);
-              const data = await response.text();
-
-              if (!isYouTubeVideo) {
-                  const parser = new DOMParser();
-                  const doc = parser.parseFromString(data, 'text/html');
-                  const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
-
-                  setPreviewData({
-                      image,
-                      youtube: false,
-                  });
-                  setLoading(false);
-              }
-          } catch (error) {
-              console.error(error);
-              setLoading(false);
-          }
-      };
-      if (!isYouTubeVideo) {
-
-          fetchData();
-      }
+    };
+    if (!isYouTubeVideo) {
+      fetchData();
+    }
   }, [url]);
 
   const isYouTubeURL = (url) => {
-      return url?.includes('youtube.com') || url?.includes('youtu.be');
+    return url?.includes("youtube.com") || url?.includes("youtu.be");
   };
 
   if (loading) {
-      return <p>Loading...</p>;
+    return <p>Loading...</p>;
   }
 
   if (!previewData) {
-      return (
-          <div className='overflow-hidden  rounded' style={{ cursor: 'pointer' }}>
-              {/* <img src={PlaceholderBanner} alt="Link Preview" className='w-100 h-100' /> */}
-          </div>
-      )
+    return (
+      <div className="overflow-hidden  rounded" style={{ cursor: "pointer" }}>
+        {/* <img src={PlaceholderBanner} alt="Link Preview" className='w-100 h-100' /> */}
+      </div>
+    );
   }
 
   if (previewData?.youtube) {
-      return (<div className='overflow-hidden  rounded' style={{ cursor: 'pointer' }}>
-          <iframe src={url} frameborder="0" className='w-100 h-100'></iframe>
-      </div>)
+    return (
+      <div className="overflow-hidden  rounded" style={{ cursor: "pointer" }}>
+        <iframe src={url} frameborder="0" className="w-100 h-100"></iframe>
+      </div>
+    );
   }
 
   const handleClick = () => {
-      window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   return (
-      <div className='overflow-hidden  rounded' onClick={handleClick} style={{ cursor: 'pointer' }}>
-          {(previewData.image ||image )&& <img src={image ?? previewData?.image} alt="Link Preview" className='w-100 h-100' />}
-      </div>
+    <div
+      className="overflow-hidden  rounded"
+      onClick={handleClick}
+      style={{ cursor: "pointer" }}
+    >
+      {(previewData.image || image) && (
+        <img
+          src={image ?? previewData?.image}
+          alt="Link Preview"
+          className="w-100 h-100"
+        />
+      )}
+    </div>
   );
 };
 
