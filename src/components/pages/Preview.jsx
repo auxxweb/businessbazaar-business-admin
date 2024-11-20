@@ -15,6 +15,7 @@ import { Box, IconButton } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import '../../assets/css/template.css';
+import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 export default function Preview() {
   const { businessData, colorTheme, closeDays, loading, isPremium } =
@@ -222,7 +223,7 @@ export default function Preview() {
     return (
       <div className="h-100vh text-center ">
         <div className="row h-100 justify-content-center align-items-center">
-          <div className="col-3 ">Loading...</div>
+          <FullPageLoader/>
         </div>
       </div>
     );
