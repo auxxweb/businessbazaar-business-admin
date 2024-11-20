@@ -37,7 +37,7 @@ const Subscription = () => {
       justifyContent: "center",
       alignItems: "center",
       height: "200px",
-      color: "#1D4ED8", // Tailwind blue-700
+      color: "#1D4ED8", // Tailwind [#107D93]
       fontSize: "20px", // Slightly larger font size for premium feel
       textAlign: "center",
       fontWeight: "500", // Medium font weight
