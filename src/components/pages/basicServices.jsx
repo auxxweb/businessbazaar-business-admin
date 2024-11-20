@@ -9,11 +9,12 @@ import { getApi } from '../../api/api'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
 import useBusiness from '../../api/useBusiness'
-import { useDebouncedCallback } from 'use-debounce';
-import FullPageLoader from '../FullPageLoader/FullPageLoader';
+import { useDebouncedCallback } from 'use-debounce'
+import FullPageLoader from '../FullPageLoader/FullPageLoader'
+import { toast } from 'sonner'
 
 const BasicServices = () => {
-  const { updateBusiness,loading } = useBusiness()
+  const { updateBusiness, loading, businesses, getBusiness } = useBusiness()
   const dispatch = useDispatch()
   const [businessData, setBusinessData] = useState([])
 
@@ -22,27 +23,17 @@ const BasicServices = () => {
 
   const navigate = useNavigate()
   useEffect(() => {
+    setBusinessData(businesses)
+
+    setServices(businesses?.service)
+  }, [businesses])
+
+  useEffect(() => {
     const fetchData = async () => {
-      try {
-        const businessDetails = await getApi(
-          `api/v1/business/profile`,
-          true,
-          dispatch,
-          navigate,
-        )
-
-        setBusinessData(businessDetails.data)
-
-        setServices(businessDetails?.data?.service)
-      } catch (error) {
-        console.error(
-          'Error fetching business details:',
-          error.message || error,
-        )
-      }
+      await getBusiness()
     }
     fetchData()
-  }, [dispatch, navigate])
+  }, [])
 
   const [showModal, setShowModal] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
@@ -73,13 +64,12 @@ const BasicServices = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
   const [imageFileToCrop, setImageFileToCrop] = useState(null)
-  const limit = 1
+  const limit = 10
   useEffect(() => {
     if (businessData) {
       setServices(businessData.service || [])
     }
   }, [businessData])
-
 
   useEffect(() => {
     if (!services?.length) {
@@ -270,23 +260,36 @@ const BasicServices = () => {
 
   const handleCreateService = async () => {
     const cleanNewService = { ...newService }
+    console.log(cleanNewService,"-----------------------");
+    
 
-    // Remove `_id` if it's invalid
-    if (!cleanNewService._id) {
-      delete cleanNewService._id
+    if (!cleanNewService?.title || !cleanNewService?.description) {
+      toast.warning("Please enter title and description", {
+        position: "top-right",
+        duration: 2000,
+        style: {
+          backgroundColor: "yellow", // Custom yellow color for warning
+          color: "#FFFFFF" // Text color
+        },
+        dismissible: true
+      });
+    } else {
+      // Remove `_id` if it's invalid
+      if (!cleanNewService._id) {
+        delete cleanNewService._id
+      }
+
+      const updatedServices = Array.isArray(services)
+        ? [...services, cleanNewService]
+        : [cleanNewService]
+
+      const updatedData = { ...businessData, service: updatedServices }
+      await updateBusiness({ service: updatedServices })
+      setBusinessData(updatedData)
+      handleCreateCloseModal()
+      setServices(updatedServices) // Update services only at the end
     }
-
-    const updatedServices = Array.isArray(services)
-      ? [...services, cleanNewService]
-      : [cleanNewService]
-
-    const updatedData = { ...businessData, service: updatedServices }
-    await updateBusiness({ service: updatedServices })
-    setBusinessData(updatedData)
-    handleCreateCloseModal()
-    setServices(updatedServices) // Update services only at the end
   }
-
 
   const handleSearchChange = useDebouncedCallback((value) => {
     if (!value?.trim()) {
@@ -304,15 +307,14 @@ const BasicServices = () => {
     setFilteredServices(filteredServices)
   }, 500)
 
-
   if (loading) {
     return (
       <div className="h-100vh text-center ">
         <div className="row h-100 justify-content-center align-items-center">
-          <FullPageLoader/>
+          <FullPageLoader />
         </div>
       </div>
-    );
+    )
   }
   return (
     <>
@@ -402,7 +404,7 @@ const BasicServices = () => {
                     <img
                       src={imageCreatePreview}
                       alt="Image Preview"
-                       className="mt-3 w-1/2 h-auto mx-auto "
+                      className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
                         objectFit: 'cover',
                         marginInline: 'auto',
@@ -427,7 +429,7 @@ const BasicServices = () => {
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
           {/* Parent div for span elements */}
           <span className="flex items-center justify-center">
-          <input
+            <input
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
               placeholder="Search by title,description"
               onChange={(e) => {
@@ -556,8 +558,8 @@ const BasicServices = () => {
                     <img
                       src={imagePreview}
                       alt="Image Preview"
-                       className="mt-3 w-1/2 h-auto mx-auto "
-                      style={{ 
+                      className="mt-3 w-1/2 h-auto mx-auto "
+                      style={{
                         objectFit: 'cover',
                         marginInline: 'auto',
                       }}
