@@ -88,7 +88,6 @@ export const getApi = async (url, authToken = true, logout, navigate) => {
   const token = localStorage.getItem("userCredential");
   const parsedToken = JSON.parse(token);
 
-  console.log(parsedToken, "aaaaaaaaaa");
 
   const config = {
     headers: {
