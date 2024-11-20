@@ -1,12 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import usePlan from "../Hooks/usePlan";
-import BackdropLoader from "./reUsableCmponent/BackdropLoader";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
 import useBusiness from "../api/useBusiness";
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
-  const { businesses, getBusiness } = useBusiness();
+  const { loading: businessLoading, businesses, getBusiness } = useBusiness();
+  const [planLoading, setPlanLoading] = useState(false);
+
+  useEffect(() => {
+    if (loading || businessLoading) {
+      setPlanLoading(true);
+    } else {
+      setPlanLoading(false);
+    }
+  }, [loading, businessLoading]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,26 +23,26 @@ const Subscription = () => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return <BackdropLoader isLoading={loading} />;
-  }
 
   const renderFreePlan = () => (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "200px",
-          color: "#4CAF50",
-          fontSize: "18px",
-          textAlign: "center",
-          fontWeight: "bold"
-        }}>
-        You are now in Free plan
-      </div>
-    </div>
+<div className="bg-white p-6 rounded-xl shadow-lg border border-blue-200">
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "200px",
+      color: "#1D4ED8", // Tailwind blue-700
+      fontSize: "20px", // Slightly larger font size for premium feel
+      textAlign: "center",
+      fontWeight: "500", // Medium font weight
+      fontFamily: "'Inter', sans-serif" // Premium standard font
+    }}
+  >
+    You are now in Free plan
+  </div>
+</div>
+
   );
 
   const renderPaidPlan = () => (
@@ -75,7 +83,13 @@ const Subscription = () => {
       <div className="p-2 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Subscription</h1>
       </div>
-      {!businesses?.isFree ? renderPaidPlan() : renderFreePlan()}
+      {
+        (businesses?.isFree || businesses?.isInFreeTrail) && !planLoading
+          ? renderFreePlan()
+          : renderPaidPlan()
+        // ? renderPaidPlan()
+        // : renderFreePlan()
+      }
     </>
   );
 };
