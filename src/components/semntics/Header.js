@@ -124,7 +124,7 @@ function Header({ toggleSidebar }) {
       </button>
 
       <img
-        src="../logo.jpeg"
+        src="../enConnectLogo.jpg"
         alt="Description of Image"
         width="65"
         height="53"

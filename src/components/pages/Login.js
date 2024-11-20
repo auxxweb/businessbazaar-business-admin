@@ -59,7 +59,7 @@ const Login = () => {
               className="bg-white border-grey space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full">
               <div className="flex justify-center mb-6">
                 <img
-                  src="/logo.jpeg"
+                  src="/enConnectLogo.jpg"
                   alt="Logo"
                   className="h-24 object-contain"
                 />
