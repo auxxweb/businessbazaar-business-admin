@@ -20,6 +20,7 @@ const BusinessDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [isSocialMedia, setSocialMediaModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [socialLinks, setSocialLinks] = useState({
     facebook: null,
     instagram: null,
@@ -95,7 +96,9 @@ const BusinessDetails = () => {
 
         setSocialLinks(businessData?.data?.socialMediaLinks);
         setCategory(businessData?.data.category);
+        setLoading(false)
       } catch (error) {
+        setLoading(false)
         console.error(
           "Error fetching business details:",
           error.message || error
@@ -234,15 +237,14 @@ const BusinessDetails = () => {
 
   return (
     <>
-      <div className="m-4 mx-auto bg-transparent  shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
-        {imageLoading && <FullPageLoader />}
+      <div className="m-4 mx-auto bg-transparent shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
+        {imageLoading || loading && <FullPageLoader />}
         <div
           className="h-full w-full absolute z-0 top-0 left-0"
           style={{
             backgroundImage: `url(${businessDetails?.logo})`,
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backfaceVisibility: "revert",
+            backgroundSize:"cover",
             opacity: "0.2",
           }}
         ></div>

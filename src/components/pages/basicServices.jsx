@@ -305,7 +305,6 @@ const BasicServices = () => {
 
   return (
     <>
-      <div className="flex rounded-lg p-4">
         {/* Cropper Modal */}
         <Modal
           show={showCropperModal}
@@ -343,10 +342,9 @@ const BasicServices = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-
-        <h2 className="text-2xl font-semibold text-gray-700">Services</h2>
+      <div className="flex justify-between items-center py-4">
+        <h2 className="text-2xl m-0 p-0 font-semibold text-gray-700">Services</h2>
         <div className="ml-auto flex items-center space-x-4">
-          {' '}
           <button
             onClick={handleShowCreateModal}
             className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"

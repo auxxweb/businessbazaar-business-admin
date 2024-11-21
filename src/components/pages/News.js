@@ -228,18 +228,18 @@ const News = () => {
   return (
     <>
       {imageLoading && <FullPageLoader />}
-      <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">
+      <div className="flex rounded-lg py-4 items-center justify-between">
+        <h2 className="text-2xl font-semibold text-nowrap text-gray-700 p-0 m-0  " >
           News & Articles
         </h2>
-        <div className="ml-auto flex items-center space-x-4">
+        <div className=" flex items-center ">
           <span className="flex items-center">
-            <span
-              className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
+            <button
+              className="bg-[#105193] hover:bg-[#107D93] text-white text-nowrap rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={handleShowCreateModal}
             >
               Add Articles
-            </span>
+            </button>
           </span>
         </div>
       </div>
@@ -271,7 +271,7 @@ const News = () => {
               padding: "16px 24px",
             }}
           >
-            <Modal.Title style={{ fontWeight: "500", fontSize: "1.25rem" }}>
+            <Modal.Title  style={{ fontWeight: "500", fontSize: "1.25rem" }}>
               Add Articles
             </Modal.Title>
           </Modal.Header>
@@ -436,21 +436,21 @@ const News = () => {
                   <p>{data?.title}</p>
                 </td>
 
-                <td className="px-4 py-2 border-r border-gray-400">
+                <td className="px-4 py-2 border-r border-gray-400 ">
+                  <div className="flex flex-col  justify-between border h-full ">
                   <div className="flex -space-x-2">
                     {showMore?.index === index && showMore?.status
                       ? data?.description.substring(0)
                       : data?.description.substring(0, 100)}
-                    <a
-                      onClick={() =>
+                    
+                  </div>
+                     <p  onClick={() =>
                         setShowMore({ index: index, status: !showMore?.status })
-                      }
-                      className="font-light text-xs "
-                    >
-                      {showMore?.status && showMore?.index === index
-                        ? "Show Less.."
+                      } className="m-0 p-0 text-xs text-end  text-blue-500 ">
+                     {showMore?.status && showMore?.index === index
+                        ? "Show Less..."
                         : "Show More..."}
-                    </a>
+                     </p>
                   </div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
