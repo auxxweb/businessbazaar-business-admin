@@ -33,7 +33,11 @@ const SpecialServices = () => {
         if (businesses) {
           setBusinessData(businesses)
           console.log(businesses)
-          setServices(businesses.specialServices.data)
+          setServices(businesses?.specialServices?.data)
+          setServiceData({
+            title: businesses?.specialServices?.title ?? '',
+            description: businesses?.specialServices?.description ?? '',
+          })
         }
       } catch (error) {
         console.error(
@@ -68,6 +72,10 @@ const SpecialServices = () => {
   const [imageCreatePreview, setImageCreatePreview] = useState('')
   const [imageCreateFile, setImageCreateFile] = useState(null)
   const [imageFile, setImageFile] = useState(null)
+  const [serviceData, setServiceData] = useState({
+    title: '',
+    description: '',
+  })
 
   const [updatedServices, setUpdatedServices] = useState({
     _id: '',
@@ -152,6 +160,13 @@ const SpecialServices = () => {
     }
   }
 
+  const setServiceInputChange = (e) => {
+    setServiceData((prev) => ({
+      ...prev, // Spread the previous state to retain other properties
+      [e.target.name]: e.target.value, // Dynamically set the property from the input name and value
+    }))
+  }
+
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
     const { name, value, type } = e.target
@@ -168,7 +183,7 @@ const SpecialServices = () => {
     }
   }
   const handleSaveChanges = async () => {
-    if (!newService?.title || !newService?.description) {
+    if (!updatedServices?.title || !updatedServices?.description) {
       toast.warning('Please enter title and description', {
         position: 'top-right',
         duration: 2000,
@@ -206,22 +221,26 @@ const SpecialServices = () => {
   }
 
   const handleDeleteServices = async () => {
-    setServices((prevServices) =>
-      prevServices.filter((Servi) => Servi._id !== selectedService._id),
-    )
+    try {
+      const updatedServices = await services?.filter(
+        (ser) => ser?._id !== selectedService?._id,
+      )
 
-    const updatedData = {
-      ...businessData,
-      specialServices: {
-        data: services.filter((Servi) => Servi._id !== selectedService._id),
-      },
+      const updatedService = {
+        specialServices: {
+          ...(businesses?.specialServices ?? []),
+          data: updatedServices,
+        },
+      }
+
+      await updateBusiness(updatedService)
+      setServices(updatedServices)
+      // setBusinessData(updatedData)
+
+      handleDeleteCloseModal()
+    } catch (error) {
+      console.log(error, 'error')
     }
-    await updateBusiness({
-      specialServices: services,
-    })
-    setBusinessData(updatedData)
-
-    handleDeleteCloseModal()
   }
   const handleCreateService = async () => {
     if (!newService?.title || !newService?.description) {
@@ -241,23 +260,32 @@ const SpecialServices = () => {
           const data = await uploadImage(imageCreateFile, 'SpecialServices')
           imgAccessUrl = data?.accessLink
         }
+
+        const newServices = businesses?.specialServices?.data || []
+        await newServices.push({
+          ...newService,
+          image: imgAccessUrl,
+        })
+
+        await newServices?.map((p) => {
+          if (!p?._id || p._id === '') {
+            delete p._id // Remove the _id property
+            return p // Return the updated object
+          } else {
+            return p // Return the object unchanged
+          }
+        })
         // Prepare updated business data immutably
         const updatedData = {
           specialServices: {
-            ...businesses?.specialServices ??[],
-            data: [
-              ...(businesses?.specialServices?.data || []),
-              {
-                ...newService,
-                image: imgAccessUrl,
-              },
-            ],
+            ...(businesses?.specialServices ?? []),
+            data: newServices,
           },
         }
         await updateBusiness(updatedData)
         handleCreateCloseModal()
       } catch (error) {
-        console.log(error,"errorr ---------------------")
+        console.log(error, 'errorr ---------------------')
         toast.error('Something went wrong , please try again!')
       }
     }
@@ -277,6 +305,19 @@ const SpecialServices = () => {
     //   handleCloseModal();
     //   return updatedServices;
     // });
+  }
+
+  const handleServiceMainSubmit = async (e) => {
+    e.preventDefault()
+    const updatedData = {
+      specialServices: {
+        title: serviceData?.title,
+        description: serviceData?.description,
+        data: services,
+      },
+    }
+
+    updateBusiness(updatedData)
   }
 
   const handleSearchChange = useDebouncedCallback((value) => {
@@ -372,11 +413,68 @@ const SpecialServices = () => {
                 Close
               </Button>
               <Button variant="success" onClick={handleCreateService}>
-                Save changes
+                Add Service
               </Button>
             </Modal.Footer>
           </Modal>
         </div>
+      </div>
+      <div className="w-100 flex justify-center">
+        <form
+          onSubmit={handleServiceMainSubmit}
+          className="bg-white p-4 border border-gray-400 rounded-md mb-6"
+          style={{ maxWidth: '65rem', width: '100%' }}
+        >
+          <div className="flex flex-col space-y-4">
+            {/* Title Input */}
+            <div>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={serviceData?.title}
+                onChange={setServiceInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                placeholder="Enter title"
+              />
+            </div>
+            {/* Description Input */}
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                rows="4"
+                name="description"
+                onChange={setServiceInputChange}
+                value={serviceData?.description}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                placeholder="Enter description"
+                // onChange={setProductInputChange}
+              ></textarea>
+            </div>
+          </div>
+          {/* Submit Button */}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="submit"
+              className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
+              style={{ backgroundColor: '#105193' }}
+            >
+              Update Details
+            </button>
+          </div>
+        </form>
       </div>
       <div className="flex rounded-lg p-4 pr-0 pt-0">
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
