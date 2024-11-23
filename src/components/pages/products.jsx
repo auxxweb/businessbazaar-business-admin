@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { Button, Modal, Form } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
-import Pagination from "../Pagination";
-import Cropper from 'react-easy-crop';
-import getCroppedImg from '../../utils/cropper.utils';
-import BackdropLoader from '../reUsableCmponent/BackdropLoader';
-import FullPageLoader from "../FullPageLoader/FullPageLoader"
+import Pagination from '../Pagination'
+import Cropper from 'react-easy-crop'
+import getCroppedImg from '../../utils/cropper.utils'
+import BackdropLoader from '../reUsableCmponent/BackdropLoader'
+import FullPageLoader from '../FullPageLoader/FullPageLoader'
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
@@ -47,27 +47,27 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [page, setPage] = useState(1);
-  const limit = 10;
+  const [page, setPage] = useState(1)
+  const limit = 10
   const [modalState, setModalState] = useState({
     showEdit: false,
     showCreate: false,
     showDelete: false,
     showCrop: false,
-  });
+  })
   const [currentImage, setCurrentImage] = useState({
     index: null,
     image: null,
-    preview: "",
+    preview: '',
     file: null,
-  });
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  })
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
 
   const handleModalState = (type, state) => {
-    setModalState((prev) => ({ ...prev, [type]: state }));
-  };
+    setModalState((prev) => ({ ...prev, [type]: state }))
+  }
   useEffect(() => {
     setProducts(businesses?.productSection)
   }, [businesses])
@@ -81,7 +81,7 @@ const Judges = () => {
       price: product.price,
       image: product.image,
     })
-    setCurrentImage({preview:product.image,image:product.image}) // Initialize preview with current image
+    setCurrentImage({ preview: product.image, image: product.image }) // Initialize preview with current image
     setShowModal(true)
   }
 
@@ -132,18 +132,18 @@ const Judges = () => {
   }
 
   const handleFileChange = async (e, isCreate = false) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
+      const previewUrl = URL.createObjectURL(file)
       setCurrentImage((prev) => ({
         ...prev,
         image: previewUrl,
         preview: previewUrl,
         file,
-      }));
-      handleModalState("showCrop", true);
+      }))
+      handleModalState('showCrop', true)
     }
-  };
+  }
 
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
@@ -175,7 +175,7 @@ const Judges = () => {
     console.log(updateData, 'updated-data')
 
     await updateBusiness(updateData)
-    setCurrentImage({image:null,preview:null})
+    setCurrentImage({ image: null, preview: null })
     handleCloseModal()
   }
 
@@ -195,14 +195,14 @@ const Judges = () => {
     console.log(updateData)
 
     await updateBusiness(updatedData)
-    setCurrentImage({image:null,preview:null})
+    setCurrentImage({ image: null, preview: null })
 
     handleDeleteCloseModal()
   }
-  
+
   const handlePageChange = (page) => {
-    setPage(page);
-  };
+    setPage(page)
+  }
 
   const handleCreateProduct = async () => {
     let accessLink = null
@@ -213,12 +213,12 @@ const Judges = () => {
     }
 
     await addProduct({ ...newProduct, image: accessLink })
-    setCurrentImage({image:null,preview:null})
+    setCurrentImage({ image: null, preview: null })
     handleCreateCloseModal()
   }
 
   if (loading) {
-    return <FullPageLoader />;
+    return <FullPageLoader />
   }
 
   return (
@@ -322,26 +322,28 @@ const Judges = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
-              <Form.Control
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-{currentImage.preview && (
-            <img
-              src={currentImage.preview}
-              alt="Preview"
-              className="w-1/2 mx-auto h-auto mt-4"
-              style={{
-                objectFit: "cover",
-                display: "block",
-                marginInline: "auto",
-              }}
-            />
-          )}
-            </Form.Group>
+                <Form.Label>
+                  Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+                </Form.Label>
+                <Form.Control
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                {currentImage.preview && (
+                  <img
+                    src={currentImage.preview}
+                    alt="Preview"
+                    className="w-1/2 mx-auto h-auto mt-4"
+                    style={{
+                      objectFit: 'cover',
+                      display: 'block',
+                      marginInline: 'auto',
+                    }}
+                  />
+                )}
+              </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer
@@ -380,7 +382,7 @@ const Judges = () => {
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Title
             </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">Description</th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Price
             </th>
@@ -390,7 +392,7 @@ const Judges = () => {
           </tr>
         </thead>
         <tbody>
-          {products?.map((product, index) => (
+          {products?.data?.map((product, index) => (
             <tr
               key={product?._id}
               className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
@@ -409,7 +411,7 @@ const Judges = () => {
                 {product?.title}
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product?._id}
+                {product?.description}
               </td>
               <td className="px-4 py-4 text-left border-r border-gray-400">
                 {product?.price}
@@ -433,7 +435,7 @@ const Judges = () => {
                     alt="pics"
                     src="/icons/delete.svg"
                     className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  /> 
+                  />
                 </button>
               </td>
             </tr>
@@ -476,25 +478,27 @@ const Judges = () => {
               />
             </Form.Group>
             <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
+              <Form.Label>
+                Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+              </Form.Label>
               <Form.Control
                 type="file"
                 name="image"
                 accept="image/*"
                 onChange={handleFileChange}
               />
-             {currentImage.preview && (
-            <img
-              src={currentImage.preview}
-              alt="Preview"
-              className="w-1/2 mx-auto h-auto mt-4"
-              style={{
-                objectFit: "cover",
-                display: "block",
-                marginInline: "auto",
-              }}
-            />
-          )}
+              {currentImage.preview && (
+                <img
+                  src={currentImage.preview}
+                  alt="Preview"
+                  className="w-1/2 mx-auto h-auto mt-4"
+                  style={{
+                    objectFit: 'cover',
+                    display: 'block',
+                    marginInline: 'auto',
+                  }}
+                />
+              )}
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -530,7 +534,7 @@ const Judges = () => {
       </div>
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
+        onHide={() => handleModalState('showCrop', false)}
       >
         <Modal.Header closeButton>
           <Modal.Title>Crop Image</Modal.Title>
@@ -538,7 +542,7 @@ const Judges = () => {
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
+            style={{ height: '400px' }}
           >
             <Cropper
               image={currentImage.preview}
@@ -548,7 +552,7 @@ const Judges = () => {
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {
-                setCroppedAreaPixels(croppedAreaPixels);
+                setCroppedAreaPixels(croppedAreaPixels)
               }}
             />
           </div>
@@ -558,14 +562,14 @@ const Judges = () => {
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
                 currentImage.preview,
-                croppedAreaPixels
-              );
+                croppedAreaPixels,
+              )
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
                 file: blob,
-              }));
-              handleModalState("showCrop", false);
+              }))
+              handleModalState('showCrop', false)
             }}
           >
             Crop & Save
