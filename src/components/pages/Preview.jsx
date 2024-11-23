@@ -1138,7 +1138,7 @@ export default function Preview() {
                       <div style={{ color: "#A4B3CB" }} class="text-right">
                         <span>
                           Copyright &copy;
-                          {new Date().getFullYear()} In Connect. All Rights
+                          {new Date().getFullYear()}  Connect. All Rights
                           Reserved
                         </span>
                       </div>

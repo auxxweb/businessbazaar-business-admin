@@ -157,7 +157,7 @@ const TemplateFooter = ({ businessData, closeDays }) => {
                     <div style={{ color: "#A4B3CB" }} class="text-right">
                       <span>
                         Copyright &copy;
-                        {new Date().getFullYear()} In Connect. All Rights
+                        {new Date().getFullYear()} En Connect. All Rights
                         Reserved
                       </span>
                     </div>
