@@ -7,7 +7,7 @@ import useBusiness from "../../api/useBusiness";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const {forgotPassword}=useBusiness()
+  const {forgotPassword,isSuccess,loading}=useBusiness()
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -68,6 +68,7 @@ const ForgotPassword = () => {
                 <input
                   className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#105193] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent focus:ring-2 focus:ring-[#105193] outline-none focus:border-gold-600 "
                   type="email"
+                  value={""}
                   id="email"
                   placeholder="Email"
                   name="email"
@@ -92,7 +93,7 @@ const ForgotPassword = () => {
               {/* Sign In Button */}
               <div className="pt-3">
                 <button
-                  // disabled={loading}
+                  disabled={loading || isSuccess}
                   className="w-full py-3 bg-gradient-to-r from-[#105193] to-[#107D93] text-white font-semibold rounded-lg hover:translate-y-1 transform transition duration-300 "
                   type="submit">
                   Send mail

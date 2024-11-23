@@ -6,6 +6,7 @@ import { useState } from "react";
 const useBusiness = () => {
   const [businesses, setBusinesses] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isSuccess,setIsSuccess]=useState(false)
 
   const navigate = useNavigate();
 
@@ -199,6 +200,7 @@ const useBusiness = () => {
         navigate
       );
       if (response?.data){
+        setIsSuccess(true)
         toast.success("Email send successfully", {
           theme: "colored",
           position: "top-right",
@@ -216,6 +218,7 @@ const useBusiness = () => {
         // navigate("/")
       }
     } catch (error) {
+      setIsSuccess(false)
       toast.error("Failed to send mail");
       console.error("Error sending mail:", error);
     } finally {
@@ -281,7 +284,8 @@ const useBusiness = () => {
     addProduct,
     changePassword,
     forgotPassword,
-    resetpassword
+    resetpassword,
+    isSuccess
   };
 };
 export default useBusiness;
