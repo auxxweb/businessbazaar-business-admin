@@ -83,7 +83,7 @@ const PaymentPage = () => {
                   <div>
                     <label
                       htmlFor="earnings"
-                      className="block text-sm font-medium text-blue-700"
+                      className="block text-sm font-medium text-[#107D93]"
                     >
                       Earnings
                     </label>
@@ -99,7 +99,7 @@ const PaymentPage = () => {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-blue-700"
+                      className="block text-sm font-medium text-[#107D93]"
                     >
                       Deduction
                     </label>
@@ -362,7 +362,7 @@ const PaymentPage = () => {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-blue-500 hover:bg-[#107D93] text-white font-bold py-2 px-4 rounded"
                   >
                     Submit
                   </button>

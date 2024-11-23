@@ -501,7 +501,7 @@ const BusinessDetails = () => {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
@@ -511,7 +511,7 @@ const BusinessDetails = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center overflow-y-scroll justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
               <h3 className="text-lg font-semibold mb-4">
                 Edit Contact & Location Details
@@ -621,7 +621,7 @@ const BusinessDetails = () => {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
@@ -664,7 +664,7 @@ const BusinessDetails = () => {
                 </button>
                 <button
                   onClick={handleSystemSettingsSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
