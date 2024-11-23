@@ -25,6 +25,9 @@ import PremiumPreview from "../pages/PremiumPreview";
 import Preview from "../pages/Preview";
 import SpecialServices from "../pages/SpecialServices";
 import Gallery from "../pages/Gallery";
+import Plans from "../pages/Plans";
+import PreviewTemplates from "../pages/PreviewTemplates";
+import Razorpay from "../Razorpay/Razorpay";
 
 function ContentArea() {
   const [token, setToken] = useState([]);
@@ -98,6 +101,18 @@ function ContentArea() {
       <Route
         path="/subscription"
         element={token ? <Subscription /> : <Login />}
+      />
+       <Route
+        path="/plans"
+        element={token ?  <Plans/>: <Login />}
+      />
+      <Route
+        path="/payment"
+        element={token ?  <Razorpay/>: <Login />}
+      />
+       <Route
+        path="/previewtemplate"
+        element={token ? <PreviewTemplates/> : <Login />}
       />
       <Route
         path="/settings"

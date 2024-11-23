@@ -3,11 +3,14 @@ import usePlan from "../Hooks/usePlan";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
 import useBusiness from "../api/useBusiness";
 import FullPageLoader from "./FullPageLoader/FullPageLoader";
+import { useNavigate } from "react-router-dom";
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
   const { loading: businessLoading, businesses, getBusiness } = useBusiness();
   const [planLoading, setPlanLoading] = useState(false);
+  const navigate= useNavigate()
+
 
   useEffect(() => {
     if (loading || businessLoading) {
@@ -70,7 +73,7 @@ const Subscription = () => {
           <p className="text-gray-700">Amount</p>
           <p className="text-gray-700 ml-2">₹ {plan?.amount}</p>
         </div>
-        <button
+        <button onClick={() => navigate("/plans")}
           disabled={!isDateLessThanToday(plan?.expiryDate)}
           className={`border-2 px-4 py-2 rounded-lg ${
             !isDateLessThanToday(plan?.expiryDate)
@@ -90,8 +93,8 @@ const Subscription = () => {
       </div>
       {
         (businesses?.isFree || businesses?.isInFreeTrail) && !planLoading
-          ? renderFreePlan()
-          : renderPaidPlan()
+        ? renderFreePlan()
+        : renderPaidPlan()
         // ? renderPaidPlan()
         // : renderFreePlan()
       }
