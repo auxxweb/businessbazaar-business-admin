@@ -634,7 +634,7 @@ const SpecialServices = () => {
             <Modal.Header closeButton>
               <Modal.Title>Confirm Deletion</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Are you sure you want to delete this Servi?</Modal.Body>
+            <Modal.Body>Are you sure you want to delete this Service?</Modal.Body>
             <Modal.Footer>
               <Button variant="dark" onClick={handleDeleteCloseModal}>
                 Cancel
