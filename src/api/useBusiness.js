@@ -6,7 +6,6 @@ import { useState } from "react";
 const useBusiness = () => {
   const [businesses, setBusinesses] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isSuccess,setIsSuccess]=useState(false)
 
   const navigate = useNavigate();
 
@@ -89,34 +88,38 @@ const useBusiness = () => {
           "userCredential",
           JSON.stringify(response?.data?.token)
         );
-        toast.success("Logged in  successfully", {
-          theme: "colored",
-          position: "top-right",
-          style: {
-            backgroundColor: "green",
-            color: "#FFFFFF",
-            height: "60px",
-            fontSize: "14px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center"
-          }
-        });
+      //   toast.success("Logged in successfully", {
+      //     theme: "colored",
+      //     position: "top-right",
+      //     style: {
+      //       backgroundColor: "green",
+      //       color: "#FFFFFF",
+      //       height: "60px",
+      //       fontSize: "14px",
+      //       display: "flex",
+      //       alignItems: "center",
+      //       justifyContent: "center",
+      //       textAlign: "center"
+      //     }
+      //   }
+      // );
         navigate("/");
-        return response?.data;
+        return { success: true, data: response?.data }; // Return success response
       }
     } catch (error) {
-      console.log(error, "errorrororororo");
-
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ?? "Something went wrong ,try again!!"
-      );
+      const errorMessage =
+        error?.response?.data?.message ?? "Something went wrong, try again!!";
+      // toast.error(errorMessage, {
+      //   theme: "colored",
+      //   position: "top-right"
+      // });
+      return { success: false, error: errorMessage }; // Return error response
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   const getBusinessDashboardData = async () => {
     setLoading(false);
@@ -200,7 +203,6 @@ const useBusiness = () => {
         navigate
       );
       if (response?.data){
-        setIsSuccess(true)
         toast.success("Email send successfully", {
           theme: "colored",
           position: "top-right",
@@ -218,7 +220,6 @@ const useBusiness = () => {
         // navigate("/")
       }
     } catch (error) {
-      setIsSuccess(false)
       toast.error("Failed to send mail");
       console.error("Error sending mail:", error);
     } finally {
@@ -229,7 +230,7 @@ const useBusiness = () => {
     setLoading(true);
     try {
       const response = await postApi(
-        `api/v1/business/reset-password`,
+       ` api/v1/business/reset-password`,
         { ...body },
         false,
         logout,
@@ -284,8 +285,7 @@ const useBusiness = () => {
     addProduct,
     changePassword,
     forgotPassword,
-    resetpassword,
-    isSuccess
+    resetpassword
   };
 };
 export default useBusiness;

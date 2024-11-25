@@ -19,13 +19,11 @@ export const postApi = async (
   };
 
   if (authToken) {
-    config.headers = {
-      Authorization: `Bearer ${token}`
-    };
+    config.headers.Authorization =` Bearer ${token}`;
   }
+
   try {
     const response = await axios.post(`${API_BASE_URL}/${url}`, body, config);
-
     return response?.data;
   } catch (error) {
     if (error.response) {
@@ -33,23 +31,12 @@ export const postApi = async (
         console.log("Unauthorized: Please check your authentication.");
         window.localStorage.removeItem("userCredential");
         await logout();
-      } else {
-        toast.error(error?.response?.data?.message ?? "Login failed!", {
-          position: "top-right",
-          duration: 2000,
-          style: {
-            backgroundColor: "#ff0606", // Custom yellow color for warning
-            color: "#FFFFFF" // Text color
-          },
-          dismissible: true
-        });
-        console.log("Error:----", error.response);
       }
-    } else {
-      console.log("Error:", error.message);
     }
+    throw error;
   }
 };
+
 
 export const deleteApi = async (url, authToken = true, logout, navigate) => {
   const token = JSON.parse(localStorage.getItem("userCredential"));
@@ -76,10 +63,10 @@ export const deleteApi = async (url, authToken = true, logout, navigate) => {
         window.localStorage.removeItem("userCredential");
         await logout();
       } else {
-        console.log("Error:", error.response.status);
+        console.log("Error:===", error.response.status);
       }
     } else {
-      console.log("Error:", error.message);
+      console.log("Error:=-=-=-", error.message);
     }
   }
 };
@@ -132,10 +119,14 @@ export const patchApi = async (
     }
   };
 
+
   if (authToken) {
     config.headers = {
       Authorization: `Bearer ${token}`
-    };
+    };//-
+  config.headers = {
+    Authorization: `Bearer ${token}`
+  };//+
   }
   try {
     const response = await axios.patch(`${API_BASE_URL}/${url}`, body, config);

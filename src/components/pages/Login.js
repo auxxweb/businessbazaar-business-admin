@@ -13,6 +13,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const { loading, businessLogin, businesses } = useBusiness();
+  const [errors, setErrors] = useState({ email: "", password: "" }); // Manage errors for both fields
 
   useEffect(() => {
     if (businesses) {
@@ -22,22 +23,43 @@ const Login = () => {
 
 
   const onSubmit = async (event) => {
-    event.preventDefault(); // Prevent the default form submission
-    const formData = new FormData(event.target); // Make sure event.target is the form
-    const email = formData.get("email"); // Get email input value
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const email = formData.get("email");
     const password = formData.get("password");
+
     try {
+      const body = { email, password };
+      const res = await businessLogin(body);
 
-      const body = {
-        email,
-        password
-      };
+      if (res.success) {
+        console.log("Login successful:", res.data);
+        setErrors({ email: "", password: "" });
+      } else {
+        const errorMessage = res.error || "Login failed.";
+        if (errorMessage.toLowerCase().includes("email")) {
+          setErrors({ email: "Invalid email address", password: "" });
+        } else if (errorMessage.toLowerCase().includes("password")) {
+          setErrors({ email: "", password: "Invalid password" });
+        } else {
+          setErrors({
+            email: "Invalid email address",
+            password: "Invalid password"
+          });
+        }
 
-       await businessLogin(body);
+        // Clear errors after 3 seconds
+        setTimeout(() => {
+          setErrors({ email: "", password: "" });
+        }, 3000);
+      }
     } catch (error) {
-      console.log("error", error);
+      console.log("Error occurred:", error);
     }
   };
+
+
+
 
   return (
     <>
@@ -59,7 +81,7 @@ const Login = () => {
               className="bg-white border-grey space-y-3 sm:space-y-4 border-[#105193] shadow-lg rounded-lg text-center py-8 sm:py-10 px-3 sm:px-8  w-full">
               <div className="flex justify-center mb-6">
                 <img
-                  src="/enConnectLogo.jpeg"
+                  src="/logo.jpeg"
                   alt="Logo"
                   className="h-24 object-contain"
                 />
@@ -87,6 +109,9 @@ const Login = () => {
                   name="email"
                   required
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-600 mt-2 text-left ml-2">{errors.email}</p>
+                )}
               </div>
 
               {/* Password Input Field */}
@@ -112,6 +137,9 @@ const Login = () => {
                     {showPassword ? <PiEyeSlashFill /> : <PiEyeFill />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-red-600 mt-2 text-left ml-2 ">{errors.password}</p>
+                )}
               </div>
 
               {/* Forgot Password Link (Right-aligned under Password) */}
