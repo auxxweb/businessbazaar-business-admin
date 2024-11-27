@@ -49,6 +49,13 @@ const Subscription = () => {
   >
     You are now in Free plan
   </div>
+  <div class="flex justify-end">
+        <button
+        onClick={()=>navigate("/plans")}
+        class="px-4 py-2 bg-green-800 mt-3 mr-3 text-white rounded hover:bg-blue-600">
+          Renew Plan
+        </button>
+      </div>
 </div>
 
   );
@@ -98,6 +105,7 @@ const Subscription = () => {
         // ? renderPaidPlan()
         // : renderFreePlan()
       }
+     
     </>
   );
 };

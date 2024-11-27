@@ -12,8 +12,6 @@ import useBusiness from "../../api/useBusiness";
 
 function Header({ toggleSidebar }) {
   const { logout, businesses, getBusiness } = useBusiness();
-  console.log(businesses, "business");
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [updatePassword, { isLoading: isLoadingUpdatePassword }] =
     useUpdatePasswordMutation();

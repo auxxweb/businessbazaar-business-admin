@@ -38,8 +38,6 @@ function ContentArea() {
 
   useEffect(() => {
     const storedToken = JSON.parse(localStorage.getItem("userCredential"));
-    console.log(location?.pathname, "pathname");
-
     // Check if the current route is not forgotpassword or resetpassword
     if (
       !storedToken &&
@@ -63,79 +61,31 @@ function ContentArea() {
       <Route path="/changePassword/:id" element={<ChangePassword />} />
       <Route path="/zones" element={token ? <Zones /> : <Login />} />
       <Route path="/news" element={token ? <News /> : <Login />} />
-      <Route
-        path="/landing-page"
-        element={token ? <LandingPage /> : <Login />}
-      />
-      <Route
-        path="/welcome-page"
-        element={token ? <WelcomePage /> : <Login />}
-      />
+
+
+
+      <Route path="/landing-page" element={token ? <LandingPage /> : <Login />}/>
+      <Route path="/welcome-page" element={token ? <WelcomePage /> : <Login />}/>
       <Route path="/products" element={token ? <Judges /> : <Login />} />
-      <Route
-        path="/judges/:id"
-        element={token ? <JudgeDetails /> : <Login />}
-      />
-      <Route
-        path="/special-services"
-        element={token ? <SpecialServices /> : <Login />}
-      />
+      <Route path="/judges/:id" element={token ? <JudgeDetails /> : <Login />}/>
+      <Route path="/special-services" element={token ? <SpecialServices /> : <Login />}/>
       <Route path="/services" element={token ? <BasicServices /> : <Login />} />
-      <Route
-        path="/participants/:id"
-        element={token ? <ParticipantDetails /> : <Login />}
-      />
-      <Route
-        path="/questions/:id"
-        element={token ? <QuestionDetails /> : <Login />}
-      />
+      <Route path="/participants/:id" element={token ? <ParticipantDetails /> : <Login />}/>
+      <Route path="/questions/:id" element={token ? <QuestionDetails /> : <Login />}/>
       <Route path="/bundles" element={token ? <Bundles /> : <Login />} />
-      <Route
-        path="/bundles/:id"
-        element={token ? <BundleDetails /> : <Login />}
-      />
-      <Route
-        path="/result"
-        element={token ? <ResponseAndResult /> : <Login />}
-      />
-      <Route
-        path="/subscription"
-        element={token ? <Subscription /> : <Login />}
-      />
-       <Route
-        path="/plans"
-        element={token ?  <Plans/>: <Login />}
-      />
-      <Route
-        path="/payment"
-        element={token ?  <Razorpay/>: <Login />}
-      />
-       <Route
-        path="/previewtemplate"
-        element={token ? <PreviewTemplates/> : <Login />}
-      />
-      <Route
-        path="/settings"
-        element={token ? <SettingAndConfi /> : <Login />}
-      />
-      <Route
-        path="/businessDetails"
-        element={token ? <BusinessDetails /> : <Login />}
-      />
+      <Route path="/bundles/:id" element={token ? <BundleDetails /> : <Login />}/>
+      <Route path="/result" element={token ? <ResponseAndResult /> : <Login />}/>
+      <Route path="/subscription" element={token ? <Subscription /> : <Login />}/>
+      <Route path="/plans" element={token ?  <Plans/>: <Login />}/>
+      <Route path="/payment" element={token ?  <Razorpay/>: <Login />}/>
+      <Route path="/previewtemplate" element={token ? <PreviewTemplates/> : <Login />} />
+      <Route path="/settings" element={token ? <SettingAndConfi /> : <Login />}/>
+      <Route path="/businessDetails" element={token ? <BusinessDetails /> : <Login />}/>
       <Route path="/gallery" element={token ? <Gallery /> : <Login />} />
-      <Route
-        path="/terms-and-conditions"
-        element={token ? <TermsAndConditions /> : <Login />}
-      />
-      <Route
-        path="/privacy-policies"
-        element={token ? <PrivacyPolicies /> : <Login />}
-      />
+      <Route path="/terms-and-conditions" element={token ? <TermsAndConditions /> : <Login />} />
+      <Route path="/privacy-policies" element={token ? <PrivacyPolicies /> : <Login />}/>
       <Route path="/preview" element={token ? <Preview /> : <Login />} />
-      <Route
-        path="/preview/premium"
-        element={token ? <PremiumPreview /> : <Login />}
-      />
+      <Route path="/preview/premium" element={token ? <PremiumPreview /> : <Login />}/>
     </Routes>
   );
 }

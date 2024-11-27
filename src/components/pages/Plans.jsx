@@ -5,19 +5,23 @@ import { useNavigate } from "react-router";
 
 import Loader from "../Loader/Loader";
 import { fetchPlans } from "../../common/functions";
+import { setPlanDetails } from "../../api/slices/plansSlice";
 
 const Plans = () => {
   const navigate = useNavigate();
   const businessState = useSelector((state) => state.business);
-
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [planData, setPlanData] = useState([]);
 
   function planSubmit(id, price, name) {
-    var freePlan = process.env.REACT_APP_FREE_PLAN_ID ?? "6735fef4c124792981be3ffb";
+ 
+    var freePlan = process.env.REACT_APP_FREE_PLAN_ID ?? "6735fef4c124792981be3ffb ";
     if (String(id) != String(freePlan)) {
       console.log("first",freePlan,"free plan",id);
-      navigate("/payment");
+      dispatch(setPlanDetails({ name, price, plan: id }));
+      const planDetails={price, name ,plan:id}
+      navigate("/payment", { state: planDetails});
     } else {
       const submitData = async () => {
         console.log("second");

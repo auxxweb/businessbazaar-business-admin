@@ -4,6 +4,7 @@ const initialState = {
   data: {}, 
 };
 
+
 const businessSlice = createSlice({
   name: 'business',
   initialState,
@@ -15,7 +16,11 @@ const businessSlice = createSlice({
       state.data = null;
     },
   },
+
 });
+
+
+
 
 export const { setBusinessData, clearBusinessData } = businessSlice.actions;
 

@@ -26,15 +26,27 @@ const useBusiness = () => {
         navigate
       );
       setBusinesses(response?.data);
-    } catch (error) {
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ?? "Something went wrong ,try again!!"
-      );
+    } catch (errorMessage) {
+      // Show the toast with the error message
+      toast.error(errorMessage ?? "Your account has been blocked", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
     } finally {
       setLoading(false);
     }
   };
+  
 
   const updateBusiness = async (updateData) => {
     setLoading(true);
@@ -111,7 +123,7 @@ const useBusiness = () => {
 
       setLoading(false);
       toast.error(
-        error?.response?.data?.message ?? "Something went wrong ,try again!!"
+        error?.response?.data?.message  ?? "Something went wrong ,try again!!"
       );
     } finally {
       setLoading(false);
@@ -125,20 +137,20 @@ const useBusiness = () => {
       return response?.data;
     } catch (error) {
       setLoading(false);
-      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
-        theme: "colored",
-        position: "top-right",
-        style: {
-          backgroundColor: "red",
-          color: "#FFFFFF",
-          height: "60px",
-          fontSize: "14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center"
-        }
-      });
+      // toast.error(error?.response?.data?.message  ?? "Something went wrong ", {
+      //   theme: "colored",
+      //   position: "top-right",
+      //   style: {
+      //     backgroundColor: "red",
+      //     color: "#FFFFFF",
+      //     height: "60px",
+      //     fontSize: "14px",
+      //     display: "flex",
+      //     alignItems: "center",
+      //     justifyContent: "center",
+      //     textAlign: "center"
+      //   }
+      // });
     } finally {
       setLoading(false);
     }
@@ -158,7 +170,7 @@ const useBusiness = () => {
       return response?.data;
     } catch (error) {
       setLoading(false);
-      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
+      toast.error(error?.response?.data?.message  ?? "Something went wrong!", {
         theme: "colored",
         position: "top-right",
         style: {
