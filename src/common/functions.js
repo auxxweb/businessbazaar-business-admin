@@ -27,10 +27,10 @@ export const fetchPlans = async () => {
     if (data.success) {
       return data;
     } else {
-      console.error("Failed to fetch categories");
+      console.error("Failed to fetch plans");
     }
   } catch (error) {
-    console.error("Error fetching categories:", error.message);
+    console.error("Error fetching plans:", error.message);
   }
 };
 
