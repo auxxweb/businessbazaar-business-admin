@@ -34,6 +34,38 @@ export const fetchPlans = async () => {
   }
 };
 
+
+
+export const createPayment = async (paymentData, token) => {
+  try {
+    
+    const response = await axios.post(
+      `${baseUrl}/api/v1/payment`,
+      paymentData, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Authorization header
+        },
+      }
+    );
+ console.log(response.data,'llllllllllllllllllll');
+    const data = response.data;
+    
+    if (data.success) {
+      return data; // Successfully created business details
+    } else {
+      console.error("Failed to add payment:", data.message || "Unknown error");
+      throw new Error(data.message || "Failed to add payment");
+    }
+    } catch (error) {
+    console.error("Error creating payment:", error);
+    throw error; // Re-throw the error to handle it in the calling function
+  }
+};
+
+
+
+
 export const checkPaymentStatus = async (paymentId, token) => {
     try {
       const response = await axios.get(`${baseUrl}/api/v1/payment/status/${paymentId}`, {
@@ -57,46 +89,3 @@ export const checkPaymentStatus = async (paymentId, token) => {
     }
   };
 
-  export const CreateBusinessDetails = async (formData) => {
-    try {
-      const response = await axios.post(`${baseUrl}/api/v1/business/`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      const data = response.data;
-      if (data.success) {
-        return data; // Successfully created business details
-      } else {
-        console.error(
-          "Failed to create business details:",
-          data.message || "Unknown error"
-        );
-        throw new Error(data.message || "Failed to create business details");
-      }
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ??
-        "Failed to create business Please try again.",
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "colored",
-          style: {
-            backgroundColor: "#e74c3c", // Custom red color for error
-            color: "#FFFFFF", // White text
-          },
-        }
-      );
-      console.error(
-        "Error occurred while fetching business site details:",
-        error.message
-      );
-      throw error; // Propagate the error
-    }
-  };
