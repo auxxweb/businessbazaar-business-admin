@@ -7,7 +7,7 @@ import { Rating } from "primereact/rating";
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import Slider from "react-slick";
-import Loader from "../Loader/Loader";
+import Loader from "../Loader/Loader"; 
 
 const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
