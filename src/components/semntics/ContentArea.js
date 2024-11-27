@@ -38,8 +38,6 @@ function ContentArea() {
 
   useEffect(() => {
     const storedToken = JSON.parse(localStorage.getItem("userCredential"));
-    console.log(location?.pathname, "pathname");
-
     // Check if the current route is not forgotpassword or resetpassword
     if (
       !storedToken &&
