@@ -435,12 +435,11 @@ const Judges = () => {
 
       <div className="mt-6">
         {/* Input Form */}
-        <div className="w-100 flex justify-center">
+        <div className="mx-auto max-w-screen-sm">
           <form
             onSubmit={handleProductMainSubmit}
-            className="bg-white p-4 border border-gray-400 rounded-md mb-6"
-            style={{ maxWidth: '65rem', width: '100%' }}
-          >
+            className="bg-white p-4 border shadow-lg border-gray-400 rounded-md mb-6"
+            style={{ maxWidth: '65rem', width: '100%' }}>
             <div className="flex flex-col space-y-4">
               {/* Title Input */}
               <div>
