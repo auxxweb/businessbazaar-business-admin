@@ -34,7 +34,7 @@ const SettingAndConfi = () => {
   return (
     <>
       <div>
-        <h1 className="font-semibold text-2xl m-4">Settings</h1>
+        <h1 className="font-semibold text-2xl py-2">Settings</h1>
       </div>
       {loading ? (
         <Loader />

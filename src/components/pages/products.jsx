@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react'
 import { Button, Modal, Form } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
-import Pagination from '../Pagination'
-import Cropper from 'react-easy-crop'
-import getCroppedImg from '../../utils/cropper.utils'
-import BackdropLoader from '../reUsableCmponent/BackdropLoader'
-import FullPageLoader from '../FullPageLoader/FullPageLoader'
+import Pagination from "../Pagination";
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../../utils/cropper.utils';
+import FullPageLoader from '../FullPageLoader/FullPageLoader';
 
 const Judges = () => {
   const { imageLoading, uploadImage } = useImageUpload()
@@ -287,17 +286,17 @@ const Judges = () => {
 
   return (
     <>
-      {/* {(imageLoading || loading)&&} */}
-      <div className="flex rounded-lg p-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Products</h2>
-        <div className="ml-auto flex items-center space-x-4">
+      {(imageLoading || loading) && <FullPageLoader/>}
+      <div className="flex justify-between items-center rounded-lg py-4">
+        <h2 className="text-2xl font-semibold text-gray-700 m-0 p-0">Products</h2>
+        <div className=" flex items-center space-x-4">
           <span className="flex items-center">
-            <span
+            <button
               className="bg-[#105193] hover:bg-[#107D93] text-white rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={handleShowCreateModal}
             >
               Add Product
-            </span>
+            </button>
           </span>
         </div>
       </div>
