@@ -495,7 +495,7 @@ const BusinessDetails = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center overflow-y-scroll top-0 pt-32 justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
               <h3 className="text-lg font-semibold mb-4">
                 Edit Contact & Location Details
