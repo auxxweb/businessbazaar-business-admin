@@ -43,9 +43,7 @@ const LandingPage = () => {
       const previewUrl = URL.createObjectURL(file);
       setCurrentImage((prev) => ({
         ...prev,
-        image: previewUrl,
         preview: previewUrl,
-        file,
       }));
       handleModalState("showCrop", true);
     }
@@ -64,10 +62,10 @@ const LandingPage = () => {
       setBusinessData({
         title: businesses?.landingPageHero?.title,
         description: businesses?.landingPageHero?.description,
+        coverImage: businesses?.landingPageHero?.coverImage,
       });
       setCurrentImage({
         image: businesses?.landingPageHero?.coverImage,
-        preview: businesses?.landingPageHero?.coverImage,
       });
     }
   }, [businesses]);
@@ -161,9 +159,9 @@ const LandingPage = () => {
             accept="image/*"
             onChange={handleFileChange}
           />
-          {currentImage.preview && (
+          {currentImage.image && (
             <img
-              src={currentImage.preview}
+              src={currentImage.image}
               alt="Preview"
               className="mt-3 w-1-2 h-auto"
               style={{
@@ -219,6 +217,7 @@ const LandingPage = () => {
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
+                image: fileUrl,
                 file: blob,
               }));
               handleModalState("showCrop", false);

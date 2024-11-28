@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import Cropper from 'react-easy-crop'
-import { Button, Modal, Form } from 'react-bootstrap'
+import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
 import useBusiness from '../../api/useBusiness'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import { toast } from 'sonner'
@@ -18,7 +18,6 @@ const SpecialServices = () => {
   const { imageLoading, uploadImage } = useImageUpload()
   const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
   const [page, setPage] = useState(1)
-  const [reFetch, SetReFetch] = useState(false)
   const limit = 10
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -32,7 +31,6 @@ const SpecialServices = () => {
       try {
         if (businesses) {
           setBusinessData(businesses)
-          console.log(businesses)
           setServices(businesses?.specialServices?.data)
           setServiceData({
             title: businesses?.specialServices?.title ?? '',
@@ -64,14 +62,14 @@ const SpecialServices = () => {
   const [showModal, setShowModal] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [validated, setValidated] = useState(true)
   const [newService, setNewService] = useState({
     title: '',
     description: '',
     image: null,
   })
-  const [imageCreatePreview, setImageCreatePreview] = useState('')
-  const [imageCreateFile, setImageCreateFile] = useState(null)
-  const [imageFile, setImageFile] = useState(null)
+  const [currentImage, setCurrentImage] = useState({ image: null, preview: null, file: null })
+
   const [serviceData, setServiceData] = useState({
     title: '',
     description: '',
@@ -83,8 +81,6 @@ const SpecialServices = () => {
     description: '',
     image: null,
   })
-  const [imagePreview, setImagePreview] = useState('')
-
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -92,15 +88,15 @@ const SpecialServices = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [isCropping, setIsCropping] = useState(false)
 
-  const handleShowModal = (Servi) => {
-    setSelectedService(Servi)
+  const handleShowModal = (serviceData) => {
+    setSelectedService(serviceData)
     setUpdatedServices({
-      _id: Servi._id,
-      title: Servi.title,
-      description: Servi.description,
-      image: Servi.image,
+      _id: serviceData._id,
+      title: serviceData.title,
+      description: serviceData.description,
+      image: serviceData.image,
     })
-    setImagePreview(Servi.image) // Initialize preview with current image
+    setCurrentImage(((prev) => ({ ...prev, image: serviceData.image })))
     setShowModal(true)
   }
 
@@ -114,7 +110,7 @@ const SpecialServices = () => {
       price: '',
       image: null,
     })
-    setImagePreview('')
+    setCurrentImage({ image: null, preview: null, file: null })
   }
 
   const handlePageChange = (page) => {
@@ -130,7 +126,7 @@ const SpecialServices = () => {
       price: '',
       image: null,
     })
-    setImageCreatePreview('')
+    setCurrentImage({ image: null, preview: null, file: null })
   }
 
   const handleDeleteCloseModal = () => {
@@ -148,8 +144,7 @@ const SpecialServices = () => {
           ...prevServices,
           image: file, // Remove quotes here
         }))
-        setImageFile(file)
-        setImagePreview(URL.createObjectURL(file))
+        setCurrentImage((prev) => ({ ...prev, preview: URL.createObjectURL(file) }))
         setIsCropping(true)
       }
     } else {
@@ -173,16 +168,23 @@ const SpecialServices = () => {
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
-        setNewService((prevServices) => ({ ...prevServices, image: file }))
-        setImageCreateFile(file)
-        setImageCreatePreview(URL.createObjectURL(file))
+        // setNewService((prevServices) => ({ ...prevServices, image: file }))
+        setCurrentImage((prev) => ({
+          ...prev,
+          preview: URL.createObjectURL(file),
+        }))
+        // setImageCreateFile(file)
+        // setImageCreatePreview(URL.createObjectURL(file))
         setIsCropping(true)
       }
     } else {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }))
     }
   }
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (e) => {
+    console.log("updatedServices");
+    e.preventDefault()
+
     if (!updatedServices?.title || !updatedServices?.description) {
       toast.warning('Please enter title and description', {
         position: 'top-right',
@@ -194,16 +196,19 @@ const SpecialServices = () => {
         dismissible: true,
       })
     } else {
-      var imageAccessUrl = selectedService.image
-      if (imageFile) {
-        const data = await uploadImage(imageFile, 'SpecialServices')
+      let imageAccessUrl = currentImage.image
+
+      if (currentImage?.file) {
+        const data = await uploadImage(currentImage?.file, 'SpecialServices')
         imageAccessUrl = data?.accessLink
+
         setUpdatedServices((prevService) => ({
           ...prevService,
           image: imageAccessUrl, // Remove quotes here
         }))
         updatedServices.image = imageAccessUrl
       }
+
       const updatedService = services.map((Servi) =>
         Servi._id === updatedServices._id ? updatedServices : Servi,
       )
@@ -216,6 +221,7 @@ const SpecialServices = () => {
       }
       await updateBusiness(updatedData)
       console.log(updatedData, 'updatedData')
+      setCurrentImage({ image: null, preview: null, file: null })
       handleCloseModal()
     }
   }
@@ -242,9 +248,11 @@ const SpecialServices = () => {
       console.log(error, 'error')
     }
   }
-  const handleCreateService = async () => {
-    if (!newService?.title || !newService?.description) {
-      toast.warning('Please enter title and description', {
+  const handleCreateService = async (e) => {
+    e.preventDefault()
+    
+    if (!currentImage?.file) {
+      return toast.warning('Please select a image file', {
         position: 'top-right',
         duration: 2000,
         style: {
@@ -255,9 +263,9 @@ const SpecialServices = () => {
       })
     } else {
       try {
-        let imgAccessUrl
-        if (imageCreateFile) {
-          const data = await uploadImage(imageCreateFile, 'SpecialServices')
+        let imgAccessUrl = null
+        if (currentImage?.file) {
+          const data = await uploadImage(currentImage?.file, 'SpecialServices')
           imgAccessUrl = data?.accessLink
         }
 
@@ -285,7 +293,7 @@ const SpecialServices = () => {
         await updateBusiness(updatedData)
         handleCreateCloseModal()
       } catch (error) {
-        console.log(error, 'errorr ---------------------')
+        console.log(error, 'error ---------------------')
         toast.error('Something went wrong , please try again!')
       }
     }
@@ -360,14 +368,16 @@ const SpecialServices = () => {
             Add Service
           </button>
           <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Add Service</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
+            <Form noValidate validated={validated} onSubmit={handleCreateService}>
+              <Modal.Header >
+                <Modal.Title>Add Service</Modal.Title>
+                <CloseButton onClick={handleCreateCloseModal} />
+              </Modal.Header>
+              <Modal.Body>
                 <Form.Group controlId="formTitle">
                   <Form.Label>Title</Form.Label>
                   <Form.Control
+                    required
                     type="text"
                     name="title"
                     value={newService.title}
@@ -377,6 +387,7 @@ const SpecialServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
+                    required
                     type="text"
                     name="description"
                     value={newService.description}
@@ -393,9 +404,9 @@ const SpecialServices = () => {
                     accept="image/*"
                     onChange={handleCreateInputChange}
                   />
-                  {imageCreatePreview && (
+                  {currentImage?.image && (
                     <img
-                      src={imageCreatePreview}
+                      src={currentImage?.image}
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
@@ -405,16 +416,16 @@ const SpecialServices = () => {
                     />
                   )}
                 </Form.Group>
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="dark" onClick={handleCreateCloseModal}>
-                Close
-              </Button>
-              <Button variant="success" onClick={handleCreateService}>
-                Add Service
-              </Button>
-            </Modal.Footer>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="dark" onClick={handleCreateCloseModal}>
+                  Close
+                </Button>
+                <Button type='submit' variant="success" >
+                  Add Service
+                </Button>
+              </Modal.Footer>
+            </Form>
           </Modal>
         </div>
       </div>
@@ -459,7 +470,7 @@ const SpecialServices = () => {
                 value={serviceData?.description}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 placeholder="Enter description"
-                // onChange={setProductInputChange}
+              // onChange={setProductInputChange}
               ></textarea>
             </div>
           </div>
@@ -487,11 +498,6 @@ const SpecialServices = () => {
               }}
             />
           </span>
-          {/* <span className="flex items-center">
-            <span className="cursor-pointer bg-[#105193] hover:bg-[#107D93] text-white p-2 lg:w-[100px] text-center rounded-3xl">
-              Search
-            </span>
-          </span> */}
         </div>
       </div>
       <table className="min-w-full table-auto mt-6">
@@ -569,16 +575,18 @@ const SpecialServices = () => {
             </tr>
           ))}
 
-          {/* Edit Servi Modal */}
+          {/* Edit Service Modal */}
           <Modal show={showModal} onHide={handleCloseModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Edit Special Services</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Form.Group controlId="formTitle">
+            <Form noValidate validated={validated} onSubmit={handleSaveChanges}>
+              <Modal.Header >
+                <Modal.Title>Edit Special Services</Modal.Title>
+                <CloseButton onClick={handleCloseModal} />
+              </Modal.Header>
+              <Modal.Body>
+                <Form.Group controlId="formTitle" >
                   <Form.Label>Title</Form.Label>
                   <Form.Control
+                    required
                     type="text"
                     name="title"
                     value={updatedServices.title}
@@ -588,6 +596,7 @@ const SpecialServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
+                    required
                     type="text"
                     name="description"
                     value={updatedServices.description}
@@ -604,9 +613,9 @@ const SpecialServices = () => {
                     accept="image/*"
                     onChange={handleInputChange}
                   />
-                  {imagePreview && (
+                  {currentImage?.image && (
                     <img
-                      src={imagePreview}
+                      src={currentImage?.image}
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
@@ -616,19 +625,19 @@ const SpecialServices = () => {
                     />
                   )}
                 </Form.Group>
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="dark" onClick={handleCloseModal}>
-                Close
-              </Button>
-              <Button variant="success" onClick={handleSaveChanges}>
-                Save changes
-              </Button>
-            </Modal.Footer>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="dark" onClick={handleCloseModal}>
+                  Close
+                </Button>
+                <Button type='submit' variant="success">
+                  Save changes
+                </Button>
+              </Modal.Footer>
+            </Form>
           </Modal>
 
-          {/* Delete Servi Confirmation Modal */}
+          {/* Delete Service Confirmation Modal */}
           <Modal show={showDeleteModal} onHide={handleDeleteCloseModal}>
             <Modal.Header closeButton>
               <Modal.Title>Confirm Deletion</Modal.Title>
@@ -663,7 +672,7 @@ const SpecialServices = () => {
             style={{ height: '400px' }}
           >
             <Cropper
-              image={imagePreview || imageCreatePreview}
+              image={currentImage.preview}
               crop={crop}
               zoom={zoom}
               aspect={4 / 5} // Adjust aspect ratio as needed
@@ -679,14 +688,16 @@ const SpecialServices = () => {
           <Button
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
-                imagePreview || imageCreatePreview,
+                currentImage?.preview,
                 croppedAreaPixels,
               )
               // Convert the croppedImage blob to a URL for preview or upload
-              imagePreview && setImagePreview(fileUrl)
-              imageCreatePreview && setImageCreatePreview(fileUrl)
-              imagePreview && setImageFile(blob)
-              imageCreatePreview && setImageCreateFile(blob)
+              setCurrentImage((prev) => ({
+                ...prev,
+                preview: fileUrl,
+                image: fileUrl,
+                file: blob,
+              }))
               setIsCropping(false)
             }}
           >

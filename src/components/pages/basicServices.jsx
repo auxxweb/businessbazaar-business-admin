@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import Cropper from 'react-easy-crop'
-import { Button, Modal, Form } from 'react-bootstrap'
+import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
 import useBusiness from '../../api/useBusiness'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import { toast } from 'sonner'
@@ -69,9 +69,7 @@ const BasicServices = () => {
     description: '',
     image: null,
   })
-  const [imageCreatePreview, setImageCreatePreview] = useState('')
-  const [imageCreateFile, setImageCreateFile] = useState(null)
-  const [imageFile, setImageFile] = useState(null)
+
   const [serviceData, setServiceData] = useState({
     title: '',
     description: '',
@@ -83,7 +81,6 @@ const BasicServices = () => {
     description: '',
     image: null,
   })
-  const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -91,6 +88,8 @@ const BasicServices = () => {
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [isCropping, setIsCropping] = useState(false)
+
+  const [currentImage,setCurrentImage] = useState({file:null,preview:null,image:null})
 
   const handleShowModal = (Servi) => {
     setSelectedService(Servi)
@@ -100,7 +99,7 @@ const BasicServices = () => {
       description: Servi.description,
       image: Servi.image,
     })
-    setImagePreview(Servi.image) // Initialize preview with current image
+    setCurrentImage({  image: Servi.image }) // Initialize preview with current image
     setShowModal(true)
   }
 
@@ -114,7 +113,7 @@ const BasicServices = () => {
       price: '',
       image: null,
     })
-    setImagePreview('')
+    setCurrentImage({ image: null, preview: null ,file:null})
   }
 
   const handlePageChange = (page) => {
@@ -130,7 +129,6 @@ const BasicServices = () => {
       price: '',
       image: null,
     })
-    setImageCreatePreview('')
   }
 
   const handleDeleteCloseModal = () => {
@@ -148,8 +146,7 @@ const BasicServices = () => {
           ...prevServices,
           image: file, // Remove quotes here
         }))
-        setImageFile(file)
-        setImagePreview(URL.createObjectURL(file))
+        setCurrentImage((prev) => ({ ...prev, preview: URL.createObjectURL(file) }))
         setIsCropping(true)
       }
     } else {
@@ -173,9 +170,8 @@ const BasicServices = () => {
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
+        setCurrentImage((prev) => ({ ...prev, preview: URL.createObjectURL(file) }))
         setNewService((prevServices) => ({ ...prevServices, image: file }))
-        setImageCreateFile(file)
-        setImageCreatePreview(URL.createObjectURL(file))
         setIsCropping(true)
       }
     } else {
@@ -194,9 +190,9 @@ const BasicServices = () => {
         dismissible: true,
       })
     } else {
-      var imageAccessUrl = selectedService.image
-      if (imageFile) {
-        const data = await uploadImage(imageFile, 'service')
+      var imageAccessUrl = currentImage?.image
+      if (currentImage?.file) {
+        const data = await uploadImage(currentImage?.file, 'service')
         imageAccessUrl = data?.accessLink
         setUpdatedServices((prevService) => ({
           ...prevService,
@@ -215,6 +211,7 @@ const BasicServices = () => {
         },
       }
       await updateBusiness(updatedData)
+      setCurrentImage({file:null,preview:null,image:null})
       console.log(updatedData, 'updatedData')
       handleCloseModal()
     }
@@ -235,14 +232,13 @@ const BasicServices = () => {
 
       await updateBusiness(updatedService)
       setServices(updatedServices)
-      // setBusinessData(updatedData)
-
       handleDeleteCloseModal()
     } catch (error) {
       console.log(error, 'error')
     }
   }
-  const handleCreateService = async () => {
+  const handleCreateService = async (e) => {
+    e.preventDefault()
     if (!newService?.title || !newService?.description) {
       toast.warning('Please enter title and description', {
         position: 'top-right',
@@ -255,9 +251,9 @@ const BasicServices = () => {
       })
     } else {
       try {
-        let imgAccessUrl
-        if (imageCreateFile) {
-          const data = await uploadImage(imageCreateFile, 'service')
+        let imgAccessUrl = null
+        if (currentImage?.file) {
+          const data = await uploadImage(currentImage?.file, 'service')
           imgAccessUrl = data?.accessLink
         }
 
@@ -289,22 +285,7 @@ const BasicServices = () => {
         toast.error('Something went wrong , please try again!')
       }
     }
-    // setServices((prevServices) => {
-    //   const updatedServices = Array.isArray(prevServices)
-    //     ? [...prevServices, newService]
-    //     : [newService];
-
-    //   const updatedData = {
-    //     service: {
-    //       ...businessData.service,
-    //       data: updatedServices,
-    //     },
-    //   };
-
-    //   setBusinessData(updatedData);
-    //   handleCloseModal();
-    //   return updatedServices;
-    // });
+  
   }
 
   const handleServiceMainSubmit = async (e) => {
@@ -360,14 +341,16 @@ const BasicServices = () => {
             Add Service
           </button>
           <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
-            <Modal.Header closeButton>
+              <Form onSubmit={handleCreateService}>
+            <Modal.Header >
               <Modal.Title>Add Service</Modal.Title>
+              <CloseButton onClick={handleCreateCloseModal}/>
             </Modal.Header>
             <Modal.Body>
-              <Form>
                 <Form.Group controlId="formTitle">
                   <Form.Label>Title</Form.Label>
                   <Form.Control
+                  required
                     type="text"
                     name="title"
                     value={newService.title}
@@ -377,6 +360,7 @@ const BasicServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
+                  required
                     as="textarea" // Render as a textarea
                     name="description"
                     rows={4} // Optional: Sets the number of rows for the textarea
@@ -390,14 +374,15 @@ const BasicServices = () => {
                     Image <span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
+                  required
                     type="file"
                     name="image"
                     accept="image/*"
                     onChange={handleCreateInputChange}
                   />
-                  {imageCreatePreview && (
+                  {currentImage?.image && (
                     <img
-                      src={imageCreatePreview}
+                      src={currentImage?.image}
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
@@ -407,16 +392,16 @@ const BasicServices = () => {
                     />
                   )}
                 </Form.Group>
-              </Form>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="dark" onClick={handleCreateCloseModal}>
                 Close
               </Button>
-              <Button variant="success" onClick={handleCreateService}>
+              <Button type='submit' variant="success" >
                 Add Service
               </Button>
             </Modal.Footer>
+              </Form>
           </Modal>
         </div>
       </div>
@@ -461,7 +446,6 @@ const BasicServices = () => {
                 value={serviceData?.description}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 placeholder="Enter description"
-                // onChange={setProductInputChange}
               ></textarea>
             </div>
           </div>
@@ -571,13 +555,13 @@ const BasicServices = () => {
             </tr>
           ))}
 
-          {/* Edit Servi Modal */}
+          {/* Edit Service Modal */}
           <Modal show={showModal} onHide={handleCloseModal}>
+              <Form onSubmit={handleSaveChanges}>
             <Modal.Header closeButton>
               <Modal.Title>Edit Special Services</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Form>
                 <Form.Group controlId="formTitle">
                   <Form.Label>Title</Form.Label>
                   <Form.Control
@@ -590,6 +574,7 @@ const BasicServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
+                    required
                     as="textarea" // Render as a textarea
                     name="description"
                     rows={4} // Optional: Number of visible rows
@@ -603,14 +588,15 @@ const BasicServices = () => {
                     Image<span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
+                  required
                     type="file"
                     name="image"
                     accept="image/*"
                     onChange={handleInputChange}
                   />
-                  {imagePreview && (
+                  {currentImage?.image && (
                     <img
-                      src={imagePreview}
+                      src={currentImage?.image}
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
@@ -620,19 +606,19 @@ const BasicServices = () => {
                     />
                   )}
                 </Form.Group>
-              </Form>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="dark" onClick={handleCloseModal}>
                 Close
               </Button>
-              <Button variant="success" onClick={handleSaveChanges}>
+              <Button type='submit' variant="success" >
                 Save changes
               </Button>
             </Modal.Footer>
+              </Form>
           </Modal>
 
-          {/* Delete Servi Confirmation Modal */}
+          {/* Delete Service Confirmation Modal */}
           <Modal show={showDeleteModal} onHide={handleDeleteCloseModal}>
             <Modal.Header closeButton>
               <Modal.Title>Confirm Deletion</Modal.Title>
@@ -669,7 +655,7 @@ const BasicServices = () => {
             style={{ height: '400px' }}
           >
             <Cropper
-              image={imagePreview || imageCreatePreview}
+              image={currentImage?.preview}
               crop={crop}
               zoom={zoom}
               aspect={16 / 8} // Adjust aspect ratio as needed
@@ -685,14 +671,15 @@ const BasicServices = () => {
           <Button
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
-                imagePreview || imageCreatePreview,
+                currentImage?.preview,
                 croppedAreaPixels,
               )
-              // Convert the croppedImage blob to a URL for preview or upload
-              imagePreview && setImagePreview(fileUrl)
-              imageCreatePreview && setImageCreatePreview(fileUrl)
-              imagePreview && setImageFile(blob)
-              imageCreatePreview && setImageCreateFile(blob)
+              setCurrentImage((prev) => ({
+                ...prev,
+                preview: fileUrl,
+                image: fileUrl,
+                file: blob,
+              }))
               setIsCropping(false)
             }}
           >

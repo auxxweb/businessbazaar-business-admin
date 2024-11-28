@@ -72,9 +72,7 @@ export default function WelcomePage() {
       const previewUrl = URL.createObjectURL(file);
       setCurrentImage((prev) => ({
         ...prev,
-        image: previewUrl,
         preview: previewUrl,
-        file,
       }));
       handleModalState("showCrop", true);
     }
@@ -161,9 +159,9 @@ export default function WelcomePage() {
             accept="image/*"
             onChange={handleFileChange}
           />
-          {currentImage.preview && (
+          {currentImage.image && (
             <img
-              src={currentImage.preview}
+              src={currentImage.image}
               alt="Preview"
               className="w-1/2 mx-auto h-auto mt-4"
               style={{
@@ -219,6 +217,7 @@ export default function WelcomePage() {
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
+                image: fileUrl,
                 file: blob,
               }));
               handleModalState("showCrop", false);
