@@ -24,20 +24,20 @@ const BusinessDetails = () => {
   const [socialLinks, setSocialLinks] = useState({
     facebook: null,
     instagram: null,
-    twitter: null,
+    twitter: null
   });
 
   const [modalState, setModalState] = useState({
     showEdit: false,
     showCreate: false,
     showDelete: false,
-    showCrop: false,
+    showCrop: false
   });
   const [currentImage, setCurrentImage] = useState({
     index: null,
     image: null,
     preview: "",
-    file: null,
+    file: null
   });
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -54,7 +54,7 @@ const BusinessDetails = () => {
         ...prev,
         image: previewUrl,
         preview: previewUrl,
-        file,
+        file
       }));
       handleModalState("showCrop", true);
     }
@@ -72,18 +72,19 @@ const BusinessDetails = () => {
     email: businessDetails?.contactDetails?.email || "",
     website: businessDetails?.contactDetails?.website || "",
     description: businessDetails?.description || "",
-    socialMediaLinks: businessDetails?.socialMediaLinks || [],
+    socialMediaLinks: businessDetails?.socialMediaLinks || []
   });
 
   const [themeData, setThemeData] = useState({
     theme: businessDetails?.theme || "",
-    secondaryTheme: businessDetails?.secondaryTheme || "",
+    secondaryTheme: businessDetails?.secondaryTheme || ""
   });
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const businessData = await getApi(
           `api/v1/business/profile`,
@@ -103,6 +104,8 @@ const BusinessDetails = () => {
           "Error fetching business details:",
           error.message || error
         );
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -120,15 +123,15 @@ const BusinessDetails = () => {
       email: businessDetails?.contactDetails?.email,
       website: businessDetails?.contactDetails?.website,
       description: businessDetails?.description,
-      socialMediaLinks: businessDetails?.socialMediaLinks,
+      socialMediaLinks: businessDetails?.socialMediaLinks
     });
     setCurrentImage({
       preview: businessDetails?.logo,
-      image: businessDetails?.logo,
+      image: businessDetails?.logo
     });
     setThemeData({
       theme: businessDetails?.theme,
-      secondaryTheme: businessDetails?.secondaryTheme,
+      secondaryTheme: businessDetails?.secondaryTheme
     });
   }, [businessDetails]);
 
@@ -171,7 +174,7 @@ const BusinessDetails = () => {
     console.log(e.target.name, e.target.value, "in theme");
     setThemeData({
       ...themeData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
   const handleSubmit = async () => {
@@ -188,7 +191,7 @@ const BusinessDetails = () => {
         buildingName: formData.buildingName,
         streetName: formData.streetName,
         landmark: formData.landmark,
-        state: formData.state,
+        state: formData.state
       },
       contactDetails: {
         ...businessDetails.contactDetails,
@@ -196,9 +199,9 @@ const BusinessDetails = () => {
         primaryNumber: formData.primaryNumber,
         secondaryNumber: formData.secondaryNumber,
         email: formData.email,
-        website: formData.website,
+        website: formData.website
       },
-      description: formData.description,
+      description: formData.description
     };
     console.log(updatedBusinessDetails);
 
@@ -222,7 +225,7 @@ const BusinessDetails = () => {
     const updatedBusinessDetails = {
       ...businessDetails,
       theme: themeData.theme,
-      secondaryTheme: themeData.secondaryTheme,
+      secondaryTheme: themeData.secondaryTheme
     };
     patchApi("api/v1/business", updatedBusinessDetails)
       .then((result) => {
@@ -236,6 +239,16 @@ const BusinessDetails = () => {
       });
     handleCloseSystemModal();
   };
+
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -278,22 +291,19 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.address?.buildingName ?? "hidden"
-                }`}
-              >
+                }`}>
                 {" "}
                 {businessDetails?.address?.buildingName}
               </p>
               <p
                 className={`${
                   businessDetails?.address?.streetName ?? "hidden"
-                }`}
-              >
+                }`}>
                 {" "}
                 {businessDetails?.address?.streetName}
               </p>
               <p
-                className={`${businessDetails?.address?.landMark ?? "hidden"}`}
-              >
+                className={`${businessDetails?.address?.landMark ?? "hidden"}`}>
                 {" "}
                 {businessDetails?.address?.landMark}
               </p>
@@ -304,8 +314,7 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.contactDetails?.email ?? "hidden"
-                }`}
-              >
+                }`}>
                 Email:{" "}
                 {businessDetails?.contactDetails?.email || (
                   <span className="text-red-500 text-sm">Not Available</span>
@@ -332,15 +341,13 @@ const BusinessDetails = () => {
               <p
                 className={`${
                   businessDetails?.contactDetails?.website ?? "hidden"
-                } `}
-              >
+                } `}>
                 Website:{" "}
                 <a
                   href={businessDetails?.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500"
-                >
+                  className="text-blue-500">
                   {" "}
                   {businessDetails?.contactDetails?.website}
                 </a>
@@ -368,8 +375,7 @@ const BusinessDetails = () => {
 
               <button
                 onClick={() => setSocialMediaModal(true)}
-                className="  ms-auto float-end "
-              >
+                className="  ms-auto float-end ">
                 <img
                   src="/icons/edit.svg"
                   alt="Edit"
@@ -386,15 +392,13 @@ const BusinessDetails = () => {
             <p className="font-semibold text-gray-600 p-0 m-0">Theme:</p>
             <div
               style={{ backgroundColor: themeData?.theme }}
-              className={`shadow w-10 h-10 rounded-xl border`}
-            ></div>
+              className={`shadow w-10 h-10 rounded-xl border`}></div>
             <p className="font-semibold text-gray-600 p-0 m-0">
               Secondary Theme:{" "}
             </p>
             <div
               style={{ backgroundColor: themeData?.secondaryTheme }}
-              className={` shadow w-10 h-10 rounded-xl border`}
-            ></div>
+              className={` shadow w-10 h-10 rounded-xl border`}></div>
             <button onClick={handleShowSystemModal} className=" float-end p-2">
               <img
                 src="/icons/edit.svg"
@@ -484,8 +488,7 @@ const BusinessDetails = () => {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
@@ -599,7 +602,7 @@ const BusinessDetails = () => {
                     style={{
                       objectFit: "cover",
                       display: "block",
-                      marginInline: "auto",
+                      marginInline: "auto"
                     }}
                   />
                 )}
@@ -608,14 +611,12 @@ const BusinessDetails = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleCloseModal}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                >
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2">
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
@@ -653,14 +654,12 @@ const BusinessDetails = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleCloseSystemModal}
-                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                >
+                  className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 mr-2">
                   Cancel
                 </button>
                 <button
                   onClick={handleSystemSettingsSubmit}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                  className="bg-[#105193] text-white px-4 py-2 rounded hover:bg-[#107D93]">
                   Save
                 </button>
               </div>
@@ -670,16 +669,14 @@ const BusinessDetails = () => {
       </div>
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
-      >
+        onHide={() => handleModalState("showCrop", false)}>
         <Modal.Header closeButton>
           <Modal.Title>Crop Image</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
-          >
+            style={{ height: "400px" }}>
             <Cropper
               image={currentImage.preview}
               crop={crop}
@@ -703,11 +700,10 @@ const BusinessDetails = () => {
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
-                file: blob,
+                file: blob
               }));
               handleModalState("showCrop", false);
-            }}
-          >
+            }}>
             Crop & Save
           </Button>
         </Modal.Footer>

@@ -6,6 +6,7 @@ import { useState } from "react";
 const useBusiness = () => {
   const [businesses, setBusinesses] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isSuccess,setIsSuccess]=useState(false)
 
   const navigate = useNavigate();
 
@@ -25,15 +26,27 @@ const useBusiness = () => {
         navigate
       );
       setBusinesses(response?.data);
-    } catch (error) {
-      setLoading(false);
-      toast.error(
-        error?.response?.data?.message ?? "Something went wrong ,try again!!"
-      );
+    } catch (errorMessage) {
+      // Show the toast with the error message
+      toast.error(errorMessage ?? "Your account has been blocked", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
     } finally {
       setLoading(false);
     }
   };
+  
 
   const updateBusiness = async (updateData) => {
     setLoading(true);
@@ -110,7 +123,7 @@ const useBusiness = () => {
 
       setLoading(false);
       toast.error(
-        error?.response?.data?.message ?? "Something went wrong ,try again!!"
+        error?.response?.data?.message  ?? "Something went wrong ,try again!!"
       );
     } finally {
       setLoading(false);
@@ -124,20 +137,20 @@ const useBusiness = () => {
       return response?.data;
     } catch (error) {
       setLoading(false);
-      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
-        theme: "colored",
-        position: "top-right",
-        style: {
-          backgroundColor: "red",
-          color: "#FFFFFF",
-          height: "60px",
-          fontSize: "14px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center"
-        }
-      });
+      // toast.error(error?.response?.data?.message  ?? "Something went wrong ", {
+      //   theme: "colored",
+      //   position: "top-right",
+      //   style: {
+      //     backgroundColor: "red",
+      //     color: "#FFFFFF",
+      //     height: "60px",
+      //     fontSize: "14px",
+      //     display: "flex",
+      //     alignItems: "center",
+      //     justifyContent: "center",
+      //     textAlign: "center"
+      //   }
+      // });
     } finally {
       setLoading(false);
     }
@@ -157,7 +170,7 @@ const useBusiness = () => {
       return response?.data;
     } catch (error) {
       setLoading(false);
-      toast.error(error?.response?.data?.message ?? "Something went wrong!", {
+      toast.error(error?.response?.data?.message  ?? "Something went wrong!", {
         theme: "colored",
         position: "top-right",
         style: {
@@ -188,6 +201,90 @@ const useBusiness = () => {
     }
   };
 
+  const forgotPassword = async (email) => {
+    setLoading(true);
+    try {
+      const response = await postApi(
+        `api/v1/business/forgot-password`,
+        { email },
+        false,
+        logout,
+        navigate
+      );
+      if (response?.data){
+        setIsSuccess(true)
+        toast.success("Email send successfully", {
+          theme: "colored",
+          position: "top-right",
+          style: {
+            backgroundColor: "green",
+            color: "#07eb38",
+            height: "60px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center"
+          }
+        });
+        // navigate("/")
+      }
+    } catch (error) {
+      setIsSuccess(false)
+      toast.error("Failed to send mail");
+      console.error("Error sending mail:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const resetpassword = async (body) => {
+    setLoading(true);
+    try {
+      const response = await postApi(
+        `api/v1/business/reset-password`,
+        { ...body },
+        false,
+        logout,
+        navigate
+      );
+      if (response?.data){
+        toast.success("Password reset successfully", {
+          theme: "colored",
+          position: "top-right",
+          style: {
+            backgroundColor: "green",
+            color: "#07eb38",
+            height: "60px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center"
+          }
+        });
+        navigate("/")
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message ??" password reset failed", {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "red",
+          color: "#ffffff",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      });
+      console.error("Error sending mail:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     getBusiness,
     loading,
@@ -197,7 +294,10 @@ const useBusiness = () => {
     logout,
     getBusinessDashboardData,
     addProduct,
-    changePassword
+    changePassword,
+    forgotPassword,
+    resetpassword,
+    isSuccess
   };
 };
 export default useBusiness;

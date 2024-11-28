@@ -88,7 +88,6 @@ export const getApi = async (url, authToken = true, logout, navigate) => {
   const token = localStorage.getItem("userCredential");
   const parsedToken = JSON.parse(token);
 
-  console.log(parsedToken, "aaaaaaaaaa");
 
   const config = {
     headers: {
@@ -105,16 +104,39 @@ export const getApi = async (url, authToken = true, logout, navigate) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      if (error.response.status === 401) {
-        console.log("Unauthorized: Please check your authentication.");
+      console.log("Unauthorized: Please check your authentication.");
         window.localStorage.removeItem("userCredential");
         await logout();
-      } else {
-        console.log("Error:", error.response.status);
-      }
+      // Pass the error response to the caller
+      throw error.response.data?.message || "An error occurred. Please try again.";
     } else {
-      console.log("Error:", error.message);
+      throw "Network error. Please check your connection.";
     }
+    // if (error.response) {
+    //   if (error.response.status === 401) {
+    //       toast.error(error?.response?.data?.message ?? "your account has been blocked", {
+    //         theme: "colored",
+    //         position: "top-right",
+    //         style: {
+    //           backgroundColor: "red",
+    //           color: "#FFFFFF",
+    //           height: "60px",
+    //           fontSize: "14px",
+    //           display: "flex",
+    //           alignItems: "center",
+    //           justifyContent: "center",
+    //           textAlign: "center"
+    //         }
+    //       });
+        
+        
+        
+    //   } else {
+    //     console.log("Error:", error.response.status);
+    //   }
+    // } else {
+    //   console.log("Error:", error.message);
+    // }
   }
 };
 

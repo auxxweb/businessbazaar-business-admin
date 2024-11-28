@@ -24,6 +24,10 @@ const Judges = () => {
   }, [])
 
   const [products, setProducts] = useState([])
+  const [productData, setProductData] = useState({
+    title: '',
+    description: '',
+  })
   const [showModal, setShowModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -46,29 +50,54 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [page, setPage] = useState(1);
-  const limit = 10;
+  const [page, setPage] = useState(1)
+  const limit = 10
   const [modalState, setModalState] = useState({
     showEdit: false,
     showCreate: false,
     showDelete: false,
     showCrop: false,
-  });
+  })
   const [currentImage, setCurrentImage] = useState({
     index: null,
     image: null,
-    preview: "",
+    preview: '',
     file: null,
-  });
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  })
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+
+  const setProductInputChange = (e) => {
+    setProductData((prev) => ({
+      ...prev, // Spread the previous state to retain other properties
+      [e.target.name]: e.target.value, // Dynamically set the property from the input name and value
+    }))
+  }
+
+  const handleProductMainSubmit = async (e) => {
+    e.preventDefault()
+
+    const updatedData = {
+      productSection: {
+        title: productData?.title,
+        description: productData?.description,
+        data: products,
+      },
+    }
+
+    await updateBusiness(updatedData)
+  }
 
   const handleModalState = (type, state) => {
-    setModalState((prev) => ({ ...prev, [type]: state }));
-  };
+    setModalState((prev) => ({ ...prev, [type]: state }))
+  }
   useEffect(() => {
-    setProducts(businesses?.productSection)
+    setProducts(businesses?.productSection?.data)
+    setProductData({
+      title: businesses?.productSection?.title ?? '',
+      description: businesses?.productSection?.description ?? '',
+    })
   }, [businesses])
 
   const handleShowModal = (product) => {
@@ -80,7 +109,7 @@ const Judges = () => {
       price: product.price,
       image: product.image,
     })
-    setCurrentImage({preview:product.image,image:product.image}) // Initialize preview with current image
+    setCurrentImage({ preview: product.image, image: product.image }) // Initialize preview with current image
     setShowModal(true)
   }
 
@@ -131,18 +160,18 @@ const Judges = () => {
   }
 
   const handleFileChange = async (e, isCreate = false) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
+      const previewUrl = URL.createObjectURL(file)
       setCurrentImage((prev) => ({
         ...prev,
         image: previewUrl,
         preview: previewUrl,
         file,
-      }));
-      handleModalState("showCrop", true);
+      }))
+      handleModalState('showCrop', true)
     }
-  };
+  }
 
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
@@ -163,45 +192,56 @@ const Judges = () => {
       const data = await uploadImage(currentImage?.file, 'products')
       accessLink = data?.accessLink
     }
-    const updatedProducts = products.map((product) =>
+    const updatedProducts = products?.map((product) =>
       product._id === updatedProduct._id
         ? { ...updatedProduct, image: accessLink }
         : product,
     )
     const updateData = {
-      productSection: updatedProducts,
+      productSection: {
+        title: productData?.title,
+        description: productData?.description,
+        data: updatedProducts,
+      },
     }
     console.log(updateData, 'updated-data')
 
     await updateBusiness(updateData)
-    setCurrentImage({image:null,preview:null})
+    setCurrentImage({ image: null, preview: null })
     handleCloseModal()
   }
 
   const handleDeleteProduct = async () => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product._id !== selectedProduct._id),
-    )
+    // setProducts((prevProducts) =>
+    //   prevProducts.filter((product) => product._id !== selectedProduct._id),
+    // )
 
-    const updatedData = {
-      productSection: products.filter(
-        (product) => product._id !== selectedProduct._id,
-      ),
-    }
-    const updateData = {
-      productSection: updatedData,
-    }
-    console.log(updateData)
+    try {
+      const updatedProducts = await products?.filter(
+        (prod) => prod?._id !== selectedProduct?._id,
+      )
 
-    await updateBusiness(updatedData)
-    setCurrentImage({image:null,preview:null})
+      const updatedData = {
+        productSection: {
+          title: productData?.title,
+          description: productData?.description,
+          data: updatedProducts,
+        },
+      }
+
+      await updateBusiness(updatedData)
+
+      setCurrentImage({ image: null, preview: null })
+    } catch (error) {
+      console.log(error, 'error')
+    }
 
     handleDeleteCloseModal()
   }
-  
+
   const handlePageChange = (page) => {
-    setPage(page);
-  };
+    setPage(page)
+  }
 
   const handleCreateProduct = async () => {
     let accessLink = null
@@ -211,9 +251,37 @@ const Judges = () => {
       accessLink = data?.accessLink
     }
 
-    await addProduct({ ...newProduct, image: accessLink })
-    setCurrentImage({image:null,preview:null})
+    const newProducts = products ?? []
+    await newProducts.push({ ...newProduct, image: accessLink })
+
+    await newProducts?.map((p) => {
+      if (!p?._id || p._id === '') {
+        delete p._id // Remove the _id property
+        return p // Return the updated object
+      } else {
+        return p // Return the object unchanged
+      }
+    })
+
+    const updateData = {
+      productSection: {
+        title: productData?.title || '', // Default to an empty string if undefined
+        description: productData?.description || '', // Default to an empty string if undefined
+        data: newProducts, // Updated list of products
+      },
+    }
+
+    console.log(updateData, 'updated-data')
+
+    await updateBusiness(updateData)
+
+    // await addProduct({ ...newProduct, image: accessLink })
+    setCurrentImage({ image: null, preview: null })
     handleCreateCloseModal()
+  }
+
+  if (loading) {
+    return <FullPageLoader />
   }
 
   return (
@@ -317,26 +385,28 @@ const Judges = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
-              <Form.Control
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-{currentImage.preview && (
-            <img
-              src={currentImage.preview}
-              alt="Preview"
-              className="w-1/2 mx-auto h-auto mt-4"
-              style={{
-                objectFit: "cover",
-                display: "block",
-                marginInline: "auto",
-              }}
-            />
-          )}
-            </Form.Group>
+                <Form.Label>
+                  Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+                </Form.Label>
+                <Form.Control
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                {currentImage.preview && (
+                  <img
+                    src={currentImage.preview}
+                    alt="Preview"
+                    className="w-1/2 mx-auto h-auto mt-4"
+                    style={{
+                      objectFit: 'cover',
+                      display: 'block',
+                      marginInline: 'auto',
+                    }}
+                  />
+                )}
+              </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer
@@ -363,78 +433,144 @@ const Judges = () => {
         </div>
       </Modal>
 
-      <table className="min-w-full table-auto mt-6">
-        <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
-          <tr>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
-              Sl No
-            </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
-              Image
-            </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
-              Title
-            </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">ID</th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
-              Price
-            </th>
-            <th className="px-4 py-4 text-left border-r border-gray-400">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {products?.map((product, index) => (
-            <tr
-              key={product?._id}
-              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
-            >
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                {index + 1}
-              </td>
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                <img
-                  src={product?.image || 'default-image.png'}
-                  alt="Product"
-                  className="w-12 h-12 object-cover"
-                />
-              </td>
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product?.title}
-              </td>
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product?._id}
-              </td>
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                {product?.price}
-              </td>
-              <td className="px-4 py-4 text-left border-r border-gray-400">
-                <button variant="info" onClick={() => handleShowModal(product)}>
-                  <img
-                    alt="pics"
-                    src="/icons/edit.svg"
-                    className="w-6 h-6 rounded-full mr-2"
-                  />
-                </button>{' '}
-                <button
-                  variant="danger"
-                  onClick={() => {
-                    setSelectedProduct(product)
-                    setShowDeleteModal(true)
-                  }}
+      <div className="mt-6">
+        {/* Input Form */}
+        <div className="w-100 flex justify-center">
+          <form
+            onSubmit={handleProductMainSubmit}
+            className="bg-white p-4 border border-gray-400 rounded-md mb-6"
+            style={{ maxWidth: '65rem', width: '100%' }}
+          >
+            <div className="flex flex-col space-y-4">
+              {/* Title Input */}
+              <div>
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  <img
-                    alt="pics"
-                    src="/icons/delete.svg"
-                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  /> 
-                </button>
-              </td>
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={productData?.title}
+                  onChange={setProductInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                  placeholder="Enter title"
+                />
+              </div>
+              {/* Description Input */}
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  rows="4"
+                  name="description"
+                  value={productData?.description}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                  placeholder="Enter description"
+                  onChange={setProductInputChange}
+                ></textarea>
+              </div>
+            </div>
+            {/* Submit Button */}
+            <div className="mt-4 flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
+                style={{ backgroundColor: '#105193' }}
+              >
+                Update Details
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Products Table */}
+        <table className="min-w-full table-auto mt-6">
+          <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
+            <tr>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Sl No
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Image
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Title
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Description
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Price
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products?.map((product, index) => (
+              <tr
+                key={product?._id}
+                className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+              >
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  {index + 1}
+                </td>
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  <img
+                    src={product?.image || 'default-image.png'}
+                    alt="Product"
+                    className="w-12 h-12 object-cover"
+                  />
+                </td>
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  {product?.title}
+                </td>
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  {product?.description}
+                </td>
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  {product?.price}
+                </td>
+                <td className="px-4 py-4 text-left border-r border-gray-400">
+                  <button
+                    variant="info"
+                    onClick={() => handleShowModal(product)}
+                  >
+                    <img
+                      alt="edit"
+                      src="/icons/edit.svg"
+                      className="w-6 h-6 rounded-full mr-2"
+                    />
+                  </button>
+                  <button
+                    variant="danger"
+                    onClick={() => {
+                      setSelectedProduct(product)
+                      setShowDeleteModal(true)
+                    }}
+                  >
+                    <img
+                      alt="delete"
+                      src="/icons/delete.svg"
+                      className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Edit Product Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -471,25 +607,27 @@ const Judges = () => {
               />
             </Form.Group>
             <Form.Group controlId="formImage" className="mt-3">
-              <Form.Label>Image <span style={{color:'grey'}}>(Ratio 1 : 1)</span></Form.Label>
+              <Form.Label>
+                Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+              </Form.Label>
               <Form.Control
                 type="file"
                 name="image"
                 accept="image/*"
                 onChange={handleFileChange}
               />
-             {currentImage.preview && (
-            <img
-              src={currentImage.preview}
-              alt="Preview"
-              className="w-1/2 mx-auto h-auto mt-4"
-              style={{
-                objectFit: "cover",
-                display: "block",
-                marginInline: "auto",
-              }}
-            />
-          )}
+              {currentImage.preview && (
+                <img
+                  src={currentImage.preview}
+                  alt="Preview"
+                  className="w-1/2 mx-auto h-auto mt-4"
+                  style={{
+                    objectFit: 'cover',
+                    display: 'block',
+                    marginInline: 'auto',
+                  }}
+                />
+              )}
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -525,7 +663,7 @@ const Judges = () => {
       </div>
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
+        onHide={() => handleModalState('showCrop', false)}
       >
         <Modal.Header closeButton>
           <Modal.Title>Crop Image</Modal.Title>
@@ -533,7 +671,7 @@ const Judges = () => {
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
+            style={{ height: '400px' }}
           >
             <Cropper
               image={currentImage.preview}
@@ -543,7 +681,7 @@ const Judges = () => {
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {
-                setCroppedAreaPixels(croppedAreaPixels);
+                setCroppedAreaPixels(croppedAreaPixels)
               }}
             />
           </div>
@@ -553,14 +691,14 @@ const Judges = () => {
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
                 currentImage.preview,
-                croppedAreaPixels
-              );
+                croppedAreaPixels,
+              )
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
                 file: blob,
-              }));
-              handleModalState("showCrop", false);
+              }))
+              handleModalState('showCrop', false)
             }}
           >
             Crop & Save

@@ -1,38 +1,44 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import Cropper from 'react-easy-crop'
-import { useSelector, useDispatch } from 'react-redux'
 import { Button, Modal, Form } from 'react-bootstrap'
-import axios from 'axios'
-import { setBusinessData } from '../../api/slices/business'
-import { useNavigate } from 'react-router-dom'
-import { getApi } from '../../api/api'
+import useBusiness from '../../api/useBusiness'
+import useImageUpload from '../../api/imageUpload/useImageUpload'
+import { toast } from 'sonner'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
-import useBusiness from '../../api/useBusiness'
-import { useDebouncedCallback } from 'use-debounce';
+import FullPageLoader from '../FullPageLoader/FullPageLoader'
 
 const BasicServices = () => {
-  const { updateBusiness } = useBusiness()
-  const dispatch = useDispatch()
   const [businessData, setBusinessData] = useState([])
 
   const [services, setServices] = useState([])
   const [filteredServices, setFilteredServices] = useState([])
 
-  const navigate = useNavigate()
+  const { imageLoading, uploadImage } = useImageUpload()
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
+  const [page, setPage] = useState(1)
+  const [reFetch, SetReFetch] = useState(false)
+  const limit = 10
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      await getBusiness()
+    }
+    fetchBusiness()
+  }, [])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const businessDetails = await getApi(
-          `api/v1/business/profile`,
-          true,
-          dispatch,
-          navigate,
-        )
-
-        setBusinessData(businessDetails.data)
-
-        setServices(businessDetails?.data?.service)
+        if (businesses) {
+          setBusinessData(businesses)
+          console.log(businesses)
+          setServices(businesses?.service?.data)
+          setServiceData({
+            title: businesses?.service?.title ?? '',
+            description: businesses?.service?.description ?? '',
+          })
+        }
       } catch (error) {
         console.error(
           'Error fetching business details:',
@@ -41,44 +47,7 @@ const BasicServices = () => {
       }
     }
     fetchData()
-  }, [dispatch, navigate])
-
-  const [showModal, setShowModal] = useState(false)
-  const [selectedService, setSelectedService] = useState(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [newService, setNewService] = useState({
-    _id: '',
-    title: '',
-    description: '',
-    image: null,
-  })
-  const [imageCreatePreview, setImageCreatePreview] = useState('')
-
-  const [updatedServices, setUpdatedServices] = useState({
-    _id: '',
-    title: '',
-    description: '',
-    image: null,
-  })
-  const [imagePreview, setImagePreview] = useState('')
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [page, setPage] = useState(1)
-  const [reFetch, SetReFetch] = useState(false)
-  // Cropper state
-  const [showCropperModal, setShowCropperModal] = useState(false)
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
-  const [imageSrc, setImageSrc] = useState(null)
-  const [imageFileToCrop, setImageFileToCrop] = useState(null)
-  const limit = 1
-  useEffect(() => {
-    if (businessData) {
-      setServices(businessData.service || [])
-    }
-  }, [businessData])
-
+  }, [businesses])
 
   useEffect(() => {
     if (!services?.length) {
@@ -92,6 +61,37 @@ const BasicServices = () => {
     setFilteredServices(paginatedServices)
   }, [services, page, limit])
 
+  const [showModal, setShowModal] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [newService, setNewService] = useState({
+    title: '',
+    description: '',
+    image: null,
+  })
+  const [imageCreatePreview, setImageCreatePreview] = useState('')
+  const [imageCreateFile, setImageCreateFile] = useState(null)
+  const [imageFile, setImageFile] = useState(null)
+  const [serviceData, setServiceData] = useState({
+    title: '',
+    description: '',
+  })
+
+  const [updatedServices, setUpdatedServices] = useState({
+    _id: '',
+    title: '',
+    description: '',
+    image: null,
+  })
+  const [imagePreview, setImagePreview] = useState('')
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [isCropping, setIsCropping] = useState(false)
+
   const handleShowModal = (Servi) => {
     setSelectedService(Servi)
     setUpdatedServices({
@@ -104,9 +104,6 @@ const BasicServices = () => {
     setShowModal(true)
   }
 
-  const handlePageChange = (page) => {
-    setPage(page)
-  }
   const handleCloseModal = () => {
     setShowModal(false)
     setSelectedService(null)
@@ -118,6 +115,10 @@ const BasicServices = () => {
       image: null,
     })
     setImagePreview('')
+  }
+
+  const handlePageChange = (page) => {
+    setPage(page)
   }
 
   const handleCreateCloseModal = () => {
@@ -136,81 +137,20 @@ const BasicServices = () => {
     setShowDeleteModal(false)
   }
 
-  const preRequestFun = async (file, position) => {
-    const url = `${process.env.REACT_APP_BE_API_KEY}/api/v1/s3url`
-    const requestBody = {
-      files: [
-        {
-          position: position,
-          file_type: file.type,
-        },
-      ],
-    }
-
-    try {
-      const response = await axios.post(url, requestBody, {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      const preReq = response.data.data[0]
-
-      if (!preReq.url) {
-        throw new Error('The URL is not defined in the response.')
-      }
-      await axios.put(preReq.url, file, {
-        headers: { 'Content-Type': file.type },
-      })
-
-      return preReq
-    } catch (error) {
-      console.error('Error uploading file:', error.message || error)
-      throw new Error('File upload failed')
-    }
-  }
-
   const handleShowCreateModal = () => setShowCreateModal(true)
-
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }, [])
-
-  const handleCropImage = async () => {
-    try {
-      const { blob, fileUrl } = await getCroppedImg(imageSrc, croppedAreaPixels)
-      if (blob) {
-        // Update the state with the cropped image URL
-        const preReq = await preRequestFun(blob, imageFileToCrop?.name)
-        if (showCreateModal) {
-          setNewService((prevServices) => ({
-            ...prevServices,
-            image: preReq?.accessLink,
-          }))
-          setImageCreatePreview(fileUrl)
-        } else if (showModal) {
-          setUpdatedServices((prevServices) => ({
-            ...prevServices,
-            image: preReq?.accessLink,
-          }))
-          setImagePreview(fileUrl)
-        }
-      }
-      setShowCropperModal(false)
-    } catch (error) {
-      console.error('Error cropping the image:', error)
-    }
-  }
 
   const handleInputChange = async (e) => {
     const { name, value, type } = e.target
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => {
-          setImageSrc(reader.result)
-          setImageFileToCrop(file)
-          setShowCropperModal(true)
-        }
+        setUpdatedServices((prevServices) => ({
+          ...prevServices,
+          image: file, // Remove quotes here
+        }))
+        setImageFile(file)
+        setImagePreview(URL.createObjectURL(file))
+        setIsCropping(true)
       }
     } else {
       setUpdatedServices((prevServices) => ({
@@ -220,72 +160,165 @@ const BasicServices = () => {
     }
   }
 
+  const setServiceInputChange = (e) => {
+    setServiceData((prev) => ({
+      ...prev, // Spread the previous state to retain other properties
+      [e.target.name]: e.target.value, // Dynamically set the property from the input name and value
+    }))
+  }
+
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
     const { name, value, type } = e.target
     if (type === 'file') {
       const file = e.target.files[0]
       if (file) {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => {
-          setImageSrc(reader.result)
-          setImageFileToCrop(file)
-          setShowCropperModal(true)
-        }
+        setNewService((prevServices) => ({ ...prevServices, image: file }))
+        setImageCreateFile(file)
+        setImageCreatePreview(URL.createObjectURL(file))
+        setIsCropping(true)
       }
     } else {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }))
     }
   }
   const handleSaveChanges = async () => {
-    const updatedService = services.map((Servi) =>
-      Servi._id === updatedServices._id ? updatedServices : Servi,
-    )
-    console.log(updatedServices)
-    const updatedData = { ...businessData, service: updatedService }
-    await updateBusiness({ service: updatedService })
-    setBusinessData(updatedData)
-    setServices(updatedService)
-    handleCloseModal()
+    if (!updatedServices?.title || !updatedServices?.description) {
+      toast.warning('Please enter title and description', {
+        position: 'top-right',
+        duration: 2000,
+        style: {
+          backgroundColor: 'yellow', // Custom yellow color for warning
+          color: '#FFFFFF', // Text color
+        },
+        dismissible: true,
+      })
+    } else {
+      var imageAccessUrl = selectedService.image
+      if (imageFile) {
+        const data = await uploadImage(imageFile, 'service')
+        imageAccessUrl = data?.accessLink
+        setUpdatedServices((prevService) => ({
+          ...prevService,
+          image: imageAccessUrl, // Remove quotes here
+        }))
+        updatedServices.image = imageAccessUrl
+      }
+      const updatedService = services.map((Servi) =>
+        Servi._id === updatedServices._id ? updatedServices : Servi,
+      )
+      setServices(updatedService)
+      const updatedData = {
+        service: {
+          ...businesses?.service,
+          data: [...updatedService],
+        },
+      }
+      await updateBusiness(updatedData)
+      console.log(updatedData, 'updatedData')
+      handleCloseModal()
+    }
   }
 
   const handleDeleteServices = async () => {
-    setServices((prevServices) =>
-      prevServices.filter((Servi) => Servi._id !== selectedService._id),
-    )
+    try {
+      const updatedServices = await services?.filter(
+        (ser) => ser?._id !== selectedService?._id,
+      )
 
-    const updatedData = {
-      ...businessData,
-      service: services.filter((Servi) => Servi._id !== selectedService._id),
+      const updatedService = {
+        service: {
+          ...(businesses?.service ?? []),
+          data: updatedServices,
+        },
+      }
+
+      await updateBusiness(updatedService)
+      setServices(updatedServices)
+      // setBusinessData(updatedData)
+
+      handleDeleteCloseModal()
+    } catch (error) {
+      console.log(error, 'error')
     }
-
-    setBusinessData(updatedData)
-    await updateBusiness({
-      service: services.filter((Servi) => Servi._id !== selectedService._id),
-    })
-    handleDeleteCloseModal()
   }
-
   const handleCreateService = async () => {
-    const cleanNewService = { ...newService }
+    if (!newService?.title || !newService?.description) {
+      toast.warning('Please enter title and description', {
+        position: 'top-right',
+        duration: 2000,
+        style: {
+          backgroundColor: 'yellow', // Custom yellow color for warning
+          color: '#FFFFFF', // Text color
+        },
+        dismissible: true,
+      })
+    } else {
+      try {
+        let imgAccessUrl
+        if (imageCreateFile) {
+          const data = await uploadImage(imageCreateFile, 'service')
+          imgAccessUrl = data?.accessLink
+        }
 
-    // Remove `_id` if it's invalid
-    if (!cleanNewService._id) {
-      delete cleanNewService._id
+        const newServices = businesses?.service?.data || []
+        await newServices.push({
+          ...newService,
+          image: imgAccessUrl,
+        })
+
+        await newServices?.map((p) => {
+          if (!p?._id || p._id === '') {
+            delete p._id // Remove the _id property
+            return p // Return the updated object
+          } else {
+            return p // Return the object unchanged
+          }
+        })
+        // Prepare updated business data immutably
+        const updatedData = {
+          service: {
+            ...(businesses?.service ?? []),
+            data: newServices,
+          },
+        }
+        await updateBusiness(updatedData)
+        handleCreateCloseModal()
+      } catch (error) {
+        console.log(error, 'errorr ---------------------')
+        toast.error('Something went wrong , please try again!')
+      }
     }
+    // setServices((prevServices) => {
+    //   const updatedServices = Array.isArray(prevServices)
+    //     ? [...prevServices, newService]
+    //     : [newService];
 
-    const updatedServices = Array.isArray(services)
-      ? [...services, cleanNewService]
-      : [cleanNewService]
+    //   const updatedData = {
+    //     service: {
+    //       ...businessData.service,
+    //       data: updatedServices,
+    //     },
+    //   };
 
-    const updatedData = { ...businessData, service: updatedServices }
-    await updateBusiness({ service: updatedServices })
-    setBusinessData(updatedData)
-    handleCreateCloseModal()
-    setServices(updatedServices) // Update services only at the end
+    //   setBusinessData(updatedData);
+    //   handleCloseModal();
+    //   return updatedServices;
+    // });
   }
 
+  const handleServiceMainSubmit = async (e) => {
+    e.preventDefault()
+    const updatedData = {
+      service: {
+        title: serviceData?.title,
+        description: serviceData?.description,
+        data: services,
+      },
+    }
+
+    updateBusiness(updatedData)
+  }
 
   const handleSearchChange = useDebouncedCallback((value) => {
     if (!value?.trim()) {
@@ -303,47 +336,22 @@ const BasicServices = () => {
     setFilteredServices(filteredServices)
   }, 500)
 
+  if (loading) {
+    return (
+      <div className="h-100vh text-center ">
+        <div className="row h-100 justify-content-center align-items-center">
+          <FullPageLoader />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
-        {/* Cropper Modal */}
-        <Modal
-          show={showCropperModal}
-          onHide={() => setShowCropperModal(false)}
-          size="lg"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Crop Image</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div
-              className="crop-container position-relative"
-              style={{ height: '400px' }}
-            >
-              <Cropper
-                image={imageSrc}
-                crop={crop}
-                zoom={zoom}
-                aspect={16 / 8} // Adjust the aspect ratio as needed
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowCropperModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleCropImage}>
-              Crop Image
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      <div className="flex justify-between items-center py-4">
-        <h2 className="text-2xl m-0 p-0 font-semibold text-gray-700">Services</h2>
+      <div className="flex rounded-lg p-4">
+        <h2 className="text-2xl font-semibold text-gray-700">
+          Common Services
+        </h2>
         <div className="ml-auto flex items-center space-x-4">
           <button
             onClick={handleShowCreateModal}
@@ -353,7 +361,7 @@ const BasicServices = () => {
           </button>
           <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Add Services</Modal.Title>
+              <Modal.Title>Add Service</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -369,15 +377,17 @@ const BasicServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea" // Render as a textarea
                     name="description"
+                    rows={4} // Optional: Sets the number of rows for the textarea
                     value={newService.description}
                     onChange={handleCreateInputChange}
                   />
                 </Form.Group>
+
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image <span>(Ratio 16 : 8)</span>
+                    Image <span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -389,7 +399,7 @@ const BasicServices = () => {
                     <img
                       src={imageCreatePreview}
                       alt="Image Preview"
-                       className="mt-3 w-1/2 h-auto mx-auto "
+                      className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
                         objectFit: 'cover',
                         marginInline: 'auto',
@@ -404,17 +414,74 @@ const BasicServices = () => {
                 Close
               </Button>
               <Button variant="success" onClick={handleCreateService}>
-                Save changes
+                Add Service
               </Button>
             </Modal.Footer>
           </Modal>
         </div>
       </div>
+      <div className="w-100 flex justify-center">
+        <form
+          onSubmit={handleServiceMainSubmit}
+          className="bg-white p-4 border border-gray-400 rounded-md mb-6"
+          style={{ maxWidth: '65rem', width: '100%' }}
+        >
+          <div className="flex flex-col space-y-4">
+            {/* Title Input */}
+            <div>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={serviceData?.title}
+                onChange={setServiceInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                placeholder="Enter title"
+              />
+            </div>
+            {/* Description Input */}
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                rows="4"
+                name="description"
+                onChange={setServiceInputChange}
+                value={serviceData?.description}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                placeholder="Enter description"
+                // onChange={setProductInputChange}
+              ></textarea>
+            </div>
+          </div>
+          {/* Submit Button */}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="submit"
+              className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
+              style={{ backgroundColor: '#105193' }}
+            >
+              Update Details
+            </button>
+          </div>
+        </form>
+      </div>
       <div className="flex rounded-lg p-4 pr-0 pt-0">
         <div className="ml-auto lg:mr-4 flex items-center space-x-4 justify-end pt-3">
           {/* Parent div for span elements */}
           <span className="flex items-center justify-center">
-          <input
+            <input
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
               placeholder="Search by title,description"
               onChange={(e) => {
@@ -507,7 +574,7 @@ const BasicServices = () => {
           {/* Edit Servi Modal */}
           <Modal show={showModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Edit Services</Modal.Title>
+              <Modal.Title>Edit Special Services</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -523,15 +590,17 @@ const BasicServices = () => {
                 <Form.Group controlId="formDescription" className="mt-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea" // Render as a textarea
                     name="description"
+                    rows={4} // Optional: Number of visible rows
                     value={updatedServices.description}
                     onChange={handleInputChange}
                   />
                 </Form.Group>
+
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image<span>(Ratio 16 : 8)</span>
+                    Image<span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -543,8 +612,8 @@ const BasicServices = () => {
                     <img
                       src={imagePreview}
                       alt="Image Preview"
-                       className="mt-3 w-1/2 h-auto mx-auto "
-                      style={{ 
+                      className="mt-3 w-1/2 h-auto mx-auto "
+                      style={{
                         objectFit: 'cover',
                         marginInline: 'auto',
                       }}
@@ -590,6 +659,47 @@ const BasicServices = () => {
           onPageChange={handlePageChange}
         />
       </div>
+      <Modal show={isCropping} onHide={() => setIsCropping(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Crop Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div
+            className="crop-container position-relative"
+            style={{ height: '400px' }}
+          >
+            <Cropper
+              image={imagePreview || imageCreatePreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={16 / 8} // Adjust aspect ratio as needed
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) => {
+                setCroppedAreaPixels(croppedAreaPixels)
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={async () => {
+              const { blob, fileUrl } = await getCroppedImg(
+                imagePreview || imageCreatePreview,
+                croppedAreaPixels,
+              )
+              // Convert the croppedImage blob to a URL for preview or upload
+              imagePreview && setImagePreview(fileUrl)
+              imageCreatePreview && setImageCreatePreview(fileUrl)
+              imagePreview && setImageFile(blob)
+              imageCreatePreview && setImageCreateFile(blob)
+              setIsCropping(false)
+            }}
+          >
+            Crop & Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }
