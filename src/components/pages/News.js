@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+import { Button, Modal, Form, CloseButton } from "react-bootstrap";
 import Pagination from "../Pagination";
 import Loader from "../Loader/Loader";
 import useNewsArticles from "../../api/news";
@@ -49,9 +49,7 @@ const News = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [page, setPage] = useState(1);
-  const [imageCreatePreview, setImageCreatePreview] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [validated, setValidated] = useState(false);
   const limit = 10;
   const [modalState, setModalState] = useState({
     showEdit: false,
@@ -79,7 +77,6 @@ const News = () => {
       const previewUrl = URL.createObjectURL(file);
       setCurrentImage((prev) => ({
         ...prev,
-        image: previewUrl,
         preview: previewUrl,
         file,
       }));
@@ -92,6 +89,7 @@ const News = () => {
   }, [newsArticles]);
 
   const handleShowModal = (newsData) => {
+    setCurrentImage({ image: newsData?.image, file: null, preview: null });
     setSelectedProduct(newsData);
     setUpdatedNews({
       _id: newsData._id,
@@ -127,6 +125,7 @@ const News = () => {
       isBanner: false,
       image: null,
     });
+    setCurrentImage({ file: null, image: null, preview: null })
   };
 
   const handleDeleteCloseModal = () => {
@@ -140,8 +139,10 @@ const News = () => {
     if (type === "file") {
       const file = e.target.files[0];
       if (file) {
-        setImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
+        setCurrentImage((prev) => ({
+          ...prev,
+          preview: URL.createObjectURL(file)
+        }))
       } else {
         console.error("Access link not found in response.");
       }
@@ -162,8 +163,10 @@ const News = () => {
       const file = e.target.files[0];
 
       if (file) {
-        setImageFile(file);
-        setImageCreatePreview(URL.createObjectURL(file));
+        setCurrentImage((prev) => ({
+          ...prev,
+          preview: URL.createObjectURL(file)
+        }))
       } else {
         console.error("Access link not found in response.");
       }
@@ -176,22 +179,16 @@ const News = () => {
       setNewNewsArticle((prevNewsData) => ({ ...prevNewsData, [name]: value }));
     }
   };
-  const handleSaveChanges = async () => {
-    console.log(currentImage);
-    
+  const handleSaveChanges = async (e) => {
+    e.preventDefault()
+    let imageLink = currentImage?.image
+
     if (currentImage?.file) {
-      uploadImage(currentImage?.file, "news").then(async (response) => {
-        if (response?.accessLink) {
-          await updateNewsArticles({
-            ...updatedNews,
-            image: response?.accessLink,
-          });
-        }
-      });
-    } else {
-      await updateNewsArticles({ ...updatedNews });
+      const response = await uploadImage(currentImage?.file, "news")
+      imageLink = response.accessLink
     }
-    setImageFile(null);
+    await updateNewsArticles({ ...updatedNews, image: imageLink });
+    setCurrentImage({ file: null, image: null, preview: null })
     handleCloseModal();
   };
 
@@ -208,20 +205,16 @@ const News = () => {
     setPage(page);
   };
 
-  const handleCreateNewsArticle = async () => {
+  const handleCreateNewsArticle = async (e) => {
+    e.preventDefault()
+    let imageLink = null
     if (currentImage?.file) {
-      uploadImage(currentImage?.file, "news").then(async (response) => {
-        if (response?.accessLink) {
-          await addNewsArticles({
-            ...newNewsArticle,
-            image: response?.accessLink,
-          });
-        }
-      });
-    } else {
-      await addNewsArticles({ ...newNewsArticle });
+      const response = await uploadImage(currentImage?.file, "news")
+      imageLink = response?.accessLink
     }
-    setImageFile(null);
+
+    await addNewsArticles({ ...newNewsArticle, image: imageLink });
+    setCurrentImage({ file: null, image: null, preview: null })
     handleCreateCloseModal();
   };
 
@@ -248,121 +241,97 @@ const News = () => {
       <Modal
         show={showCreateModal}
         onHide={handleCreateCloseModal}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
       >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-            overflow: "hidden",
-            width: "500px",
-          }}
-        >
-          <Modal.Header
-            closeButton
-            style={{
-              borderBottom: "1px solid #eaeaea",
-              padding: "16px 24px",
-            }}
-          >
-            <Modal.Title  style={{ fontWeight: "500", fontSize: "1.25rem" }}>
-              Add Articles
-            </Modal.Title>
+        <Form noValidate validated onSubmit={handleCreateNewsArticle}>
+          <Modal.Header>
+            <Modal.Title> Add Articles</Modal.Title>
+            <CloseButton onClick={handleCreateCloseModal} />
           </Modal.Header>
           <Modal.Body
             style={{
               padding: "24px",
             }}
           >
-            <Form>
-              <Form.Group controlId="formTitle">
-                <Form.Label style={{ fontWeight: "500" }}>Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="title"
-                  required
-                  value={newNewsArticle.title}
-                  onChange={handleCreateInputChange}
+            <Form.Group controlId="formTitle">
+              <Form.Label style={{ fontWeight: "500" }}>Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                required
+                value={newNewsArticle.title}
+                onChange={handleCreateInputChange}
+                style={{
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  padding: "10px",
+                }}
+              />
+            </Form.Group>
+            <Form.Group controlId="formDescription" className="mt-3">
+              <Form.Label style={{ fontWeight: "500" }}>
+                Description
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="description"
+                required
+                value={newNewsArticle.description}
+                onChange={handleCreateInputChange}
+                style={{
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  padding: "10px",
+                }}
+              />
+            </Form.Group>
+            <Form.Group controlId="formLink" className="mt-3">
+              <Form.Label style={{ fontWeight: "500" }}>Link</Form.Label>
+              <Form.Control
+                type="link"
+                name="link"
+                required
+                value={newNewsArticle.link}
+                onChange={handleCreateInputChange}
+                style={{
+                  borderRadius: "8px",
+                  padding: "8px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </Form.Group>
+            <Form.Group controlId="formImage" className="mt-3">
+              <Form.Label>
+                Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
+              </Form.Label>
+              <Form.Control
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              {currentImage.image && (
+                <img
+                  src={currentImage.image}
+                  alt="Preview"
+                  className="w-1/2 mx-auto h-auto mt-4"
                   style={{
-                    borderRadius: "8px",
-                    border: "1px solid #ddd",
-                    padding: "10px",
+                    objectFit: "cover",
+                    display: "block",
+                    marginInline: "auto",
                   }}
                 />
-              </Form.Group>
-              <Form.Group controlId="formDescription" className="mt-3">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Description
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="description"
-                  required
-                  value={newNewsArticle.description}
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #ddd",
-                    padding: "10px",
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formLink" className="mt-3">
-                <Form.Label style={{ fontWeight: "500" }}>Link</Form.Label>
-                <Form.Control
-                  type="link"
-                  name="link"
-                  required
-                  value={newNewsArticle.link}
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: "8px",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formImage" className="mt-3">
-                <Form.Label>
-                  Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
-                </Form.Label>
-                <Form.Control
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                {currentImage.preview && (
-                  <img
-                    src={currentImage.preview}
-                    alt="Preview"
-                    className="w-1/2 mx-auto h-auto mt-4"
-                    style={{
-                      objectFit: "cover",
-                      display: "block",
-                      marginInline: "auto",
-                    }}
-                  />
-                )}
-              </Form.Group>
-              <Form.Group controlId="formIsBanner" className="mt-3">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Make it a banner
-                </Form.Label>
-                <Form.Check
-                  name="isBanner"
-                  required
-                  value={newNewsArticle?.isBanner ? true : false}
-                  onChange={handleCreateInputChange}
-                />
-              </Form.Group>
-            </Form>
+              )}
+            </Form.Group>
+            <Form.Group controlId="formIsBanner" className="mt-3">
+              <Form.Label style={{ fontWeight: "500" }}>
+                Make it a banner
+              </Form.Label>
+              <Form.Check
+                name="isBanner"
+                value={newNewsArticle?.isBanner ? true : false}
+                onChange={handleCreateInputChange}
+              />
+            </Form.Group>
           </Modal.Body>
           <Modal.Footer
             style={{
@@ -373,7 +342,7 @@ const News = () => {
             }}
           >
             <Button
-              onClick={handleCreateNewsArticle}
+              type="submit"
               style={{
                 fontWeight: "500",
                 padding: "10px 20px",
@@ -385,8 +354,8 @@ const News = () => {
               Submit
             </Button>
           </Modal.Footer>
-        </div>
-      </Modal>
+        </Form>
+      </Modal >
 
       <table className="min-w-full table-auto mt-6 border-collapse">
         <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
@@ -438,27 +407,28 @@ const News = () => {
 
                 <td className="px-4 py-2 border-r border-gray-400 ">
                   <div className="flex flex-col  justify-between border h-full ">
-                  <div className="flex -space-x-2">
-                    {showMore?.index === index && showMore?.status
-                      ? data?.description.substring(0)
-                      : data?.description.substring(0, 100)}
-                    
-                  </div>
-                     <p  onClick={() =>
-                        setShowMore({ index: index, status: !showMore?.status })
-                      } className="m-0 p-0 text-xs text-end  text-blue-500 ">
-                     {showMore?.status && showMore?.index === index
+                    <div className="flex -space-x-2">
+                      {showMore?.index === index && showMore?.status
+                        ? data?.description.substring(0)
+                        : data?.description.substring(0, 100)}
+
+                    </div>
+                    <p onClick={() =>
+                      setShowMore({ index: index, status: !showMore?.status })
+                    } className="m-0 p-0 text-xs text-end  text-blue-500 ">
+                      {showMore?.status && showMore?.index === index
                         ? "Show Less..."
                         : "Show More..."}
-                     </p>
+                    </p>
                   </div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  <LinkPreviewComponent url={data?.link} image={data?.image} />
+                  {data?.image ? <div> <img width={300} src={data?.image} className="h-auto" /> </div> : <LinkPreviewComponent url={data?.link} />}
+
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
                   <div className="flex -space-x-2">
-                    <a target="_blank" href={data?.link} rel="noreferrer">
+                    <a target="_blank" href={data?.link} rel="no referrer">
                       Url
                     </a>{" "}
                   </div>
@@ -476,6 +446,7 @@ const News = () => {
                     variant="danger"
                     onClick={() => {
                       setUpdatedNews(data);
+
                       setShowDeleteModal(true);
                     }}
                   >
@@ -494,14 +465,16 @@ const News = () => {
 
       {/* Edit Product Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit News Article</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
+        <Form noValidate validated={validated} onSubmit={handleSaveChanges}>
+          <Modal.Header >
+            <Modal.Title>Edit News Article</Modal.Title>
+            <CloseButton onClick={handleCloseModal} />
+          </Modal.Header>
+          <Modal.Body>
             <Form.Group controlId="formTitle">
               <Form.Label>Title</Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="title"
                 value={updatedNews.title}
@@ -511,6 +484,7 @@ const News = () => {
             <Form.Group controlId="formDescription" className="mt-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="description"
                 value={updatedNews.description}
@@ -520,6 +494,7 @@ const News = () => {
             <Form.Group controlId="formLink" className="mt-3">
               <Form.Label style={{ fontWeight: "500" }}>Link</Form.Label>
               <Form.Control
+
                 type="link"
                 name="link"
                 required
@@ -542,9 +517,9 @@ const News = () => {
                 accept="image/*"
                 onChange={handleFileChange}
               />
-              {currentImage.preview && (
+              {currentImage.image && (
                 <img
-                  src={currentImage.preview}
+                  src={currentImage.image}
                   alt="Preview"
                   className="w-1/2 mx-auto h-auto mt-4"
                   style={{
@@ -566,17 +541,17 @@ const News = () => {
                 onChange={handleCreateInputChange}
               />
             </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={handleSaveChanges}>
-            Save changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" type="submit">
+              Save changes
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal >
 
       {/* Delete Product Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={handleDeleteCloseModal}>
+      < Modal show={showDeleteModal} onHide={handleDeleteCloseModal} >
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
@@ -589,7 +564,7 @@ const News = () => {
             Delete
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal >
       <div className="m-auto flex justify-end mt-8">
         <Pagination
           totalItems={totalNews}
@@ -634,7 +609,7 @@ const News = () => {
               );
               setCurrentImage((prev) => ({
                 ...prev,
-                preview: fileUrl,
+                image: fileUrl,
                 file: blob,
               }));
               handleModalState("showCrop", false);
@@ -648,7 +623,7 @@ const News = () => {
   );
 };
 
-const LinkPreviewComponent = ({ url, image }) => {
+const LinkPreviewComponent = ({ url }) => {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -723,9 +698,9 @@ const LinkPreviewComponent = ({ url, image }) => {
       onClick={handleClick}
       style={{ cursor: "pointer" }}
     >
-      {(previewData.image || image) && (
+      {(previewData.image) && (
         <img
-          src={image ?? previewData?.image}
+          src={previewData?.image}
           alt="Link Preview"
           className="w-100 h-100"
         />

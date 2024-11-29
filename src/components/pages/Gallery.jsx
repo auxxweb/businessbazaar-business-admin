@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, CloseButton, Form, Modal } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 const Gallery = () => {
-  const { businesses, getBusiness, updateBusiness ,loading} = useBusiness();
-  const { uploadImage,imageLoading } = useImageUpload();
+  const { businesses, getBusiness, updateBusiness, loading } = useBusiness();
+  const { uploadImage, imageLoading } = useImageUpload();
 
   const [gallery, setGallery] = useState([]);
   const [modalState, setModalState] = useState({
@@ -34,12 +34,9 @@ const Gallery = () => {
   const handleFileChange = async (e, isCreate = false) => {
     const file = e.target.files[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
       setCurrentImage((prev) => ({
         ...prev,
-        image: previewUrl,
-        preview: previewUrl,
-        file,
+        preview: URL.createObjectURL(file),
       }));
       handleModalState("showCrop", true);
     }
@@ -54,9 +51,9 @@ const Gallery = () => {
         await updateBusiness({ gallery: newGallery });
         setGallery(newGallery);
       }
-      resetCurrentImage();
-      handleModalState("showEdit", false);
     }
+    resetCurrentImage();
+    handleModalState("showEdit", false);
   };
 
   const handleDeleteGallery = async () => {
@@ -75,9 +72,9 @@ const Gallery = () => {
         await updateBusiness({ gallery: newGallery });
         setGallery(newGallery);
       }
-      resetCurrentImage();
-      handleModalState("showCreate", false);
     }
+    resetCurrentImage();
+    handleModalState("showCreate", false);
   };
 
   const resetCurrentImage = () => {
@@ -109,7 +106,6 @@ const Gallery = () => {
       </div>
     );
   }
-
   return (
     <>
       <div className="container">
@@ -127,8 +123,8 @@ const Gallery = () => {
           </div>
         </div>
         <div className="row">
-          {imageLoading&&(
-            <FullPageLoader/>
+          {imageLoading && (
+            <FullPageLoader />
           )}
           {gallery.map((item, index) => (
             <div className="col-md-3 p-2" key={index}>
@@ -138,7 +134,7 @@ const Gallery = () => {
                   <button
                     className="rounded shadow text-xs"
                     onClick={() => {
-                      setCurrentImage({ index, image: item, preview: item });
+                      setCurrentImage({ index, image: item, preview: null, file: null });
                       handleModalState("showEdit", true);
                     }}
                   >
@@ -176,10 +172,15 @@ const Gallery = () => {
           resetCurrentImage();
         }}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
+        <Modal.Header >
+          <Modal.Title >
             {modalState.showCreate ? "Add Gallery" : "Edit Gallery"}
           </Modal.Title>
+          <CloseButton onClick={() => {
+            handleModalState("showCreate", false);
+            handleModalState("showEdit", false);
+            resetCurrentImage();
+          }} />
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -193,11 +194,11 @@ const Gallery = () => {
                 accept="image/*"
                 onChange={handleFileChange}
               />
-              {currentImage.preview && (
+              {currentImage.image && (
                 <img
-                  src={currentImage.preview}
+                  src={currentImage.image}
                   alt="Preview"
-                   className="mt-3 w-1/2 h-auto mx-auto "
+                  className="mt-3 w-1/2 h-auto mx-auto "
                   style={{
                     objectFit: "cover",
                     display: "block",
@@ -276,7 +277,7 @@ const Gallery = () => {
               );
               setCurrentImage((prev) => ({
                 ...prev,
-                preview: fileUrl,
+                image: fileUrl,
                 file: blob,
               }));
               handleModalState("showCrop", false);
