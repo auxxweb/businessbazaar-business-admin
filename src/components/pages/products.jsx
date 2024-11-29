@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
@@ -8,6 +8,7 @@ import getCroppedImg from '../../utils/cropper.utils';
 import FullPageLoader from '../FullPageLoader/FullPageLoader';
 
 const Judges = () => {
+  const fileInputRef = useRef(null);
   const { imageLoading, uploadImage } = useImageUpload()
   const {
     businesses,
@@ -22,7 +23,11 @@ const Judges = () => {
     }
     fetchBusiness()
   }, [])
-
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input
+    }
+  };
   const [products, setProducts] = useState([])
   const [productData, setProductData] = useState({
     title: '',
@@ -398,6 +403,7 @@ const Judges = () => {
                   type="file"
                   name="image"
                   accept="image/*"
+                  ref={fileInputRef}
                   onChange={handleFileChange}
                 />
                 {currentImage.image && (
@@ -620,6 +626,7 @@ const Judges = () => {
                 type="file"
                 name="image"
                 accept="image/*"
+                ref={fileInputRef}
                 onChange={handleFileChange}
               />
               {currentImage.image && (
@@ -658,6 +665,7 @@ const Judges = () => {
             Delete
           </Button>
         </Modal.Footer>
+
       </Modal>
       <div className="m-auto flex justify-end mt-8">
         <Pagination
@@ -667,12 +675,16 @@ const Judges = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState('showCrop', false)}
+        onHide={() =>{ resetCropper()
+          handleModalState('showCrop', false)}}
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton onClick={() =>{ resetCropper()
+             handleModalState('showCrop', false)}} />
         </Modal.Header>
         <Modal.Body>
           <div

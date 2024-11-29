@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import Cropper from 'react-easy-crop'
 import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
@@ -10,6 +10,7 @@ import getCroppedImg from '../../utils/cropper.utils'
 import FullPageLoader from '../FullPageLoader/FullPageLoader'
 
 const SpecialServices = () => {
+  const fileInputRef = useRef(null)
   const [businessData, setBusinessData] = useState([])
 
   const [services, setServices] = useState([])
@@ -25,6 +26,12 @@ const SpecialServices = () => {
     }
     fetchBusiness()
   }, [])
+
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '' // Clear the file input
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -402,6 +409,7 @@ const SpecialServices = () => {
                     type="file"
                     name="image"
                     accept="image/*"
+                    ref={fileInputRef}
                     onChange={handleCreateInputChange}
                   />
                   {currentImage?.image && (
@@ -611,6 +619,7 @@ const SpecialServices = () => {
                     type="file"
                     name="image"
                     accept="image/*"
+                    ref={fileInputRef}
                     onChange={handleInputChange}
                   />
                   {currentImage?.image && (
@@ -662,9 +671,12 @@ const SpecialServices = () => {
           onPageChange={handlePageChange}
         />
       </div>
-      <Modal show={isCropping} onHide={() => setIsCropping(false)}>
-        <Modal.Header closeButton>
+      <Modal show={isCropping} onHide={(()=>{  resetCropper() 
+            setIsCropping(false)})}>
+        <Modal.Header >
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton onClick={(()=>{  resetCropper() 
+            setIsCropping(false)})} />
         </Modal.Header>
         <Modal.Body>
           <div
