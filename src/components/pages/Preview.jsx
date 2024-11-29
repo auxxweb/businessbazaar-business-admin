@@ -1129,13 +1129,13 @@ export default function Preview() {
               </div>
               <div className="col-12">
                 <hr style={{ width: "100%", opacity: 0.25, color: "white" }} />
-                <div class="footer-bottom">
-                  <div class="row w-full justify-content-between">
-                    <div class="col-sm-4 text-left">
+                <div className="footer-bottom">
+                  <div className="row w-full justify-content-between">
+                    <div className="col-sm-4 text-left">
                       <a href="/terms-and-conditions">Terms and Conditions</a>
                     </div>
-                    <div class="col-sm-4 text-right">
-                      <div style={{ color: "#A4B3CB" }} class="text-right">
+                    <div className="col-sm-4 text-right">
+                      <div style={{ color: "#A4B3CB" }} className="text-right">
                         <span>
                           Copyright &copy;
                           {new Date().getFullYear()} En Connect. All Rights

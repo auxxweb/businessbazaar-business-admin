@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { Button, CloseButton, Form, Modal } from "react-bootstrap";
 import useBusiness from "../../api/useBusiness";
@@ -7,8 +7,15 @@ import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
 const Gallery = () => {
+  const fileInputRef  = useRef(null);
   const { businesses, getBusiness, updateBusiness, loading } = useBusiness();
   const { uploadImage, imageLoading } = useImageUpload();
+
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Clear the file input
+    }
+  };
 
   const [gallery, setGallery] = useState([]);
   const [modalState, setModalState] = useState({
@@ -192,6 +199,7 @@ const Gallery = () => {
                 type="file"
                 name="image"
                 accept="image/*"
+                ref={fileInputRef}
                 onChange={handleFileChange}
               />
               {currentImage.image && (
@@ -213,8 +221,7 @@ const Gallery = () => {
           <Button
             onClick={
               modalState.showCreate ? handleCreateProduct : handleSaveChanges
-            }
-          >
+            }>
             {modalState.showCreate ? "Submit" : "Save changes"}
           </Button>
         </Modal.Footer>
@@ -245,10 +252,16 @@ const Gallery = () => {
       {/* Crop Modal */}
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
+        onHide={() =>{ 
+          handleModalState("showCrop", false)
+          resetCropper()
+        }}
       >
-        <Modal.Header closeButton>
+        <Modal.Header >
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton onClick={(()=>{ 
+            handleModalState("showCrop", false)
+          resetCropper()})} />
         </Modal.Header>
         <Modal.Body>
           <div
