@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Modal, Form } from 'react-bootstrap'
+import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
 import useImageUpload from '../../api/imageUpload/useImageUpload'
 import useBusiness from '../../api/useBusiness'
 import Pagination from "../Pagination";
@@ -50,6 +50,7 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [validated, setValidated] = useState(true);
   const [page, setPage] = useState(1)
   const limit = 10
   const [modalState, setModalState] = useState({
@@ -101,6 +102,8 @@ const Judges = () => {
   }, [businesses])
 
   const handleShowModal = (product) => {
+    console.log(product);
+
     setSelectedProduct(product)
     setUpdatedProduct({
       _id: product._id,
@@ -123,11 +126,11 @@ const Judges = () => {
       price: '',
       image: null,
     })
+    setCurrentImage({ image: null, preview: null })
     setImagePreview('')
   }
 
   const handleCreateCloseModal = () => {
-    setShowCreateModal(false)
     setNewProduct({
       _id: '',
       title: '',
@@ -135,6 +138,13 @@ const Judges = () => {
       price: '',
       image: null,
     })
+    setCurrentImage({
+      index: null,
+      image: null,
+      preview: '',
+      file: null,
+    })
+    setShowCreateModal(false)
     setImageCreatePreview('')
   }
 
@@ -165,9 +175,7 @@ const Judges = () => {
       const previewUrl = URL.createObjectURL(file)
       setCurrentImage((prev) => ({
         ...prev,
-        image: previewUrl,
         preview: previewUrl,
-        file,
       }))
       handleModalState('showCrop', true)
     }
@@ -187,7 +195,7 @@ const Judges = () => {
     }
   }
   const handleSaveChanges = async () => {
-    let accessLink = null
+    let accessLink = selectedProduct.image
     if (currentImage?.file) {
       const data = await uploadImage(currentImage?.file, 'products')
       accessLink = data?.accessLink
@@ -243,7 +251,10 @@ const Judges = () => {
     setPage(page)
   }
 
-  const handleCreateProduct = async () => {
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
+    setValidated(false)
+
     let accessLink = null
     if (currentImage?.file) {
       const data = await uploadImage(currentImage?.file, 'products')
@@ -275,7 +286,7 @@ const Judges = () => {
 
     await updateBusiness(updateData)
 
-    // await addProduct({ ...newProduct, image: accessLink })
+    await addProduct({ ...newProduct, image: accessLink })
     setCurrentImage({ image: null, preview: null })
     handleCreateCloseModal()
   }
@@ -286,7 +297,7 @@ const Judges = () => {
 
   return (
     <>
-      {(imageLoading || loading) && <FullPageLoader/>}
+      {(imageLoading || loading) && <FullPageLoader />}
       <div className="flex justify-between items-center rounded-lg py-4">
         <h2 className="text-2xl font-semibold text-gray-700 m-0 p-0">Products</h2>
         <div className=" flex items-center space-x-4">
@@ -321,24 +332,17 @@ const Judges = () => {
             width: '500px',
           }}
         >
-          <Modal.Header
-            closeButton
-            style={{
-              borderBottom: '1px solid #eaeaea',
-              padding: '16px 24px',
-            }}
-          >
-            <Modal.Title style={{ fontWeight: '500', fontSize: '1.25rem' }}>
-              Add Product
-            </Modal.Title>
+          <Modal.Header >
+            <Modal.Title>Add Product</Modal.Title>
+            <CloseButton onClick={handleCreateCloseModal} />
           </Modal.Header>
           <Modal.Body
             style={{
               padding: '24px',
             }}
           >
-            <Form>
-              <Form.Group controlId="formTitle">
+            <Form noValidate validated={validated} onSubmit={handleCreateProduct}>
+              <Form.Group controlId="validationCustom01">
                 <Form.Label style={{ fontWeight: '500' }}>Title</Form.Label>
                 <Form.Control
                   type="text"
@@ -375,6 +379,7 @@ const Judges = () => {
                 <Form.Control
                   type="number"
                   name="price"
+                  required
                   value={newProduct.price}
                   onChange={handleCreateInputChange}
                   style={{
@@ -389,14 +394,15 @@ const Judges = () => {
                   Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
                 </Form.Label>
                 <Form.Control
+                  required
                   type="file"
                   name="image"
                   accept="image/*"
                   onChange={handleFileChange}
                 />
-                {currentImage.preview && (
+                {currentImage.image && (
                   <img
-                    src={currentImage.preview}
+                    src={currentImage.image}
                     alt="Preview"
                     className="w-1/2 mx-auto h-auto mt-4"
                     style={{
@@ -418,7 +424,7 @@ const Judges = () => {
             }}
           >
             <Button
-              onClick={handleCreateProduct}
+              type='submit'
               style={{
                 fontWeight: '500',
                 padding: '10px 20px',
@@ -435,12 +441,11 @@ const Judges = () => {
 
       <div className="mt-6">
         {/* Input Form */}
-        <div className="w-100 flex justify-center">
+        <div className="mx-auto max-w-screen-sm">
           <form
             onSubmit={handleProductMainSubmit}
-            className="bg-white p-4 border border-gray-400 rounded-md mb-6"
-            style={{ maxWidth: '65rem', width: '100%' }}
-          >
+            className="bg-white p-4 border shadow-lg border-gray-400 rounded-md mb-6"
+            style={{ maxWidth: '65rem', width: '100%' }}>
             <div className="flex flex-col space-y-4">
               {/* Title Input */}
               <div>
@@ -574,8 +579,9 @@ const Judges = () => {
 
       {/* Edit Product Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
+        <Modal.Header >
           <Modal.Title>Edit Product</Modal.Title>
+          <CloseButton onClick={handleCloseModal} />
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -616,9 +622,9 @@ const Judges = () => {
                 accept="image/*"
                 onChange={handleFileChange}
               />
-              {currentImage.preview && (
+              {currentImage.image && (
                 <img
-                  src={currentImage.preview}
+                  src={currentImage.image}
                   alt="Preview"
                   className="w-1/2 mx-auto h-auto mt-4"
                   style={{
@@ -696,6 +702,7 @@ const Judges = () => {
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
+                image: fileUrl,
                 file: blob,
               }))
               handleModalState('showCrop', false)
