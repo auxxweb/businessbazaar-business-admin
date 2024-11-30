@@ -98,7 +98,7 @@ const ChangePassword = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    class="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   ">
+                    className="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   ">
                     {showPassword ? <PiEyeSlashFill /> : <PiEyeFill />}
                   </button>
                 </div>
@@ -123,7 +123,7 @@ const ChangePassword = () => {
                   <button
                     type="button"
                     onClick={() => setShowCPassword(!showCPassword)}
-                    class="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   ">
+                    className="absolute inset-y-0 end-0 text-xl  flex items-center  z-20 px-3  cursor-pointer text-[#888888] rounded-e-md   ">
                     {showCPassword ? <PiEyeSlashFill /> : <PiEyeFill />}
                   </button>
                 </div>

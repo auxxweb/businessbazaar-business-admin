@@ -1,11 +1,11 @@
 import placeholder from "../../assets/images/person-placeholder.png";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { setBusinessData } from "../../api/slices/business";
 import { useNavigate } from "react-router-dom";
 import { getApi, patchApi } from "../../api/api";
 import Cropper from "react-easy-crop";
-import { Button, Modal } from "react-bootstrap";
+import { Button, CloseButton, Modal } from "react-bootstrap";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
@@ -18,6 +18,13 @@ const BusinessDetails = () => {
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [isSocialMedia, setSocialMediaModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef(null);
+
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input
+    }
+  }
 
   const [modalState, setModalState] = useState({
     showEdit: false,
@@ -358,21 +365,21 @@ const BusinessDetails = () => {
             </div>
             <div className="flex items-center gap-3 ">
               <p className="p-0 m-0 ">Follow Us On:</p>
-              {formData?.socialMediaLinks?.map((item) => {
+              {formData?.socialMediaLinks?.map((item,index) => {
                 if (item.tag === "facebook") {
-                  return <Facebook url={item?.link} />;
+                  return <Facebook key={index} url={item?.link} />;
                 }
                 if (item.tag === "instagram") {
-                  return <Instagram url={item?.link} />;
+                  return <Instagram key={index} url={item?.link} />;
                 }
                 if (item.tag === "twitter") {
-                  return <Twitter url={item?.link} />;
+                  return <Twitter key={index} url={item?.link} />;
                 }
                 if (item.tag === "youtube") {
-                  return <Youtube url={item?.link} />;
+                  return <Youtube key={index} url={item?.link} />;
                 }
                 if (item.tag === "linkedin") {
-                  return <LinkedIn url={item?.link} />;
+                  return <LinkedIn key={index} url={item?.link} />;
                 }
               })}
 
@@ -594,6 +601,7 @@ const BusinessDetails = () => {
                   type="file"
                   name="image"
                   accept="image/*"
+                  ref={fileInputRef}
                   onChange={handleFileChange}
                   className="border border-gray-300 p-2 w-full rounded"
                 />
@@ -672,9 +680,16 @@ const BusinessDetails = () => {
       </div>
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}>
-        <Modal.Header closeButton>
+        onHide={() => {
+          resetCropper()
+          handleModalState("showCrop", false)
+        }}>
+        <Modal.Header >
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton onClick={() => {
+            resetCropper()
+            handleModalState("showCrop", false)
+          }} />
         </Modal.Header>
         <Modal.Body>
           <div
@@ -723,7 +738,7 @@ const Twitter = ({ url }) => {
       <svg
         className="w-10 h-10 "
         xmlns="http://www.w3.org/2000/svg"
-        enable-background="new 0 0 1668.56 1221.19"
+        enableBackground="new 0 0 1668.56 1221.19"
         viewBox="0 0 1668.56 1221.19"
         id="twitter-x"
       >
@@ -732,7 +747,7 @@ const Twitter = ({ url }) => {
           cy="610.6"
           r="481.33"
           stroke="#fff"
-          stroke-miterlimit="10"
+          strokeMiterlimit="10"
         ></circle>
         <path
           fill="#fff"
@@ -785,7 +800,7 @@ const Instagram = ({ url }) => {
         />
         <path
           fillRule="evenodd"
-          clipPule="evenodd"
+          clippule="evenodd"
           d="M1.65396 4.27606C1 5.55953 1 7.23969 1 10.6V13.4C1 16.7603 1 18.4405 1.65396 19.7239C2.2292 20.8529 3.14708 21.7708 4.27606 22.346C5.55953 23 7.23969 23 10.6 23H13.4C16.7603 23 18.4405 23 19.7239 22.346C20.8529 21.7708 21.7708 20.8529 22.346 19.7239C23 18.4405 23 16.7603 23 13.4V10.6C23 7.23969 23 5.55953 22.346 4.27606C21.7708 3.14708 20.8529 2.2292 19.7239 1.65396C18.4405 1 16.7603 1 13.4 1H10.6C7.23969 1 5.55953 1 4.27606 1.65396C3.14708 2.2292 2.2292 3.14708 1.65396 4.27606ZM13.4 3H10.6C8.88684 3 7.72225 3.00156 6.82208 3.0751C5.94524 3.14674 5.49684 3.27659 5.18404 3.43597C4.43139 3.81947 3.81947 4.43139 3.43597 5.18404C3.27659 5.49684 3.14674 5.94524 3.0751 6.82208C3.00156 7.72225 3 8.88684 3 10.6V13.4C3 15.1132 3.00156 16.2777 3.0751 17.1779C3.14674 18.0548 3.27659 18.5032 3.43597 18.816C3.81947 19.5686 4.43139 20.1805 5.18404 20.564C5.49684 20.7234 5.94524 20.8533 6.82208 20.9249C7.72225 20.9984 8.88684 21 10.6 21H13.4C15.1132 21 16.2777 20.9984 17.1779 20.9249C18.0548 20.8533 18.5032 20.7234 18.816 20.564C19.5686 20.1805 20.1805 19.5686 20.564 18.816C20.7234 18.5032 20.8533 18.0548 20.9249 17.1779C20.9984 16.2777 21 15.1132 21 13.4V10.6C21 8.88684 20.9984 7.72225 20.9249 6.82208C20.8533 5.94524 20.7234 5.49684 20.564 5.18404C20.1805 4.43139 19.5686 3.81947 18.816 3.43597C18.5032 3.27659 18.0548 3.14674 17.1779 3.0751C16.2777 3.00156 15.1132 3 13.4 3Z"
           fill="#0F0F0F"
         />

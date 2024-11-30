@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useBusiness from "../../api/useBusiness";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import { toast } from "sonner";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
-import { Button, Modal } from "react-bootstrap";
+import { Button, CloseButton, Modal } from "react-bootstrap";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropper.utils";
 
 export default function WelcomePage() {
+  const fileInputRef = useRef(null);
   const [modalState, setModalState] = useState({
     showEdit: false,
     showCreate: false,
@@ -23,6 +24,12 @@ export default function WelcomePage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input
+    }
+  };
 
   const handleModalState = (type, state) => {
     setModalState((prev) => ({ ...prev, [type]: state }));
@@ -184,10 +191,13 @@ export default function WelcomePage() {
       {/* Crop Modal */}
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
+        onHide={(() =>{ resetCropper()
+           handleModalState("showCrop", false)})}
       >
-        <Modal.Header closeButton>
+        <Modal.Header >
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton onClick={(() =>{ resetCropper()
+           handleModalState("showCrop", false)})}/>
         </Modal.Header>
         <Modal.Body>
           <div

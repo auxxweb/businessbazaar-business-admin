@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Modal, Form, CloseButton } from "react-bootstrap";
 import Pagination from "../Pagination";
 import Loader from "../Loader/Loader";
@@ -7,6 +7,7 @@ import useImageUpload from "../../api/imageUpload/useImageUpload";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
+
 
 const News = () => {
   const { imageLoading, uploadImage } = useImageUpload();
@@ -25,7 +26,7 @@ const News = () => {
     };
     getNews();
   }, []);
-
+  const fileInputRef = useRef(null);
   const [news, setNews] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -84,6 +85,12 @@ const News = () => {
     }
   };
 
+  const resetCropper = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input
+    }
+  };
+
   useEffect(() => {
     setNews(newsArticles?.data);
   }, [newsArticles]);
@@ -96,7 +103,7 @@ const News = () => {
       title: newsData.title,
       description: newsData.description,
       link: newsData.link,
-      isBanner: newsData.isBanner,
+      isBanner: newsData.isBanner ? true : false,
       image: newsData.image,
     });
     setShowModal(true);
@@ -240,8 +247,7 @@ const News = () => {
       {/* Add Product Modal */}
       <Modal
         show={showCreateModal}
-        onHide={handleCreateCloseModal}
-      >
+        onHide={handleCreateCloseModal}>
         <Form noValidate validated onSubmit={handleCreateNewsArticle}>
           <Modal.Header>
             <Modal.Title> Add Articles</Modal.Title>
@@ -307,6 +313,7 @@ const News = () => {
                 type="file"
                 name="image"
                 accept="image/*"
+                ref={fileInputRef}
                 onChange={handleFileChange}
               />
               {currentImage.image && (
@@ -494,12 +501,11 @@ const News = () => {
             <Form.Group controlId="formLink" className="mt-3">
               <Form.Label style={{ fontWeight: "500" }}>Link</Form.Label>
               <Form.Control
-
                 type="link"
                 name="link"
                 required
                 value={updatedNews.link}
-                onChange={handleCreateInputChange}
+                onChange={handleInputChange}
                 style={{
                   borderRadius: "8px",
                   padding: "8px",
@@ -512,6 +518,7 @@ const News = () => {
                 Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
               </Form.Label>
               <Form.Control
+               ref={fileInputRef}
                 type="file"
                 name="image"
                 accept="image/*"
@@ -538,7 +545,7 @@ const News = () => {
                 name="isBanner"
                 required
                 value={updatedNews?.isBanner ? true : false}
-                onChange={handleCreateInputChange}
+                onChange={handleInputChange}
               />
             </Form.Group>
           </Modal.Body>
@@ -577,10 +584,15 @@ const News = () => {
       {/* Crop Modal */}
       <Modal
         show={modalState.showCrop}
-        onHide={() => handleModalState("showCrop", false)}
+        onHide={(() =>{ resetCropper()
+        handleModalState("showCrop", false)})}
       >
-        <Modal.Header closeButton>
+        <Modal.Header >
           <Modal.Title>Crop Image</Modal.Title>
+          <CloseButton  onClick={(() =>{ 
+           resetCropper()
+            handleModalState("showCrop", false)
+        })}/>
         </Modal.Header>
         <Modal.Body>
           <div
@@ -588,7 +600,7 @@ const News = () => {
             style={{ height: "400px" }}
           >
             <Cropper
-              image={currentImage.preview}
+              image={currentImage?.preview}
               crop={crop}
               zoom={zoom}
               aspect={16 / 9}

@@ -19,7 +19,6 @@ export default function getCroppedImg(imageSrc, crop) {
         crop.width,
         crop.height
       );
-
       canvas.toBlob((blob) => {
         if (!blob) {
           console.error("Canvas is empty");
