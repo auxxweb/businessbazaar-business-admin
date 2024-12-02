@@ -5,7 +5,7 @@ import { setBusinessData } from "../../api/slices/business";
 import { useNavigate } from "react-router-dom";
 import { getApi, patchApi } from "../../api/api";
 import Cropper from "react-easy-crop";
-import { Button, CloseButton, Modal } from "react-bootstrap";
+import { Button, CloseButton, Modal, Spinner } from "react-bootstrap";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
@@ -13,6 +13,7 @@ import FullPageLoader from "../FullPageLoader/FullPageLoader";
 const BusinessDetails = () => {
   const { uploadImage, imageLoading } = useImageUpload();
   const [businessDetails, setBusinessDetails] = useState([]);
+  const [updateLoading, setUPdateLoading] = useState(false)
   const [category, setCategory] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
@@ -145,7 +146,7 @@ const BusinessDetails = () => {
     ) {
       const array = [...formData.socialMediaLinks];
       function updateLinkById(array, tag, newLink) {
-        const itemToUpdate = array.find((item) => item.tag === tag);
+        const itemToUpdate = array.find((item) => item?.tag === tag);
         if (itemToUpdate) {
           itemToUpdate.link = newLink;
         }
@@ -173,6 +174,7 @@ const BusinessDetails = () => {
     });
   };
   const handleSubmit = async () => {
+    setUPdateLoading(true)
     let logo = businessDetails?.logo;
     if (currentImage?.file) {
       const imageData = await uploadImage(currentImage.file, "products");
@@ -211,15 +213,19 @@ const BusinessDetails = () => {
           setBusinessDetails({ email: businessDetails?.email, ...updatedBusinessDetails });
           dispatch(setBusinessData({ email: businessDetails?.email, ...updatedBusinessDetails }));
         }
+        setUPdateLoading(false)
+        handleCloseModal();
       })
       .catch((err) => {
         console.log(err);
+        setUPdateLoading(false)
+        handleCloseModal();
       });
-    setSocialMediaModal(false);
-    handleCloseModal();
+
   };
 
   const handleUpdateSocialMedia = async (e) => {
+    setUPdateLoading(true)
     e.preventDefault()
     const updatedSocialMedia = {
       socialMediaLinks: formData?.socialMediaLinks
@@ -230,13 +236,18 @@ const BusinessDetails = () => {
           setBusinessDetails({ ...businessDetails, ...updatedSocialMedia });
           dispatch(setBusinessData({ ...businessDetails, ...updatedSocialMedia }));
         }
+        setSocialMediaModal(false)
+        setUPdateLoading(false)
       })
       .catch((err) => {
         console.log(err);
+        setSocialMediaModal(false)
+        setUPdateLoading(false)
       });
-    setSocialMediaModal(false)
+
   }
   const handleSystemSettingsSubmit = () => {
+    setUPdateLoading(true)
     const updatedBusinessDetails = {
       theme: themeData.theme,
       secondaryTheme: themeData.secondaryTheme
@@ -247,11 +258,13 @@ const BusinessDetails = () => {
           setBusinessDetails({ ...businessDetails, ...updatedBusinessDetails });
           dispatch(setBusinessData({ ...businessDetails, ...updatedBusinessDetails }));
         }
+        setUPdateLoading(false)
+        handleCloseSystemModal();
       })
       .catch((err) => {
-        console.log(err);
+        setUPdateLoading(false)
+        handleCloseSystemModal();
       });
-    handleCloseSystemModal();
   };
 
   if (loading) {
@@ -365,7 +378,7 @@ const BusinessDetails = () => {
             </div>
             <div className="flex items-center gap-3 ">
               <p className="p-0 m-0 ">Follow Us On:</p>
-              {formData?.socialMediaLinks?.map((item,index) => {
+              {formData?.socialMediaLinks?.map((item, index) => {
                 if (item.tag === "facebook") {
                   return <Facebook key={index} url={item?.link} />;
                 }
@@ -421,7 +434,11 @@ const BusinessDetails = () => {
 
         {isSocialMedia && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+              {updateLoading &&
+                <div className="absolute  z-30 bg-white rounded-lg opacity-80 left-0 top-0 w-100 h-100 flex justify-center items-center ">
+                  <Spinner className="z-50" variant="success" />
+                </div>}
               <h3 className="text-lg font-semibold mb-4">
                 Edit Social Media Details
               </h3>
@@ -509,7 +526,11 @@ const BusinessDetails = () => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center overflow-y-scroll top-0 pt-32 justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+              {updateLoading &&
+                <div className="absolute  z-30 bg-white rounded-lg opacity-80 left-0 top-0 w-100 h-100 flex justify-center items-center ">
+                  <Spinner className="z-50" variant="success" />
+                </div>}
               <h3 className="text-lg font-semibold mb-4">
                 Edit Contact & Location Details
               </h3>
@@ -638,7 +659,10 @@ const BusinessDetails = () => {
         {/* System Settings Modal */}
         {isSystemModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="bg-white relative p-6 rounded-lg shadow-lg w-96 z-10">
+              {updateLoading && <div className="absolute  z-30 bg-white rounded-lg opacity-80 left-0 top-0 w-100 h-100 flex justify-center items-center ">
+                <Spinner className="z-50" variant="success" />
+              </div>}
               <h3 className="text-lg font-semibold mb-4">
                 Edit System Settings
               </h3>
