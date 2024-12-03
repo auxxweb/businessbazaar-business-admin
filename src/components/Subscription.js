@@ -5,9 +5,10 @@ import useBusiness from "../api/useBusiness";
 import FullPageLoader from "./FullPageLoader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
 
+
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
-  const { loading: businessLoading, businesses, getBusiness } = useBusiness();
+  const { loading: businessLoading, businesses, getBusiness,getCurrentPlan } = useBusiness();
   const [planLoading, setPlanLoading] = useState(false);
   const navigate= useNavigate()
 
@@ -23,6 +24,15 @@ const Subscription = () => {
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([fetchPlanDetails(), getBusiness()]);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getCurrentPlan()
+      console.log(data);
+      
     };
     fetchData();
   }, []);
@@ -100,7 +110,7 @@ const Subscription = () => {
       </div>
       {
         (businesses?.isFree || businesses?.isInFreeTrail) && !planLoading
-        ? renderFreePlan()
+        ? renderPaidPlan()
         : renderPaidPlan()
         // ? renderPaidPlan()
         // : renderFreePlan()

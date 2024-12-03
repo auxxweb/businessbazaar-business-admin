@@ -201,6 +201,7 @@ const useBusiness = () => {
     }
   };
 
+
   const forgotPassword = async (email) => {
     setLoading(true);
     try {
@@ -285,6 +286,18 @@ const useBusiness = () => {
     }
   };
 
+  const getCurrentPlan = async () => {
+    try {
+      const response = await getApi(`api/v1/payment/current-plan`, `api/v1/business/profile`,
+        true,
+        logout,
+        navigate);
+      return response?.data;
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
   return {
     getBusiness,
     loading,
@@ -297,7 +310,8 @@ const useBusiness = () => {
     changePassword,
     forgotPassword,
     resetpassword,
-    isSuccess
+    isSuccess,
+    getCurrentPlan
   };
 };
 export default useBusiness;
