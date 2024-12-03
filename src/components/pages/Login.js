@@ -19,11 +19,11 @@ const Login = () => {
 
   const [isLoading,setIsLoading]= useState(false);
 
-  useEffect(() => {
-    if (parsedToken) {
-      navigate("/");
-    }
-  }, [parsedToken]);
+  // useEffect(() => {
+  //   if (parsedToken) {
+  //     navigate("/");
+  //   }
+  // }, [parsedToken]);
 
 
   const onSubmit = async (event) => {
