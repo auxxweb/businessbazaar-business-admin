@@ -13,15 +13,17 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
+  const token = localStorage.getItem("userCredential");
+  const parsedToken = JSON.parse(token);
   const { loading, businessLogin, businesses } = useBusiness();
 
   const [isLoading,setIsLoading]= useState(false);
 
   useEffect(() => {
-    if (businesses) {
+    if (parsedToken) {
       navigate("/");
     }
-  }, [businesses]);
+  }, [parsedToken]);
 
 
   const onSubmit = async (event) => {
