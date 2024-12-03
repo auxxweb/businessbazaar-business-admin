@@ -20,13 +20,14 @@ export default function Razorpay() {
   const navigate = useNavigate()
   const {  businesses,getBusiness } = useBusiness();
 
-  useEffect(()=>{
-    setBusinessData(businesses)
-  },[setBusinessData])
+  // useEffect(()=>{
+  //   setBusinessData(businesses)
+  // },[setBusinessData])
 //   const planDetails = useSelector((state) => state.planDetails);
   const location = useLocation();
 
   const  planDetails  = location.state || {}; // Destructure state
+console.log(planDetails);
 
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function Razorpay() {
       getBusiness();
     };
 
-    fetchData();
+    // fetchData();
   }, []);
 
 
@@ -113,7 +114,7 @@ export default function Razorpay() {
 
     const options = {
       key: "rzp_test_DBApSwEptkCDdS", // Dummy Razorpay key ID for testing
-      amount: planDetails?.amount * 100, // Amount in paise (50000 paise = ₹500)
+      amount: planDetails?.price * 100, // Amount in paise (50000 paise = ₹500)
       currency: "INR",
       name: "EnConnect",
       description:
@@ -212,12 +213,11 @@ export default function Razorpay() {
         try { 
          
             const id = businessData._id
-            const token = localStorage.getItem('userCredential')
+            const token = JSON.parse(localStorage.getItem('userCredential'))
             console.log(businessData,'kjkj')
             console.log(planDetails.plan,'ithaaan ath')
-            const paymentRes= createPayment(planDetails.plan,token)
+            const paymentRes= await createPayment({plan:planDetails.plan},token)
             if(paymentRes.success){
-                alert('hi')
                 handlePayment(id, token)
             }    
   

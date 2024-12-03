@@ -9,7 +9,9 @@ const config = {
   },
 };
 
-const baseUrl = process.env.REACT_APP_BE_API_KEY ?? ""; // Use process.env
+// const baseUrl = process.env.REACT_APP_BE_API_KEY ?? ""; // Use process.env
+const baseUrl = "http://localhost:5000" ?? ""; // Use process.env
+
 
 
 // const baseUrl = "https://server.instant-connect.in";

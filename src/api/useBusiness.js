@@ -288,7 +288,7 @@ const useBusiness = () => {
 
   const getCurrentPlan = async () => {
     try {
-      const response = await getApi(`api/v1/payment/current-plan`, `api/v1/business/profile`,
+      const response = await getApi(`api/v1/payment/current-plan`,
         true,
         logout,
         navigate);
