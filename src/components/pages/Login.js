@@ -7,12 +7,15 @@ import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setBusinessData } from "../../api/slices/business";
 import useBusiness from "../../api/useBusiness";
+import Loader from "../Loader/Loader";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const { loading, businessLogin, businesses } = useBusiness();
+
+  const [isLoading,setIsLoading]= useState(false);
 
   useEffect(() => {
     if (businesses) {
@@ -27,7 +30,7 @@ const Login = () => {
     const email = formData.get("email"); // Get email input value
     const password = formData.get("password");
     try {
-
+      setIsLoading(true);
       const body = {
         email,
         password
@@ -36,8 +39,14 @@ const Login = () => {
        await businessLogin(body);
     } catch (error) {
       console.log("error", error);
+    }finally {
+      setIsLoading(false);
     }
   };
+
+  if(isLoading){
+    return <Loader/>
+  }
 
   return (
     <>

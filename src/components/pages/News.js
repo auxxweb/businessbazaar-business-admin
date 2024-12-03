@@ -103,7 +103,7 @@ const News = () => {
       title: newsData.title,
       description: newsData.description,
       link: newsData.link,
-      isBanner: newsData.isBanner,
+      isBanner: newsData.isBanner ? true : false,
       image: newsData.image,
     });
     setShowModal(true);
@@ -505,7 +505,7 @@ const News = () => {
                 name="link"
                 required
                 value={updatedNews.link}
-                onChange={handleCreateInputChange}
+                onChange={handleInputChange}
                 style={{
                   borderRadius: "8px",
                   padding: "8px",
@@ -545,7 +545,7 @@ const News = () => {
                 name="isBanner"
                 required
                 value={updatedNews?.isBanner ? true : false}
-                onChange={handleCreateInputChange}
+                onChange={handleInputChange}
               />
             </Form.Group>
           </Modal.Body>
