@@ -105,13 +105,15 @@ export const getApi = async (url, authToken = true, logout, navigate) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      console.log("Unauthorized: Please check your authentication.");
+      if (error.response.status === 401) {
+        console.log("Unauthorized: Please check your authentication.");
         window.localStorage.removeItem("userCredential");
         await logout();
-      // Pass the error response to the caller
-      throw error.response.data?.message || "An error occurred. Please try again.";
+      } else {
+        console.log("Error:", error.response.status);
+      }
     } else {
-      throw "Network error. Please check your connection.";
+      console.log("Error:", error.message);
     }
     // if (error.response) {
     //   if (error.response.status === 401) {
