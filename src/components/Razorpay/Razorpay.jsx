@@ -122,7 +122,7 @@ export default function Razorpay() {
         setLoader(true);
         const interval = setInterval(async () => {
           try {
-            const paymentData = await checkPaymentStatus( token);
+            const paymentData = await checkPaymentStatus(token);
             console.log(paymentData,'payment dataaaaaaaa')
             const payment_status = paymentData?.data?.PaymentStatus;
             const id= paymentData?.business

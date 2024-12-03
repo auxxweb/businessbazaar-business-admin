@@ -68,9 +68,9 @@ export const createPayment = async (paymentData, token) => {
 
 
 
-export const checkPaymentStatus = async (paymentId, token) => {
+export const checkPaymentStatus = async ( token) => {
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/payment/status/${paymentId}`, {
+      const response = await axios.get(`${baseUrl}/api/v1/payment/status/`, {
         headers: {
           Authorization: `Bearer ${token}`, // Add the Bearer token here
         },
