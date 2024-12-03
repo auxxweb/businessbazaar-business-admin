@@ -184,7 +184,7 @@ export default function Razorpay() {
         contact: businessData?.contactDetails?.primaryNumber,
       },
       notes: {
-        businessId: id,
+        payment_id: id,
       },
       theme: {
         color: businessData?.theme, // Customize theme color
@@ -204,8 +204,8 @@ export default function Razorpay() {
         console.log(businessData, 'kjkj')
         console.log(planDetails.plan, 'ithaaan ath')
         const paymentRes = await createPayment({ plan: planDetails.plan }, token)
-        if (paymentRes.success) {
-          handlePayment(id, token)
+        if (paymentRes?.success && paymentRes?.data?._id) {
+          handlePayment(paymentRes?.data?._id, token)
         }
 
       } catch (error) {
