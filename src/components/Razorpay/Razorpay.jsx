@@ -20,14 +20,13 @@ export default function Razorpay() {
   const navigate = useNavigate()
   const {  businesses,getBusiness } = useBusiness();
 
-  // useEffect(()=>{
-  //   setBusinessData(businesses)
-  // },[setBusinessData])
-//   const planDetails = useSelector((state) => state.planDetails);
+  useEffect(()=>{
+    setBusinessData(businesses)
+  },[businesses])
+  // const planDetails = useSelector((state) => state.planDetails);
   const location = useLocation();
 
   const  planDetails  = location.state || {}; // Destructure state
-console.log(planDetails);
 
 
   useEffect(() => {
@@ -35,10 +34,8 @@ console.log(planDetails);
       getBusiness();
     };
 
-    // fetchData();
+    fetchData();
   }, []);
-
-
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -200,7 +197,7 @@ console.log(planDetails);
         businessId: id,
       },
       theme: {
-        color: businessData.theme, // Customize theme color
+        color: businessData?.theme, // Customize theme color
       },
     };
 
