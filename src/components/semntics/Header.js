@@ -122,12 +122,11 @@ function Header({ toggleSidebar }) {
       </button>
 
       <img
-        src="../enConnectLogo.jpeg"
+        src="/enConnectLogo.jpeg"
         alt="Description of Image"
-        width="65"
-        height="53"
+        width="170"
+        height="150"
       />
-
       <div className="flex items-center space-x-2">
         <img
           src={businesses?.logo ?? avatar}
