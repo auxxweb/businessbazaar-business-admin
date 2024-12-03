@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+
+// Page imports
 import Subscription from "../Subscription";
 import SettingAndConfi from "../pages/SettingAndConfi";
 import JudgeDetails from "../pages/JudgeDetails";
@@ -30,64 +32,60 @@ import PreviewTemplates from "../pages/PreviewTemplates";
 import Razorpay from "../Razorpay/Razorpay";
 
 function ContentArea() {
-  const [token, setToken] = useState([]);
-
+  const [token, setToken] = useState(null);
   const navigate = useNavigate();
-
   const location = useLocation();
 
   useEffect(() => {
+    console.log(location.pathname,"pathName")
     const storedToken = JSON.parse(localStorage.getItem("userCredential"));
-    // Check if the current route is not forgotpassword or resetpassword
-    if (
-      !storedToken &&
-      !(
-        location.pathname.startsWith("/changePassword") ||
-        location.pathname === "/forgotPassword"
-      )
-    ) {
+    if (!storedToken && !location.pathname.match(/\/(forgotPassword|changePassword)/)) {
       navigate("/login");
-    } else if (storedToken) {
-      setToken(storedToken); // Set token if it exists
+    } else {
+      setToken(storedToken);
     }
-  }, [navigate, location]);
+  }, [location.pathname, navigate]);
 
-  return (
-    <Routes>
-      {/* Use Routes to define all your app routes */}
-      <Route path="/" element={token ? <DashBoard /> : <Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/forgotPassword" element={<ForgotPassword />} />
-      <Route path="/changePassword/:id" element={<ChangePassword />} />
-      <Route path="/zones" element={token ? <Zones /> : <Login />} />
-      <Route path="/news" element={token ? <News /> : <Login />} />
+  const routes = [
+    { path: "/", element: <DashBoard />, protected: true },
+    { path: "/login", element: <Login /> },
+    { path: "/forgotPassword", element: <ForgotPassword /> },
+    { path: "/changePassword/:id", element: <ChangePassword /> },
+    { path: "/zones", element: <Zones />, protected: true },
+    { path: "/news", element: <News />, protected: true },
+    { path: "/landing-page", element: <LandingPage />, protected: true },
+    { path: "/welcome-page", element: <WelcomePage />, protected: true },
+    { path: "/products", element: <Judges />, protected: true },
+    { path: "/judges/:id", element: <JudgeDetails />, protected: true },
+    { path: "/special-services", element: <SpecialServices />, protected: true },
+    { path: "/services", element: <BasicServices />, protected: true },
+    { path: "/participants/:id", element: <ParticipantDetails />, protected: true },
+    { path: "/questions/:id", element: <QuestionDetails />, protected: true },
+    { path: "/bundles", element: <Bundles />, protected: true },
+    { path: "/bundles/:id", element: <BundleDetails />, protected: true },
+    { path: "/result", element: <ResponseAndResult />, protected: true },
+    { path: "/subscription", element: <Subscription />, protected: true },
+    { path: "/plans", element: <Plans />, protected: true },
+    { path: "/payment", element: <Razorpay />, protected: true },
+    { path: "/previewtemplate", element: <PreviewTemplates />, protected: true },
+    { path: "/settings", element: <SettingAndConfi />, protected: true },
+    { path: "/businessDetails", element: <BusinessDetails />, protected: true },
+    { path: "/gallery", element: <Gallery />, protected: true },
+    { path: "/terms-and-conditions", element: <TermsAndConditions />, protected: true },
+    { path: "/privacy-policies", element: <PrivacyPolicies />, protected: true },
+    { path: "/preview", element: <Preview />, protected: true },
+    { path: "/preview/premium", element: <PremiumPreview />, protected: true },
+  ];
 
-
-
-      <Route path="/landing-page" element={token ? <LandingPage /> : <Login />}/>
-      <Route path="/welcome-page" element={token ? <WelcomePage /> : <Login />}/>
-      <Route path="/products" element={token ? <Judges /> : <Login />} />
-      <Route path="/judges/:id" element={token ? <JudgeDetails /> : <Login />}/>
-      <Route path="/special-services" element={token ? <SpecialServices /> : <Login />}/>
-      <Route path="/services" element={token ? <BasicServices /> : <Login />} />
-      <Route path="/participants/:id" element={token ? <ParticipantDetails /> : <Login />}/>
-      <Route path="/questions/:id" element={token ? <QuestionDetails /> : <Login />}/>
-      <Route path="/bundles" element={token ? <Bundles /> : <Login />} />
-      <Route path="/bundles/:id" element={token ? <BundleDetails /> : <Login />}/>
-      <Route path="/result" element={token ? <ResponseAndResult /> : <Login />}/>
-      <Route path="/subscription" element={token ? <Subscription /> : <Login />}/>
-      <Route path="/plans" element={token ?  <Plans/>: <Login />}/>
-      <Route path="/payment" element={token ?  <Razorpay/>: <Login />}/>
-      <Route path="/previewtemplate" element={token ? <PreviewTemplates/> : <Login />} />
-      <Route path="/settings" element={token ? <SettingAndConfi /> : <Login />}/>
-      <Route path="/businessDetails" element={token ? <BusinessDetails /> : <Login />}/>
-      <Route path="/gallery" element={token ? <Gallery /> : <Login />} />
-      <Route path="/terms-and-conditions" element={token ? <TermsAndConditions /> : <Login />} />
-      <Route path="/privacy-policies" element={token ? <PrivacyPolicies /> : <Login />}/>
-      <Route path="/preview" element={token ? <Preview /> : <Login />} />
-      <Route path="/preview/premium" element={token ? <PremiumPreview /> : <Login />}/>
-    </Routes>
+  const renderRoute = ({ path, element, protected: isProtected }) => (
+    <Route
+      key={path}
+      path={path}
+      element={isProtected && !token ? <Login /> : element}
+    />
   );
+
+  return <Routes>{routes.map(renderRoute)}</Routes>;
 }
 
 export default ContentArea;
