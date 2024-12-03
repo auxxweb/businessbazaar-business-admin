@@ -18,27 +18,23 @@ function Browse() {
     const pathParts = pathname.split("/")?.filter(Boolean);
     return `/${pathParts[0]}`;
   };
-  
   const basePath = getBasePath(location.pathname);
-  
   useEffect(() => {
-    const handleNavigation = () => {
-      if (publicRoutes.includes(basePath)) {
-        if (userData) {
-          navigate("/");
-        } else {
-          navigate(location.pathname);
-        }
-      } else if (previewRoutes.includes(basePath) && userData) {
+    if (publicRoutes.includes(basePath)) {
+      if (userData) {
+        navigate("/");
+      } else {
         navigate(location.pathname);
-      } else if (!userData) {
+      }
+    } else if (previewRoutes.includes(basePath) && userData) {
+      navigate(location.pathname);
+    } else {
+      if (!userData) {
         navigate("/login");
       }
-    };
-  
-    handleNavigation();
-  }, [basePath, location.pathname, userData, navigate]);
-  
+    }
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     // Function to detect language and apply appropriate classes
