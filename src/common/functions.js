@@ -9,7 +9,9 @@ const config = {
   },
 };
 
-const baseUrl = process.env.REACT_APP_BE_API_KEY ?? ""; // Use process.env
+// const baseUrl = process.env.REACT_APP_BE_API_KEY ?? ""; // Use process.env
+const baseUrl = "http://localhost:5000" ?? ""; // Use process.env
+
 
 
 // const baseUrl = "https://server.instant-connect.in";
@@ -66,9 +68,9 @@ export const createPayment = async (paymentData, token) => {
 
 
 
-export const checkPaymentStatus = async (paymentId, token) => {
+export const checkPaymentStatus = async ( token) => {
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/payment/status/${paymentId}`, {
+      const response = await axios.get(`${baseUrl}/api/v1/payment/status/`, {
         headers: {
           Authorization: `Bearer ${token}`, // Add the Bearer token here
         },

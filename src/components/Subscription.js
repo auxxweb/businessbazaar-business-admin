@@ -1,93 +1,132 @@
 import React, { useEffect, useState } from "react";
 import usePlan from "../Hooks/usePlan";
 import { formatDate, isDateLessThanToday } from "../utils/appUtils";
-import useBusiness from "../api/useBusiness";
 import FullPageLoader from "./FullPageLoader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
 
+
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
-  const { loading: businessLoading, businesses, getBusiness } = useBusiness();
-  const [planLoading, setPlanLoading] = useState(false);
-  const navigate= useNavigate()
-
-
-  useEffect(() => {
-    if (loading || businessLoading) {
-      setPlanLoading(true);
-    } else {
-      setPlanLoading(false);
-    }
-  }, [loading, businessLoading]);
+  const navigate = useNavigate()
+  const [currentPlan, setCurrentPlan] = useState({
+    startDate: null,
+    endDate: null,
+    amount: 0,
+    planStatus: false,
+    specialAccess: false
+  })
+  const [planIsActive, setPlanIsActive] = useState(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([fetchPlanDetails(), getBusiness()]);
-    };
-    fetchData();
+    fetchPlanDetails()
   }, []);
 
-  if(planLoading){
-    return <FullPageLoader/>
+  useEffect(() => {
+
+    if (plan) {
+      const { business, payment } = plan;
+
+      if (business?.plan === "SPECIAL_TRAIL") {
+        setPlanIsActive(true)
+        setCurrentPlan((prev) => ({ ...prev, startDate: business?.validity, specialAccess: true }))
+
+      } else {
+        if (!payment && business?.plan === "FREE_TRAIL") {
+          if (!isDateLessThanToday(business?.validity)) {
+            setPlanIsActive(true)
+            setCurrentPlan(((prev) => ({
+              ...prev,
+              startDate: business?.createdAt,
+              endDate: business?.validity,
+              amount: 0
+            })))
+          }
+        }
+        if (payment && !isDateLessThanToday(payment?.expiryDate)) {
+          setPlanIsActive(true)
+          setCurrentPlan(((prev) => ({
+            ...prev,
+            startDate: payment?.createdAt,
+            endDate: payment?.expiryDate,
+            amount: payment?.amount
+          })))
+        }
+        if (payment && (isDateLessThanToday(payment?.expiryDate) || isDateLessThanToday(business?.validity))) {
+          setPlanIsActive(false)
+          setCurrentPlan(((prev) => ({
+            ...prev,
+            startDate: payment?.createdAt,
+            endDate: payment?.expiryDate,
+            amount: payment?.amount
+          })))
+        }
+
+      }
+    }
+
+
+  }, [plan]);
+
+  if (loading) {
+    return <FullPageLoader />
   }
 
 
   const renderFreePlan = () => (
-<div className="bg-white p-6 rounded-xl shadow-lg border border-blue-200">
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "200px",
-      color: "#1D4ED8", // Tailwind [#107D93]
-      fontSize: "20px", // Slightly larger font size for premium feel
-      textAlign: "center",
-      fontWeight: "500", // Medium font weight
-      fontFamily: "'Inter', sans-serif" // Premium standard font
-    }}
-  >
-    You are now in Free plan
-  </div>
-  <div className="flex justify-end">
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-200">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "200px",
+          color: "#1D4ED8", // Tailwind [#107D93]
+          fontSize: "20px", // Slightly larger font size for premium feel
+          textAlign: "center",
+          fontWeight: "500", // Medium font weight
+          fontFamily: "'Inter', sans-serif" // Premium standard font
+        }}
+      >
+        You are now in Free plan
+      </div>
+      <div className="flex justify-end">
         <button
-        onClick={()=>navigate("/plans")}
-        className="px-4 py-2 bg-green-800 mt-3 mr-3 text-white rounded hover:bg-blue-600">
+          onClick={() => navigate("/plans")}
+          className="px-4 py-2 bg-green-800 mt-3 mr-3 text-white rounded hover:bg-blue-600">
           Renew Plan
         </button>
       </div>
-</div>
+    </div>
 
   );
 
   const renderPaidPlan = () => (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold">{plan?.plan?.plan}</h2>
-      <div className="flex space-x-4 justify-between items-center">
+      <h2 className="text-xl font-semibold">{plan?.payment?.plan?.plan}</h2>
+      <div className="flex flex-col sm:flex-row space-x-4 justify-between items-center">
         <div className="items-center">
-          <p className="text-gray-700">{plan?.plan?.validity} year</p>
-          <p className="text-gray-700 mt-2">ID: {plan?.paymentId}</p>
+          <p className="text-gray-700">{plan?.business?.plan === "SPECIAL_TRAIL" ? "Special Trail" : plan?.payment?.plan?.validity} year</p>
+          {/* <p className="text-gray-700 mt-2">ID: {plan?.payment?._id}</p> */}
         </div>
         <div className="items-center">
-          <p className="text-gray-700">Started Date</p>
-          <p className="text-gray-700 ml-2">{formatDate(plan?.date)}</p>
+          <p className="text-gray-700 font-semibold">Started Date</p>
+          <p className="text-gray-700 ml-2">{formatDate(currentPlan?.startDate)}</p>
         </div>
         <div className="items-center">
-          <p className="text-gray-700">Expiration Date</p>
-          <p className="text-gray-700 ml-2">{formatDate(plan?.expiryDate)}</p>
+          <p className="text-gray-700 font-semibold">Expiration Date</p>
+          <p className="text-gray-700 ml-2">{formatDate(currentPlan?.endDate)}</p>
         </div>
         <div className="items-center">
-          <p className="text-gray-700">Amount</p>
-          <p className="text-gray-700 ml-2">₹ {plan?.amount}</p>
+          <p className="text-gray-700 font-semibold">Amount</p>
+          <p className="text-gray-700 ml-2">₹ {currentPlan?.amount}</p>
         </div>
         <button onClick={() => navigate("/plans")}
-          disabled={!isDateLessThanToday(plan?.expiryDate)}
-          className={`border-2 px-4 py-2 rounded-lg ${
-            !isDateLessThanToday(plan?.expiryDate)
-              ? `text-green-600 border-green-600`
-              : `text-red-600 border-red-600`
-          }`}>
-          {!isDateLessThanToday(plan?.expiryDate) ? "Active" : "Renew now"}
+          disabled={planIsActive}
+          className={`border-2 px-4 py-2 rounded-lg ${planIsActive
+            ? `text-green-600 border-green-600`
+            : `text-red-600 border-red-600`
+            }`}>
+          {!isDateLessThanToday(currentPlan?.endDate) ? "Active" : "Renew now"}
         </button>
       </div>
     </div>
@@ -99,13 +138,11 @@ const Subscription = () => {
         <h1 className="text-2xl font-semibold">Subscription</h1>
       </div>
       {
-        (businesses?.isFree || businesses?.isInFreeTrail) && !planLoading
-        ? renderFreePlan()
-        : renderPaidPlan()
-        // ? renderPaidPlan()
-        // : renderFreePlan()
+        (plan?.business?.isFree || plan?.business?.isInFreeTrail)
+          ? renderPaidPlan()
+          : renderFreePlan()
       }
-     
+
     </>
   );
 };

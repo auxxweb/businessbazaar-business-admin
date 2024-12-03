@@ -10,15 +10,18 @@ const usePlan = () => {
   const {logout}=useBusiness()
 
   const fetchPlanDetails = async () => {
-    // setLoading(true);
-    // try {
-    //   const response = await getApi(`api/v1/payment/current-plan`, true,logout);
-    //   setPlan(response?.data);
-    // } catch (e) {
-    //   console.log(e, "error");
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      setLoading(true);
+      const response = await getApi(`api/v1/payment/current-plan`,
+        true,
+        logout,
+        );
+        setPlan(response?.data);
+        setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error, "error");
+    }
   };
 
 

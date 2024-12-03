@@ -6,13 +6,16 @@ import { useNavigate } from "react-router";
 import Loader from "../Loader/Loader";
 import { fetchPlans } from "../../common/functions";
 import { setPlanDetails } from "../../api/slices/plansSlice";
+import useBusiness from "../../api/useBusiness";
 
 const Plans = () => {
   const navigate = useNavigate();
-  const businessState = useSelector((state) => state.business);
+  const businessState = useSelector((state) => state);
+  const {businesses,getBusiness} = useBusiness()
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [planData, setPlanData] = useState([]);
+  const [allPlans,setAllPlans]=useState([])
 
   function planSubmit(id, price, name) {
  
@@ -29,25 +32,40 @@ const Plans = () => {
         requestBody.selectedPlan = id;
       
       };
-      submitData();
+      // submitData();
     }
   }
 
-  const handlePrevStep = () => navigate("/create-business/gallery");
-
   useEffect(() => {
     const fetchData = async () => {
+      await getBusiness()
       try {
         const plans = await fetchPlans()
-        setPlanData(plans?.data?.data);
+        if(plans){
+          setAllPlans(plans?.data?.data);
+        }
+        setLoading(false)
       } catch (error) {
         console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
+        setLoading(false)
+      } 
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+  if(allPlans && businesses){
+    if((businesses?.isFreeTrailUsed || businesses?.isInFreeTrail || businesses?.isFree ) ){
+      setPlanData(allPlans?.filter((item) => item.plan != 'Free Plan'));
+    }else{
+      setPlanData(allPlans);
+    }
+  }
+    
+  }, [allPlans,businesses])
+  
+
+
 
   if (loading) {
     return (
@@ -69,12 +87,6 @@ const Plans = () => {
           {/* Right Form Section */}
           <div className="col-12 col-md-12 row justify-content-center h-100 p-3 p-md-5 right-portion">
             <div className="col-12 text-start">
-              <button
-                className="btn btn-dark w-auto float-start"
-                onClick={handlePrevStep}
-              >
-                <i className="bi bi-arrow-left"></i>
-              </button>
             </div>
             <div className="row justify-content-center">
               <div className="col-12 text-center">
