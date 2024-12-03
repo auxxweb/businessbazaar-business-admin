@@ -15,26 +15,30 @@ function Browse() {
   const navigate = useNavigate();
   const userData = getUserCredential();
   const getBasePath = (pathname) => {
-    const pathParts = pathname.split("/").filter(Boolean);
+    const pathParts = pathname.split("/")?.filter(Boolean);
     return `/${pathParts[0]}`;
   };
+  
   const basePath = getBasePath(location.pathname);
+  
   useEffect(() => {
-    if (publicRoutes.includes(basePath)) {
-      if (userData) {
-        navigate("/");
-      } else {
+    const handleNavigation = () => {
+      if (publicRoutes.includes(basePath)) {
+        if (userData) {
+          navigate("/");
+        } else {
+          navigate(location.pathname);
+        }
+      } else if (previewRoutes.includes(basePath) && userData) {
         navigate(location.pathname);
-      }
-    } else if (previewRoutes.includes(basePath) && userData) {
-      navigate(location.pathname);
-    } else {
-      if (!userData) {
+      } else if (!userData) {
         navigate("/login");
       }
-    }
-    //eslint-disable-next-line
-  }, []);
+    };
+  
+    handleNavigation();
+  }, [basePath, location.pathname, userData, navigate]);
+  
 
   useEffect(() => {
     // Function to detect language and apply appropriate classes
