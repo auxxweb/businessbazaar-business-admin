@@ -51,7 +51,7 @@ const ForgotPassword = () => {
                 />
               </div>
               <h1 className="text-3xl font-semibold text-center text-[#333]">
-                ForgotPassword
+                Forgot Password
               </h1>
               <h3 className=" text-sm sm:text-base text-[#686219]">
               Enter your email to reset your password.
@@ -68,7 +68,7 @@ const ForgotPassword = () => {
                 <input
                   className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-[#105193] text-gold-500 placeholder-gold-500 rounded-[22px] bg-transparent focus:ring-2 focus:ring-[#105193] outline-none focus:border-gold-600 "
                   type="email"
-                  value={""}
+                  // value={""}
                   id="email"
                   placeholder="Email"
                   name="email"
