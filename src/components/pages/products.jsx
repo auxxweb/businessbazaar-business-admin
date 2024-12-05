@@ -55,7 +55,7 @@ const Judges = () => {
   const [imagePreview, setImagePreview] = useState('')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [validated, setValidated] = useState(true);
+  const [validated, setValidated] = useState(false);
   const [page, setPage] = useState(1)
   const limit = 10
   const [modalState, setModalState] = useState({
@@ -258,43 +258,55 @@ const Judges = () => {
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-    setValidated(false)
-
-    let accessLink = null
-    if (currentImage?.file) {
-      const data = await uploadImage(currentImage?.file, 'products')
-      console.log(data?.accessLink, 'data-accessLink')
-      accessLink = data?.accessLink
+  
+    // Trigger form validation
+    if (!newProduct.title || !newProduct.description) {
+      setValidated(true);
+      return;
     }
-
-    const newProducts = products ?? []
-    await newProducts.push({ ...newProduct, image: accessLink })
-
-    await newProducts?.map((p) => {
-      if (!p?._id || p._id === '') {
-        delete p._id // Remove the _id property
-        return p // Return the updated object
-      } else {
-        return p // Return the object unchanged
+    
+    try {
+      let accessLink = null;
+  
+      // Upload the image if it exists
+      if (currentImage?.file) {
+        const data = await uploadImage(currentImage.file, 'products');
+        console.log(data?.accessLink, 'data-accessLink');
+        accessLink = data?.accessLink;
       }
-    })
-
-    const updateData = {
-      productSection: {
-        title: productData?.title || '', // Default to an empty string if undefined
-        description: productData?.description || '', // Default to an empty string if undefined
-        data: newProducts, // Updated list of products
-      },
+  
+      // Prepare the new list of products
+      const updatedProducts = [...(products || []), { ...newProduct, image: accessLink }];
+  
+      // Remove `_id` properties if necessary
+      const sanitizedProducts = updatedProducts.map((product) => {
+        const { _id, ...rest } = product; // Destructure to remove `_id`
+        return _id ? product : rest; // Return product without `_id` if it doesn't exist or is empty
+      });
+  
+      // Create the updated data payload
+      const updateData = {
+        productSection: {
+          title: productData?.title || '', // Default to an empty string if undefined
+          description: productData?.description || '', // Default to an empty string if undefined
+          data: sanitizedProducts, // Updated and sanitized list of products
+        },
+      };
+  
+      console.log(updateData, 'updated-data');
+  
+      // Update the business and add the product
+      await updateBusiness(updateData);
+  
+      // Reset form state
+      setCurrentImage({ image: null, preview: null });
+      setValidated(false);
+      handleCreateCloseModal();
+    } catch (error) {
+      console.error('Error creating product:', error);
     }
-
-    console.log(updateData, 'updated-data')
-
-    await updateBusiness(updateData)
-
-    await addProduct({ ...newProduct, image: accessLink })
-    setCurrentImage({ image: null, preview: null })
-    handleCreateCloseModal()
-  }
+  };
+  
 
   if (loading) {
     return <FullPageLoader />
@@ -319,131 +331,145 @@ const Judges = () => {
 
       {/* Add Product Modal */}
       <Modal
-        show={showCreateModal}
-        onHide={handleCreateCloseModal}
-        style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <div
+  show={showCreateModal}
+  onHide={handleCreateCloseModal}
+  style={{
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }}
+>
+  <div
+    style={{
+      backgroundColor: '#fff',
+      borderRadius: '12px',
+      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+      overflow: 'hidden',
+      width: '500px',
+    }}
+  >
+    <Modal.Header>
+      <Modal.Title>Add Product</Modal.Title>
+      <CloseButton onClick={handleCreateCloseModal} />
+    </Modal.Header>
+    <Modal.Body
+      style={{
+        padding: '24px',
+      }}
+    >
+      <Form noValidate validated={validated} onSubmit={handleCreateProduct}>
+        {/* Title Field */}
+        <Form.Group controlId="validationCustom01">
+          <Form.Label style={{ fontWeight: '500' }}>Title</Form.Label>
+          <Form.Control
+            type="text"
+            name="title"
+            required
+            value={newProduct.title}
+            onChange={handleCreateInputChange}
+            style={{
+              borderRadius: '8px',
+              border: '1px solid #ddd',
+              padding: '10px',
+            }}
+          />
+          <Form.Control.Feedback type="invalid">
+            Please provide a title.
+          </Form.Control.Feedback>
+        </Form.Group>
+
+        {/* Description Field */}
+        <Form.Group controlId="formDescription" className="mt-3">
+          <Form.Label style={{ fontWeight: '500' }}>Description</Form.Label>
+          <Form.Control
+            type="text"
+            name="description"
+            required
+            value={newProduct.description}
+            onChange={handleCreateInputChange}
+            style={{
+              borderRadius: '8px',
+              border: '1px solid #ddd',
+              padding: '10px',
+            }}
+          />
+          <Form.Control.Feedback type="invalid">
+            Please provide a description.
+          </Form.Control.Feedback>
+        </Form.Group>
+
+        {/* Price Field */}
+        <Form.Group controlId="formPrice" className="mt-3">
+          <Form.Label style={{ fontWeight: '500' }}>Price</Form.Label>
+          <Form.Control
+            type="number"
+            name="price"
+            // required
+            value={newProduct.price}
+            onChange={handleCreateInputChange}
+            style={{
+              borderRadius: '8px',
+              border: '1px solid #ddd',
+              padding: '10px',
+            }}
+          />
+          {/* <Form.Control.Feedback type="invalid">
+            Please provide a valid price.
+          </Form.Control.Feedback> */}
+        </Form.Group>
+
+        {/* Image Upload Field */}
+        <Form.Group controlId="formImage" className="mt-3">
+          <Form.Label>
+            Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+          </Form.Label>
+          <Form.Control
+            // required
+            type="file"
+            name="image"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+          {/* <Form.Control.Feedback type="invalid">
+            Please upload an image.
+          </Form.Control.Feedback> */}
+          {currentImage.image && (
+            <img
+              src={currentImage.image}
+              alt="Preview"
+              className="w-1/2 mx-auto h-auto mt-4"
+              style={{
+                objectFit: 'cover',
+                display: 'block',
+                marginInline: 'auto',
+              }}
+            />
+          )}
+        </Form.Group>
+
+        {/* Submit Button */}
+        <Button
+        
+          type="submit"
           style={{
-            backgroundColor: '#fff',
-            borderRadius: '12px',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-            overflow: 'hidden',
-            width: '500px',
+            fontWeight: '500',
+            width: '100%',
+            padding: '10px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            border: 'none',
+            marginTop: '20px',
           }}
         >
-          <Modal.Header >
-            <Modal.Title>Add Product</Modal.Title>
-            <CloseButton onClick={handleCreateCloseModal} />
-          </Modal.Header>
-          <Modal.Body
-            style={{
-              padding: '24px',
-            }}
-          >
-            <Form noValidate validated={validated} onSubmit={handleCreateProduct}>
-              <Form.Group controlId="validationCustom01">
-                <Form.Label style={{ fontWeight: '500' }}>Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="title"
-                  required
-                  value={newProduct.title}
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #ddd',
-                    padding: '10px',
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formDescription" className="mt-3">
-                <Form.Label style={{ fontWeight: '500' }}>
-                  Description
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="description"
-                  required
-                  value={newProduct.description}
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #ddd',
-                    padding: '10px',
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formPrice" className="mt-3">
-                <Form.Label style={{ fontWeight: '500' }}>Price</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="price"
-                  required
-                  value={newProduct.price}
-                  onChange={handleCreateInputChange}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #ddd',
-                    padding: '10px',
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formImage" className="mt-3">
-                <Form.Label>
-                  Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
-                </Form.Label>
-                <Form.Control
-                  required
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-                {currentImage.image && (
-                  <img
-                    src={currentImage.image}
-                    alt="Preview"
-                    className="w-1/2 mx-auto h-auto mt-4"
-                    style={{
-                      objectFit: 'cover',
-                      display: 'block',
-                      marginInline: 'auto',
-                    }}
-                  />
-                )}
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer
-            style={{
-              borderTop: '1px solid #eaeaea',
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '16px',
-            }}
-          >
-            <Button
-              type='submit'
-              style={{
-                fontWeight: '500',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-                border: 'none',
-              }}
-            >
-              Submit
-            </Button>
-          </Modal.Footer>
-        </div>
-      </Modal>
+          Submit
+        </Button>
+      </Form>
+    </Modal.Body>
+  </div>
+</Modal>
+
 
       <div className="mt-6">
         {/* Input Form */}
