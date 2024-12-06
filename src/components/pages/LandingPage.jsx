@@ -6,6 +6,8 @@ import FullPageLoader from "../FullPageLoader/FullPageLoader";
 import { Button, CloseButton, Modal } from "react-bootstrap";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropper.utils";
+import { TextField } from "@mui/material";
+import { handleWordExceeded } from "../../utils/appUtils";
 
 const LandingPage = () => {
   const [modalState, setModalState] = useState({
@@ -118,40 +120,37 @@ const LandingPage = () => {
         </h2>
 
         {/* Title Input */}
-        <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="block text-gray-700 text-sm font-medium mb-1"
-          >
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={businessData?.title}
-            onChange={handleInputChange}
-            className="w-full p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
+        <TextField
+          variant="outlined"
+          required
+          fullWidth
+          label="Landing Page Title (8 words)"
+          id="title"
+          name="title"
+          autoComplete="title"
+          value={businessData?.title}
+          onChange={handleInputChange}
+          error={handleWordExceeded(businessData?.title, 8)}
+          helperText={handleWordExceeded(businessData?.title, 8) ? "exceeded the limit" : ""}
+          className="my-4"
+        />
         {/* Description Input */}
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 text-sm font-medium mb-1"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={businessData?.description}
-            onChange={handleInputChange}
-            rows="4"
-            className="w-full p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <TextField
+          variant="outlined"
+          required
+          fullWidth
+          multiline
+          rows={5}
+          label="Landing Page Description (50 words)"
+          id="description"
+          name="description"
+          autoComplete="description"
+          value={businessData?.description}
+          onChange={handleInputChange}
+          error={handleWordExceeded(businessData?.description, 50)}
+          helperText={handleWordExceeded(businessData?.description, 50) ? "exceeded the limit" : ""}
+          className="mb-4"
+        />
 
         {/* Image Input with Preview */}
         <div className="mb-4">
@@ -207,8 +206,7 @@ const LandingPage = () => {
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: "400px" }}
-          >
+            style={{ height: "400px" }} >
             <Cropper
               image={currentImage.preview}
               crop={crop}

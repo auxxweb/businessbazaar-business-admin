@@ -230,7 +230,7 @@ const News = () => {
       {imageLoading && <FullPageLoader />}
       <div className="flex rounded-lg py-4 items-center justify-between">
         <h2 className="text-2xl font-semibold text-nowrap text-gray-700 p-0 m-0  " >
-          News & Articles
+          Our Blogs
         </h2>
         <div className=" flex items-center ">
           <span className="flex items-center">
@@ -238,7 +238,7 @@ const News = () => {
               className="bg-[#105193] hover:bg-[#107D93] text-white text-nowrap rounded-3xl pt-2 pb-2 pl-4 pr-4 cursor-pointer"
               onClick={handleShowCreateModal}
             >
-              Add Articles
+              Add Blog
             </button>
           </span>
         </div>
@@ -250,7 +250,7 @@ const News = () => {
         onHide={handleCreateCloseModal}>
         <Form noValidate validated onSubmit={handleCreateNewsArticle}>
           <Modal.Header>
-            <Modal.Title> Add Articles</Modal.Title>
+            <Modal.Title> Add Blogs</Modal.Title>
             <CloseButton onClick={handleCreateCloseModal} />
           </Modal.Header>
           <Modal.Body
@@ -474,7 +474,7 @@ const News = () => {
       <Modal show={showModal} onHide={handleCloseModal}>
         <Form noValidate validated={validated} onSubmit={handleSaveChanges}>
           <Modal.Header >
-            <Modal.Title>Edit News Article</Modal.Title>
+            <Modal.Title>Edit Blog</Modal.Title>
             <CloseButton onClick={handleCloseModal} />
           </Modal.Header>
           <Modal.Body>
@@ -562,7 +562,7 @@ const News = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this News?</Modal.Body>
+        <Modal.Body>Are you sure you want to delete this Blog?</Modal.Body>
         <Modal.Footer>
           <Button variant="dark" onClick={handleDeleteCloseModal}>
             Cancel

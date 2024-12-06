@@ -6,6 +6,8 @@ import Pagination from "../Pagination";
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../../utils/cropper.utils';
 import FullPageLoader from '../FullPageLoader/FullPageLoader';
+import { TextField } from '@mui/material';
+import { handleWordExceeded } from '../../utils/appUtils';
 
 const Judges = () => {
   const fileInputRef = useRef(null);
@@ -258,32 +260,32 @@ const Judges = () => {
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-  
+
     // Trigger form validation
     if (!newProduct.title || !newProduct.description) {
       setValidated(true);
       return;
     }
-    
+
     try {
       let accessLink = null;
-  
+
       // Upload the image if it exists
       if (currentImage?.file) {
         const data = await uploadImage(currentImage.file, 'products');
         console.log(data?.accessLink, 'data-accessLink');
         accessLink = data?.accessLink;
       }
-  
+
       // Prepare the new list of products
       const updatedProducts = [...(products || []), { ...newProduct, image: accessLink }];
-  
+
       // Remove `_id` properties if necessary
       const sanitizedProducts = updatedProducts.map((product) => {
         const { _id, ...rest } = product; // Destructure to remove `_id`
         return _id ? product : rest; // Return product without `_id` if it doesn't exist or is empty
       });
-  
+
       // Create the updated data payload
       const updateData = {
         productSection: {
@@ -292,12 +294,12 @@ const Judges = () => {
           data: sanitizedProducts, // Updated and sanitized list of products
         },
       };
-  
+
       console.log(updateData, 'updated-data');
-  
+
       // Update the business and add the product
       await updateBusiness(updateData);
-  
+
       // Reset form state
       setCurrentImage({ image: null, preview: null });
       setValidated(false);
@@ -306,7 +308,7 @@ const Judges = () => {
       console.error('Error creating product:', error);
     }
   };
-  
+
 
   if (loading) {
     return <FullPageLoader />
@@ -331,144 +333,130 @@ const Judges = () => {
 
       {/* Add Product Modal */}
       <Modal
-  show={showCreateModal}
-  onHide={handleCreateCloseModal}
-  style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  }}
->
-  <div
-    style={{
-      backgroundColor: '#fff',
-      borderRadius: '12px',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-      overflow: 'hidden',
-      width: '500px',
-    }}
-  >
-    <Modal.Header>
-      <Modal.Title>Add Product</Modal.Title>
-      <CloseButton onClick={handleCreateCloseModal} />
-    </Modal.Header>
-    <Modal.Body
-      style={{
-        padding: '24px',
-      }}
-    >
-      <Form noValidate validated={validated} onSubmit={handleCreateProduct}>
-        {/* Title Field */}
-        <Form.Group controlId="validationCustom01">
-          <Form.Label style={{ fontWeight: '500' }}>Title</Form.Label>
-          <Form.Control
-            type="text"
-            name="title"
-            required
-            value={newProduct.title}
-            onChange={handleCreateInputChange}
-            style={{
-              borderRadius: '8px',
-              border: '1px solid #ddd',
-              padding: '10px',
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            Please provide a title.
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {/* Description Field */}
-        <Form.Group controlId="formDescription" className="mt-3">
-          <Form.Label style={{ fontWeight: '500' }}>Description</Form.Label>
-          <Form.Control
-            type="text"
-            name="description"
-            required
-            value={newProduct.description}
-            onChange={handleCreateInputChange}
-            style={{
-              borderRadius: '8px',
-              border: '1px solid #ddd',
-              padding: '10px',
-            }}
-          />
-          <Form.Control.Feedback type="invalid">
-            Please provide a description.
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {/* Price Field */}
-        <Form.Group controlId="formPrice" className="mt-3">
-          <Form.Label style={{ fontWeight: '500' }}>Price</Form.Label>
-          <Form.Control
-            type="number"
-            name="price"
-            // required
-            value={newProduct.price}
-            onChange={handleCreateInputChange}
-            style={{
-              borderRadius: '8px',
-              border: '1px solid #ddd',
-              padding: '10px',
-            }}
-          />
-          {/* <Form.Control.Feedback type="invalid">
-            Please provide a valid price.
-          </Form.Control.Feedback> */}
-        </Form.Group>
-
-        {/* Image Upload Field */}
-        <Form.Group controlId="formImage" className="mt-3">
-          <Form.Label>
-            Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
-          </Form.Label>
-          <Form.Control
-            // required
-            type="file"
-            name="image"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-          />
-          {/* <Form.Control.Feedback type="invalid">
-            Please upload an image.
-          </Form.Control.Feedback> */}
-          {currentImage.image && (
-            <img
-              src={currentImage.image}
-              alt="Preview"
-              className="w-1/2 mx-auto h-auto mt-4"
-              style={{
-                objectFit: 'cover',
-                display: 'block',
-                marginInline: 'auto',
-              }}
-            />
-          )}
-        </Form.Group>
-
-        {/* Submit Button */}
-        <Button
-        
-          type="submit"
+        show={showCreateModal}
+        onHide={handleCreateCloseModal}
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div
           style={{
-            fontWeight: '500',
-            width: '100%',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-            border: 'none',
-            marginTop: '20px',
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+            overflow: 'hidden',
+            width: '500px',
           }}
         >
-          Submit
-        </Button>
-      </Form>
-    </Modal.Body>
-  </div>
-</Modal>
+          <Modal.Header>
+            <Modal.Title>Add Product</Modal.Title>
+            <CloseButton onClick={handleCreateCloseModal} />
+          </Modal.Header>
+          <Modal.Body
+            style={{
+              padding: '24px',
+            }}
+          >
+            <Form noValidate validated={validated} onSubmit={handleCreateProduct}>
+              {/* Title Field */}
+              <Form.Group controlId="formTitle">
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  label="Title (8 words)"
+                  id="title"
+                  name="title"
+                  autoComplete="title"
+                  value={newProduct?.title}
+                  onChange={handleCreateInputChange}
+                  error={handleWordExceeded(newProduct?.title, 8)}
+                  helperText={handleWordExceeded(newProduct?.title, 8) ? "exceeded the limit" : ""}
+                  className="my-4"
+                />
+              </Form.Group>
+              <Form.Group controlId="formDescription" className="mt-3">
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  multiline
+                  rows={5}
+                  label="Description (50 words)"
+                  id="description"
+                  name="description"
+                  autoComplete="description"
+                  value={newProduct?.description}
+                  onChange={handleCreateInputChange}
+                  error={handleWordExceeded(newProduct?.description, 50)}
+                  helperText={handleWordExceeded(newProduct?.description, 50) ? "exceeded the limit" : ""}
+                  className="mb-4"
+                />
+              </Form.Group>
+              <Form.Group controlId="formDescription" className="mt-3">
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  type='number'
+                  label="Price"
+                  id="price"
+                  name="price"
+                  autoComplete="price"
+                  value={newProduct?.price}
+                  onChange={handleCreateInputChange}
+                  className="mb-4"
+                />
+              </Form.Group>
+              {/* Image Upload Field */}
+              <Form.Group controlId="formImage" className="mt-3">
+                <Form.Label>
+                  Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
+                </Form.Label>
+                <Form.Control
+                  // required
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+                {currentImage.image && (
+                  <img
+                    src={currentImage.image}
+                    alt="Preview"
+                    className="w-1/2 mx-auto h-auto mt-4"
+                    style={{
+                      objectFit: 'cover',
+                      display: 'block',
+                      marginInline: 'auto',
+                    }}
+                  />
+                )}
+              </Form.Group>
+
+              {/* Submit Button */}
+              <Button
+
+                type="submit"
+                style={{
+                  fontWeight: '500',
+                  width: '100%',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                  border: 'none',
+                  marginTop: '20px',
+                }}
+              >
+                Submit
+              </Button>
+            </Form>
+          </Modal.Body>
+        </div>
+      </Modal>
 
 
       <div className="mt-6">
@@ -480,41 +468,39 @@ const Judges = () => {
             style={{ maxWidth: '65rem', width: '100%' }}>
             <div className="flex flex-col space-y-4">
               {/* Title Input */}
-              <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={productData?.title}
-                  onChange={setProductInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                  placeholder="Enter title"
-                />
-              </div>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                multiline
+                label="Title (8 words)"
+                id="title"
+                name="title"
+                autoComplete="title"
+                value={productData?.title}
+                onChange={setProductInputChange}
+                error={handleWordExceeded(productData?.title, 8)}
+                helperText={handleWordExceeded(productData?.title, 8) ? "exceeded the limit" : ""}
+                className="mb-4"
+              />
               {/* Description Input */}
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  rows="4"
-                  name="description"
-                  value={productData?.description}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                  placeholder="Enter description"
-                  onChange={setProductInputChange}
-                ></textarea>
-              </div>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                multiline
+                label="Description (50 words)"
+                id="description"
+                name="description"
+                autoComplete="title"
+                value={productData?.description}
+                onChange={setProductInputChange}
+                error={handleWordExceeded(productData?.description, 50)}
+                helperText={handleWordExceeded(productData?.description, 50) ? "exceeded the limit" : ""}
+                className="mb-4"
+                rows={8}
+              />
+
             </div>
             {/* Submit Button */}
             <div className="mt-4 flex justify-end">
@@ -618,30 +604,51 @@ const Judges = () => {
         <Modal.Body>
           <Form>
             <Form.Group controlId="formTitle">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                label="Title (8 words)"
+                id="title"
                 name="title"
-                value={updatedProduct.title}
+                autoComplete="title"
+                value={updatedProduct?.title}
                 onChange={handleInputChange}
+                error={handleWordExceeded(updatedProduct?.title, 8)}
+                helperText={handleWordExceeded(updatedProduct?.title, 8) ? "exceeded the limit" : ""}
+                className="my-4"
               />
             </Form.Group>
             <Form.Group controlId="formDescription" className="mt-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                type="text"
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                multiline
+                rows={5}
+                label="Description (50 words)"
+                id="description"
                 name="description"
-                value={updatedProduct.description}
+                autoComplete="description"
+                value={updatedProduct?.description}
                 onChange={handleInputChange}
+                error={handleWordExceeded(updatedProduct?.description, 50)}
+                helperText={handleWordExceeded(updatedProduct?.description, 50) ? "exceeded the limit" : ""}
+                className="mb-4"
               />
             </Form.Group>
-            <Form.Group controlId="formPrice" className="mt-3">
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type="number"
+            <Form.Group controlId="formDescription" className="mt-3">
+              <TextField
+                variant="outlined"
+                fullWidth
+                type='number'
+                label="Price"
+                id="price"
                 name="price"
-                value={updatedProduct.price}
+                autoComplete="price"
+                value={updatedProduct?.price}
                 onChange={handleInputChange}
+                className="mb-4"
               />
             </Form.Group>
             <Form.Group controlId="formImage" className="mt-3">
@@ -704,13 +711,17 @@ const Judges = () => {
 
       <Modal
         show={modalState.showCrop}
-        onHide={() =>{ resetCropper()
-          handleModalState('showCrop', false)}}
+        onHide={() => {
+          resetCropper()
+          handleModalState('showCrop', false)
+        }}
       >
         <Modal.Header>
           <Modal.Title>Crop Image</Modal.Title>
-          <CloseButton onClick={() =>{ resetCropper()
-             handleModalState('showCrop', false)}} />
+          <CloseButton onClick={() => {
+            resetCropper()
+            handleModalState('showCrop', false)
+          }} />
         </Modal.Header>
         <Modal.Body>
           <div

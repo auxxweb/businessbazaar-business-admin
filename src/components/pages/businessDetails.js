@@ -189,9 +189,10 @@ const BusinessDetails = () => {
         ...businessDetails.address,
         buildingName: formData.buildingName,
         streetName: formData.streetName,
-        landmark: formData.landmark,
+        landMark: formData.landmark,
         state: formData.state
       },
+      email:formData.email,
       contactDetails: {
         ...businessDetails.contactDetails,
         whatsAppNumber: formData.whatsAppNumber,
@@ -201,7 +202,7 @@ const BusinessDetails = () => {
       },
       description: formData.description
     };
-
+console.log(updatedBusinessDetails?.email,businessDetails?.email)
     if (updatedBusinessDetails?.email === businessDetails?.email) {
       delete updatedBusinessDetails?.contactDetails?.email
       delete updatedBusinessDetails?.email
@@ -615,7 +616,6 @@ const BusinessDetails = () => {
                   className="border border-gray-300 p-2 w-full rounded"
                 />
                 <label>
-                  {" "}
                   Image <span style={{ color: "grey" }}>(Ratio 1 : 1)</span>
                 </label>
                 <input

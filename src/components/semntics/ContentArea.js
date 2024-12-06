@@ -52,7 +52,7 @@ function ContentArea() {
     { path: "/forgotPassword", element: <ForgotPassword /> },
     { path: "/changePassword/:id", element: <ChangePassword /> },
     { path: "/zones", element: <Zones />, protected: true },
-    { path: "/news", element: <News />, protected: true },
+    { path: "/blogs", element: <News />, protected: true },
     { path: "/landing-page", element: <LandingPage />, protected: true },
     { path: "/welcome-page", element: <WelcomePage />, protected: true },
     { path: "/products", element: <Judges />, protected: true },
