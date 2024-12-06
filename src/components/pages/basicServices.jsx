@@ -8,6 +8,8 @@ import { toast } from 'sonner'
 import Pagination from '../Pagination'
 import getCroppedImg from '../../utils/cropper.utils'
 import FullPageLoader from '../FullPageLoader/FullPageLoader'
+import { TextField } from '@mui/material'
+import { handleWordExceeded } from '../../utils/appUtils'
 
 const BasicServices = () => {
   const fileInputRef = useRef(null)
@@ -38,7 +40,6 @@ const BasicServices = () => {
     const fetchData = async () => {
       try {
         if (businesses) {
-          setBusinessData(businesses)
           console.log(businesses)
           setServices(businesses?.service?.data)
           setServiceData({
@@ -288,7 +289,7 @@ const BasicServices = () => {
         await updateBusiness(updatedData)
         handleCreateCloseModal()
       } catch (error) {
-        console.log(error, 'errorr ---------------------')
+        console.log(error, 'error ---------------------')
         toast.error('Something went wrong , please try again!')
       }
     }
@@ -361,27 +362,39 @@ const BasicServices = () => {
               </Modal.Header>
               <Modal.Body>
                 <Form.Group controlId="formTitle">
-                  <Form.Label>Title</Form.Label>
-                  <Form.Control
+                  <TextField
+                    variant="outlined"
                     required
-                    type="text"
+                    fullWidth
+                    label="Title (8 words)"
+                    id="title"
                     name="title"
-                    value={newService.title}
+                    autoComplete="title"
+                    value={newService?.title}
                     onChange={handleCreateInputChange}
+                    error={handleWordExceeded(newService?.title, 8)}
+                    helperText={handleWordExceeded(newService?.title, 8) ? "exceeded the limit" : ""}
+                    className="my-4"
                   />
                 </Form.Group>
                 <Form.Group controlId="formDescription" className="mt-3">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
+                  <TextField
+                    variant="outlined"
                     required
-                    as="textarea" // Render as a textarea
+                    fullWidth
+                    multiline
+                    rows={5}
+                    label="Description (50 words)"
+                    id="description"
                     name="description"
-                    rows={4} // Optional: Sets the number of rows for the textarea
-                    value={newService.description}
+                    autoComplete="description"
+                    value={newService?.description}
                     onChange={handleCreateInputChange}
+                    error={handleWordExceeded(newService?.description, 50)}
+                    helperText={handleWordExceeded(newService?.description, 50) ? "exceeded the limit" : ""}
+                    className="mb-4"
                   />
                 </Form.Group>
-
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
                     Image <span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
@@ -427,41 +440,41 @@ const BasicServices = () => {
         >
           <div className="flex flex-col space-y-4">
             {/* Title Input */}
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={serviceData?.title}
-                onChange={setServiceInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                placeholder="Enter title"
-              />
-            </div>
+
+            <TextField
+              variant="outlined"
+              required
+              fullWidth
+              multiline
+              label="Title (8 words)"
+              id="title"
+              name="title"
+              autoComplete="title"
+              value={serviceData?.title}
+              onChange={setServiceInputChange}
+              error={handleWordExceeded(serviceData?.title, 8)}
+              helperText={handleWordExceeded(serviceData?.title, 8) ? "exceeded the limit" : ""}
+              className="mb-4"
+            />
+
+
             {/* Description Input */}
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
-                rows="4"
-                name="description"
-                onChange={setServiceInputChange}
-                value={serviceData?.description}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                placeholder="Enter description"
-              ></textarea>
-            </div>
+            <TextField
+              variant="outlined"
+              required
+              fullWidth
+              multiline
+              label="Description (50 words)"
+              id="description"
+              name="description"
+              autoComplete="title"
+              value={serviceData?.description}
+              onChange={setServiceInputChange}
+              error={handleWordExceeded(serviceData?.description, 50)}
+              helperText={handleWordExceeded(serviceData?.description, 50) ? "exceeded the limit" : ""}
+              className="mb-4"
+              rows={8}
+            />
           </div>
           {/* Submit Button */}
           <div className="mt-4 flex justify-end">
@@ -583,27 +596,39 @@ const BasicServices = () => {
                 })} />
               </Modal.Header>
               <Modal.Body>
-                <Form.Group controlId="formTitle">
-                  <Form.Label>Title</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="title"
-                    value={updatedServices.title}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-                <Form.Group controlId="formDescription" className="mt-3">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    required
-                    as="textarea" // Render as a textarea
-                    name="description"
-                    rows={4} // Optional: Number of visible rows
-                    value={updatedServices.description}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
 
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  multiline
+                  label="Title (8 words)"
+                  id="title"
+                  name="title"
+                  autoComplete="title"
+                  value={updatedServices?.title}
+                  onChange={handleInputChange}
+                  error={handleWordExceeded(updatedServices?.title, 8)}
+                  helperText={handleWordExceeded(updatedServices?.title, 8) ? "exceeded the limit" : ""}
+                  className="mb-4"
+                />
+                {/* Description Input */}
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  multiline
+                  label="Description (50 words)"
+                  id="description"
+                  name="description"
+                  autoComplete="title"
+                  value={updatedServices?.description}
+                  onChange={handleInputChange}
+                  error={handleWordExceeded(updatedServices?.description, 50)}
+                  helperText={handleWordExceeded(updatedServices?.description, 50) ? "exceeded the limit" : ""}
+                  className="mb-4"
+                  rows={6}
+                />
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
                     Image<span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>

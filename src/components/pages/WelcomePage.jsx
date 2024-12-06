@@ -6,6 +6,8 @@ import FullPageLoader from "../FullPageLoader/FullPageLoader";
 import { Button, CloseButton, Modal } from "react-bootstrap";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropper.utils";
+import { TextField } from "@mui/material";
+import { handleWordExceeded } from "../../utils/appUtils";
 
 export default function WelcomePage() {
   const fileInputRef = useRef(null);
@@ -116,42 +118,38 @@ export default function WelcomePage() {
         <h2 className="text-3xl font-semibold text-gray-800 mb-4">
           Edit Welcome Page
         </h2>
-
-        {/* Title Input */}
-        <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="block text-gray-700 text-sm font-medium mb-1"
-          >
-            Title
-          </label>
-          <input
-            type="text"
+        <TextField
+            variant="outlined"
+            required
+            fullWidth
+            label="Welcome Page Title (8 words)"
             id="title"
-            value={businessData?.title}
             name="title"
+            autoComplete="title"
+            value={businessData?.title}
             onChange={handleInputChange}
-            className="w-full p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+            error={handleWordExceeded(businessData?.title, 8)}
+            helperText={handleWordExceeded(businessData?.title, 8) ? "exceeded the limit" : ""}
+            className="my-4"
+             />
 
         {/* Description Input */}
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 text-sm font-medium mb-1"
-          >
-            Description
-          </label>
-          <textarea
+        <TextField
+            variant="outlined"
+            required
+            fullWidth
+            multiline
+            rows={8}
+            label="Welcome Page Description (50 words)"
             id="description"
+            name="description"
+            autoComplete="description"
             value={businessData?.description}
             onChange={handleInputChange}
-            rows="4"
-            name="description"
-            className="w-full p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+            error={handleWordExceeded(businessData?.description, 50)}
+            helperText={handleWordExceeded(businessData?.description, 50) ? "exceeded the limit" : ""}
+            className="mb-4"
+             />
 
         <div className="mb-4">
           <label
