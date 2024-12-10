@@ -26,13 +26,46 @@ const Subscription = () => {
     if (plan) {
       const { business, payment } = plan;
 
+      console.log({business,payment});
+      
+
       if (business?.plan === "SPECIAL_TRAIL") {
         setPlanIsActive(true)
         setCurrentPlan((prev) => ({ ...prev, startDate: business?.validity, specialAccess: true }))
-
       } else {
-        if (!payment && business?.plan === "FREE_TRAIL") {
-          if (!isDateLessThanToday(business?.validity)) {
+
+        if(payment){
+          if (isDateLessThanToday(payment?.expiryDate) || isDateLessThanToday(business?.validity)) {
+            setPlanIsActive(false)
+            setCurrentPlan(((prev) => ({
+              ...prev,
+              startDate: payment?.createdAt,
+              endDate: payment?.expiryDate,
+              amount: payment?.amount
+            })))
+          }
+
+          if(!isDateLessThanToday(payment?.expiryDate)){
+            setPlanIsActive(true)
+          setCurrentPlan(((prev) => ({
+            ...prev,
+            startDate: payment?.createdAt,
+            endDate: payment?.expiryDate,
+            amount: payment?.amount
+          })))
+          }
+
+        }else{
+          if(business?.plan === "FREE_TRAIL" && !isDateLessThanToday(business?.validity)){
+            setPlanIsActive(true)
+            setCurrentPlan(((prev) => ({
+              ...prev,
+              startDate: business?.createdAt ?business?.createdAt : business?.selectedPlan?.createdAt,
+              endDate: business?.validity,
+              amount: 0
+            })))
+          }
+          if(business?.plan ==='PAID' &&  !isDateLessThanToday(business?.validity)){
             setPlanIsActive(true)
             setCurrentPlan(((prev) => ({
               ...prev,
@@ -42,25 +75,6 @@ const Subscription = () => {
             })))
           }
         }
-        if (payment && !isDateLessThanToday(payment?.expiryDate)) {
-          setPlanIsActive(true)
-          setCurrentPlan(((prev) => ({
-            ...prev,
-            startDate: payment?.createdAt,
-            endDate: payment?.expiryDate,
-            amount: payment?.amount
-          })))
-        }
-        if (payment && (isDateLessThanToday(payment?.expiryDate) || isDateLessThanToday(business?.validity))) {
-          setPlanIsActive(false)
-          setCurrentPlan(((prev) => ({
-            ...prev,
-            startDate: payment?.createdAt,
-            endDate: payment?.expiryDate,
-            amount: payment?.amount
-          })))
-        }
-
       }
     }
 
@@ -110,11 +124,11 @@ const Subscription = () => {
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Started Date</p>
-          <p className="text-gray-700 ml-2">{formatDate(currentPlan?.startDate)}</p>
+          <p className="text-gray-700 ml-2">{`${currentPlan?.startDate ? formatDate(currentPlan?.startDate)  : " "}`}</p>
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Expiration Date</p>
-          <p className="text-gray-700 ml-2">{formatDate(currentPlan?.endDate)}</p>
+          <p className="text-gray-700 ml-2">{`${currentPlan?.endDate ? formatDate(currentPlan?.endDate)  : ""}`}</p>
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Amount</p>
