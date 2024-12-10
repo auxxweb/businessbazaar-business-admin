@@ -75,7 +75,9 @@ const useBusiness = () => {
           }
         });
       }
+    
     } catch (error) {
+      console.log(error);
       setLoading(false);
       toast.error(
         error?.response?.data?.message ?? "Something went wrong ,try again!!"
