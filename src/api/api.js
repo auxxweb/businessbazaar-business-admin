@@ -174,6 +174,23 @@ export const patchApi = async (
         window.localStorage.removeItem("userCredential");
         await logout();
       } else {
+        if(error?.response?.data?.message ==='Plan not valid'){
+          toast.warning("Your plan expired, please renew now", {
+            theme: "colored",
+            position: "top-right", // Position the toast at the top-center of the screen
+            style: {
+              backgroundColor: "orange", // Custom green background color for success
+              color: "#FFFFFF", // White text
+              height: "60px", // Set a higher height for the toast
+              fontSize: "14px", // Increase font size for better readability
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              right:".5rem"
+            }
+          });
+        }
         console.log("Error:", error.response.status);
       }
     } else {
