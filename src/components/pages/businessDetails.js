@@ -116,7 +116,7 @@ const BusinessDetails = () => {
       whatsAppNumber: businessDetails?.contactDetails?.whatsAppNumber,
       primaryNumber: businessDetails?.contactDetails?.primaryNumber,
       secondaryNumber: businessDetails?.contactDetails?.secondaryNumber,
-      email: businessDetails?.email,
+      email: businessDetails?.contactDetails?.email,
       website: businessDetails?.contactDetails?.website,
       description: businessDetails?.description,
       socialMediaLinks: businessDetails?.socialMediaLinks
@@ -192,19 +192,17 @@ const BusinessDetails = () => {
         landMark: formData.landmark,
         state: formData.state
       },
-      email:formData.email,
       contactDetails: {
         ...businessDetails.contactDetails,
         whatsAppNumber: formData.whatsAppNumber,
         primaryNumber: formData.primaryNumber,
         secondaryNumber: formData.secondaryNumber,
-        website: formData.website
+        website: formData.website,
+        email:formData.email
       },
       description: formData.description
     };
-console.log(updatedBusinessDetails?.email,businessDetails?.email)
-    if (updatedBusinessDetails?.email === businessDetails?.email) {
-      delete updatedBusinessDetails?.contactDetails?.email
+    if (updatedBusinessDetails?.email) {
       delete updatedBusinessDetails?.email
     }
 
@@ -337,11 +335,9 @@ console.log(updatedBusinessDetails?.email,businessDetails?.email)
                 {" "}
                 {businessDetails?.address?.state}
               </p>
-              <p
-                className={`${businessDetails?.email ?? "hidden"
-                  }`}>
-                Email:{" "}
-                {businessDetails?.email || (
+              <p className={` `}>
+               Email:{" "}
+                {businessDetails?.contactDetails?.email || (
                   <span className="text-red-500 text-sm">Not Available</span>
                 )}
               </p>
