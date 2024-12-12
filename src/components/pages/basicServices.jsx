@@ -186,7 +186,10 @@ const BasicServices = () => {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }))
     }
   }
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (e) => {
+    console.log("updatedServices");
+    e.preventDefault()
+    
     if (!updatedServices?.title || !updatedServices?.description) {
       toast.warning('Please enter title and description', {
         position: 'top-right',
@@ -218,6 +221,7 @@ const BasicServices = () => {
           data: [...updatedService],
         },
       }
+      console.log(updatedData,'')
       await updateBusiness(updatedData)
       setCurrentImage({ file: null, preview: null, image: null })
       console.log(updatedData, 'updatedData')
