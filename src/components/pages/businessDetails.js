@@ -9,6 +9,18 @@ import { Button, CloseButton, Modal, Spinner } from "react-bootstrap";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
+import { toast } from "sonner";
+
+const openInNewTab = (url) => {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url; // Add 'https://' if missing
+  }
+  const newTab = window.open(url, '_blank','noopener,noreferrer');
+  if (newTab) {
+    newTab.opener = null;
+    newTab.focus(); // Ensure the new tab is focused
+  } 
+};
 
 const BusinessDetails = () => {
   const { uploadImage, imageLoading } = useImageUpload();
@@ -174,6 +186,26 @@ const BusinessDetails = () => {
     });
   };
   const handleSubmit = async () => {
+
+    if(!formData.primaryNumber && !formData.secondaryNumber && !formData.whatsAppNumber  ) {
+      toast.warning("Please enter at least one contact number", {
+        theme: "colored",
+        position: "top-right", // Position the toast at the top-center of the screen
+        style: {
+          backgroundColor: "orange", // Custom green background color for success
+          color: "#FFFFFF", // White text
+          height: "60px", // Set a higher height for the toast
+          fontSize: "14px", // Increase font size for better readability
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          right:".5rem"
+        }
+      });
+return
+    }
+
     setUPdateLoading(true)
     let logo = businessDetails?.logo;
     if (currentImage?.file) {
@@ -376,20 +408,20 @@ const BusinessDetails = () => {
             <div className="flex items-center gap-3 ">
               <p className="p-0 m-0 ">Follow Us On:</p>
               {formData?.socialMediaLinks?.map((item, index) => {
-                if (item.tag === "facebook") {
-                  return <Facebook key={index} url={item?.link} />;
+                if (item.tag === "facebook" && item?.link) {
+                  return <Facebook handleClick={openInNewTab} key={index} url={item?.link} />;
                 }
-                if (item.tag === "instagram") {
-                  return <Instagram key={index} url={item?.link} />;
+                if (item.tag === "instagram" && item?.link) {
+                  return <Instagram handleClick={openInNewTab} key={index} url={item?.link} />;
                 }
-                if (item.tag === "twitter") {
-                  return <Twitter key={index} url={item?.link} />;
+                if (item.tag === "twitter" && item?.link) {
+                  return <Twitter handleClick={openInNewTab} key={index} url={item?.link} />;
                 }
-                if (item.tag === "youtube") {
-                  return <Youtube key={index} url={item?.link} />;
+                if (item.tag === "youtube" && item?.link) {
+                  return <Youtube handleClick={openInNewTab} key={index} url={item?.link} />;
                 }
-                if (item.tag === "linkedin") {
-                  return <LinkedIn key={index} url={item?.link} />;
+                if (item.tag === "linkedin" && item?.link) {
+                  return <LinkedIn handleClick={openInNewTab} key={index} url={item?.link} />;
                 }
               })}
 
@@ -752,9 +784,9 @@ const BusinessDetails = () => {
 
 export default BusinessDetails;
 
-const Twitter = ({ url }) => {
+const Twitter = ({ url,handleClick }) => {
   return (
-    <a className="cursor-pointer" target="_blank" href={url}>
+    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
       <svg
         className="w-10 h-10 "
         xmlns="http://www.w3.org/2000/svg"
@@ -781,9 +813,9 @@ z"
   );
 };
 
-const Facebook = ({ url }) => {
+const Facebook = ({ url,handleClick }) => {
   return (
-    <a className="cursor-pointer" target="_blank" href={url}>
+    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
       <svg
         className="w-8 h-8 "
         fill="#000000"
@@ -798,9 +830,9 @@ const Facebook = ({ url }) => {
   );
 };
 
-const Instagram = ({ url }) => {
+const Instagram = ({ url,handleClick }) => {
   return (
-    <a className="cursor-pointer" target="_blank" href={url}>
+    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
       <svg
         width="27px"
         height="27px"
@@ -829,9 +861,9 @@ const Instagram = ({ url }) => {
   );
 };
 
-const LinkedIn = ({ url }) => {
+const LinkedIn = ({ url,handleClick }) => {
   return (
-    <a className="cursor-pointer" target="_blank" href={url}>
+    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 50 50"
@@ -845,9 +877,9 @@ const LinkedIn = ({ url }) => {
   );
 };
 
-const Youtube = ({ url }) => {
+const Youtube = ({ url ,handleClick}) => {
   return (
-    <a className="cursor-pointer " target="_blank" href={url}>
+    <a className="cursor-pointer " onClick={(()=>handleClick(url))}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 50 50"

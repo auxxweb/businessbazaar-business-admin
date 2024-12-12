@@ -34,3 +34,15 @@ export const handleWordExceeded = (text, limit) => {
   }
   return error
 }
+
+export const addYears = (oldDate, yearsToAdd) => {
+  const currentDate = new Date(oldDate); // Get the current date
+  currentDate.setFullYear(currentDate.getFullYear() + yearsToAdd); // Add the years
+  return currentDate; // Return the updated date
+}
+
+export const addDays = (oldDate, daysToAdd = 14) => {
+  const currentDate = new Date(oldDate); // Get the current date
+  currentDate.setDate(currentDate.getDate() + daysToAdd); // Add the days
+  return currentDate; // Return the updated date
+}
