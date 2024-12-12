@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import usePlan from "../Hooks/usePlan";
-import { formatDate, isDateLessThanToday } from "../utils/appUtils";
+import { addDays, addYears, formatDate } from "../utils/appUtils";
 import FullPageLoader from "./FullPageLoader/FullPageLoader";
 import { useNavigate } from "react-router-dom";
-
 
 const Subscription = () => {
   const { plan, loading, fetchPlanDetails } = usePlan();
@@ -26,54 +25,39 @@ const Subscription = () => {
     if (plan) {
       const { business, payment } = plan;
 
-      console.log({business,payment});
-      
-
       if (business?.plan === "SPECIAL_TRAIL") {
         setPlanIsActive(true)
         setCurrentPlan((prev) => ({ ...prev, startDate: business?.validity, specialAccess: true }))
       } else {
 
-        if(payment){
-          if (isDateLessThanToday(payment?.expiryDate) || isDateLessThanToday(business?.validity)) {
+        if (payment) {
+
+          const expiryDate = addYears(payment?.createdAt, payment?.plan?.validity);
+
+          if (expiryDate >= new Date()) {
+            setPlanIsActive(true)
+          } else {
             setPlanIsActive(false)
-            setCurrentPlan(((prev) => ({
-              ...prev,
-              startDate: payment?.createdAt,
-              endDate: payment?.expiryDate,
-              amount: payment?.amount
-            })))
           }
 
-          if(!isDateLessThanToday(payment?.expiryDate)){
-            setPlanIsActive(true)
-          setCurrentPlan(((prev) => ({
-            ...prev,
+          setCurrentPlan({
             startDate: payment?.createdAt,
-            endDate: payment?.expiryDate,
-            amount: payment?.amount
-          })))
-          }
+            endDate: expiryDate,
+            amount: payment?.plan?.amount
+          })
 
-        }else{
-          if(business?.plan === "FREE_TRAIL" && !isDateLessThanToday(business?.validity)){
+        } else {
+          const expiryDate = addDays(business?.createdAt)
+          if (expiryDate >= new Date()) {
             setPlanIsActive(true)
-            setCurrentPlan(((prev) => ({
-              ...prev,
-              startDate: business?.createdAt ?business?.createdAt : business?.selectedPlan?.createdAt,
-              endDate: business?.validity,
-              amount: 0
-            })))
+          } else {
+            setPlanIsActive(false)
           }
-          if(business?.plan ==='PAID' &&  !isDateLessThanToday(business?.validity)){
-            setPlanIsActive(true)
-            setCurrentPlan(((prev) => ({
-              ...prev,
-              startDate: business?.createdAt,
-              endDate: business?.validity,
-              amount: 0
-            })))
-          }
+          setCurrentPlan({
+            startDate: business?.createdAt,
+            endDate: expiryDate,
+            amount: 0
+          })
         }
       }
     }
@@ -124,11 +108,11 @@ const Subscription = () => {
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Started Date</p>
-          <p className="text-gray-700 ml-2">{`${currentPlan?.startDate ? formatDate(currentPlan?.startDate)  : " "}`}</p>
+          <p className="text-gray-700 ml-2">{`${currentPlan?.startDate ? formatDate(currentPlan?.startDate) : " "}`}</p>
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Expiration Date</p>
-          <p className="text-gray-700 ml-2">{`${currentPlan?.endDate ? formatDate(currentPlan?.endDate)  : ""}`}</p>
+          <p className="text-gray-700 ml-2">{`${currentPlan?.endDate ? formatDate(currentPlan?.endDate) : ""}`}</p>
         </div>
         <div className="items-center">
           <p className="text-gray-700 font-semibold">Amount</p>
@@ -140,7 +124,7 @@ const Subscription = () => {
             ? `text-green-600 border-green-600`
             : `text-red-600 border-red-600`
             }`}>
-          {!isDateLessThanToday(currentPlan?.endDate) ? "Active" : "Renew now"}
+          {planIsActive ? "Active" : "Renew now"}
         </button>
       </div>
     </div>
