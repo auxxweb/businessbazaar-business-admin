@@ -10,10 +10,10 @@ import getCroppedImg from '../../utils/cropper.utils'
 import FullPageLoader from '../FullPageLoader/FullPageLoader'
 import { TextField } from '@mui/material'
 import { handleWordExceeded } from '../../utils/appUtils'
+import { showToast } from '../../utils/notification'
 
 const BasicServices = () => {
   const fileInputRef = useRef(null)
-  const [businessData, setBusinessData] = useState([])
 
   const [services, setServices] = useState([])
   const [filteredServices, setFilteredServices] = useState([])
@@ -186,21 +186,29 @@ const BasicServices = () => {
       setNewService((prevServices) => ({ ...prevServices, [name]: value }))
     }
   }
+
   const handleSaveChanges = async (e) => {
-    console.log("updatedServices");
     e.preventDefault()
-    
+    console.log("updatedServices");
+
     if (!updatedServices?.title || !updatedServices?.description) {
-      toast.warning('Please enter title and description', {
-        position: 'top-right',
-        duration: 2000,
-        style: {
-          backgroundColor: 'yellow', // Custom yellow color for warning
-          color: '#FFFFFF', // Text color
-        },
-        dismissible: true,
-      })
+      if (!updatedServices?.title) {
+        showToast('Please enter title ')
+        return
+      }
+      if (!updatedServices?.description) {
+        showToast('Please enter description ')
+        return
+      }
     } else {
+      if (handleWordExceeded(updatedServices?.title, 8)) {
+        showToast('Title cannot exceed 8 words ')
+        return
+      }
+      if (handleWordExceeded(updatedServices?.description, 50)) {
+        showToast('Description cannot exceed 50 words')
+        return
+      }
       var imageAccessUrl = currentImage?.image
       if (currentImage?.file) {
         const data = await uploadImage(currentImage?.file, 'service')
@@ -222,7 +230,7 @@ const BasicServices = () => {
           data: [...updatedService],
         },
       }
-      console.log(updatedData,'')
+      console.log(updatedData, '')
       await updateBusiness(updatedData)
       setCurrentImage({ file: null, preview: null, image: null })
       console.log(updatedData, 'updatedData')
@@ -230,7 +238,8 @@ const BasicServices = () => {
     }
   }
 
-  const handleDeleteServices = async () => {
+  const handleDeleteServices = async (e) => {
+    e.preventDefault()
     try {
       const updatedServices = await services?.filter(
         (ser) => ser?._id !== selectedService?._id,
@@ -254,16 +263,22 @@ const BasicServices = () => {
   const handleCreateService = async (e) => {
     e.preventDefault()
     if (!newService?.title || !newService?.description) {
-      toast.warning('Please enter title and description', {
-        position: 'top-right',
-        duration: 2000,
-        style: {
-          backgroundColor: 'yellow', // Custom yellow color for warning
-          color: '#FFFFFF', // Text color
-        },
-        dismissible: true,
-      })
+      if (!newService?.title) {
+        showToast('Please enter title ')
+      }
+      if (!newService?.description) {
+        showToast('Please enter description ')
+      }
+
     } else {
+      if (handleWordExceeded(newService?.title, 8)) {
+        showToast('Title cannot exceed 8 words ')
+        return
+      }
+      if (handleWordExceeded(newService?.description, 50)) {
+        showToast('Description cannot exceed 50 words')
+        return
+      }
       try {
         let imgAccessUrl = null
         if (currentImage?.file) {
@@ -304,6 +319,15 @@ const BasicServices = () => {
   }
 
   const handleServiceMainSubmit = async (e) => {
+    e.preventDefault()
+    if (handleWordExceeded(serviceData?.title, 8)) {
+      showToast('Title cannot exceed 8 words ')
+      return
+    }
+    if (handleWordExceeded(serviceData?.description, 50)) {
+      showToast('Description cannot exceed 50 words')
+      return
+    }
     e.preventDefault()
     const updatedData = {
       ...businesses,
@@ -536,60 +560,60 @@ const BasicServices = () => {
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
           {filteredServices?.map((splServices, index) => {
-            if(splServices?.title || splServices?.description){
+            if (splServices?.title || splServices?.description) {
               return (
                 <tr
-              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
-              key={index}
-            >
-              <td className="px-4 py-2 border-r border-gray-400">
-                {index + 1}
-              </td>
+                  className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+                  key={index}
+                >
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    {index + 1}
+                  </td>
 
-              <td className="px-4 py-2 border-r border-gray-400">
-                <img
-                  alt="img"
-                  src={splServices?.image ?? 't'}
-                  className="w-14 h-14 rounded-full mr-2 mt-2"
-                />
-              </td>
-              <td className="px-4 py-2 border-r border-gray-400">
-                {splServices?.title}
-              </td>
-              {/* <td className="px-4 py-2 border-r border-gray-400">
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <img
+                      alt="img"
+                      src={splServices?.image ?? 't'}
+                      className="w-14 h-14 rounded-full mr-2 mt-2"
+                    />
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    {splServices?.title}
+                  </td>
+                  {/* <td className="px-4 py-2 border-r border-gray-400">
                 {splServices?._id}
               </td> */}
-              <td className="px-4 py-2 border-r border-gray-400">
-                <div className="flex -space-x-2">
-                  {splServices?.description}
-                </div>
-              </td>
-              <td className="px-4 py-2 border-r border-gray-400">
-                <button
-                  onClick={(e) => {
-                    handleShowModal(splServices)
-                  }}
-                >
-                  <img
-                    alt="pics"
-                    src="/icons/edit.svg"
-                    className="w-6 h-6 rounded-full mr-2"
-                  />
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(true)
-                    setSelectedService(splServices)
-                  }}
-                >
-                  <img
-                    alt="pics"
-                    src="/icons/delete.svg"
-                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  />
-                </button>
-              </td>
-            </tr>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <div className="flex -space-x-2">
+                      {splServices?.description}
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <button
+                      onClick={(e) => {
+                        handleShowModal(splServices)
+                      }}
+                    >
+                      <img
+                        alt="pics"
+                        src="/icons/edit.svg"
+                        className="w-6 h-6 rounded-full mr-2"
+                      />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDeleteModal(true)
+                        setSelectedService(splServices)
+                      }}
+                    >
+                      <img
+                        alt="pics"
+                        src="/icons/delete.svg"
+                        className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                      />
+                    </button>
+                  </td>
+                </tr>
               )
             }
           })}
@@ -646,7 +670,6 @@ const BasicServices = () => {
                     Image<span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
-                    required
                     type="file"
                     name="image"
                     accept="image/*"
