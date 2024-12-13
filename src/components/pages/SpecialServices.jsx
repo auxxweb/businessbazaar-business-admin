@@ -223,6 +223,7 @@ const SpecialServices = () => {
       )
       setServices(updatedService)
       const updatedData = {
+        ...businesses,
         specialServices: {
           ...businesses?.specialServices,
           data: [...updatedService],
@@ -242,6 +243,7 @@ const SpecialServices = () => {
       )
 
       const updatedService = {
+        ...businesses,
         specialServices: {
           ...(businesses?.specialServices ?? []),
           data: updatedServices,
@@ -294,6 +296,7 @@ const SpecialServices = () => {
         })
         // Prepare updated business data immutably
         const updatedData = {
+          ...businesses,
           specialServices: {
             ...(businesses?.specialServices ?? []),
             data: newServices,
@@ -327,6 +330,7 @@ const SpecialServices = () => {
   const handleServiceMainSubmit = async (e) => {
     e.preventDefault()
     const updatedData = {
+      ...businesses,
       specialServices: {
         title: serviceData?.title,
         description: serviceData?.description,

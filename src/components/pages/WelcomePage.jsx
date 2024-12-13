@@ -98,6 +98,7 @@ export default function WelcomePage() {
       }
       // Prepare updated business data immutably
       const updatedData = {
+        ...businesses,
         welcomePart: {
           ...businesses?.welcomePart,
           title: businessData?.title,

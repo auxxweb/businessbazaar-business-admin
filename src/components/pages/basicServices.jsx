@@ -216,6 +216,7 @@ const BasicServices = () => {
       )
       setServices(updatedService)
       const updatedData = {
+        ...businesses,
         service: {
           ...businesses?.service,
           data: [...updatedService],
@@ -236,6 +237,7 @@ const BasicServices = () => {
       )
 
       const updatedService = {
+        ...businesses,
         service: {
           ...(businesses?.service ?? []),
           data: updatedServices,
@@ -285,6 +287,7 @@ const BasicServices = () => {
         })
         // Prepare updated business data immutably
         const updatedData = {
+          ...businesses,
           service: {
             ...(businesses?.service ?? []),
             data: newServices,
@@ -303,6 +306,7 @@ const BasicServices = () => {
   const handleServiceMainSubmit = async (e) => {
     e.preventDefault()
     const updatedData = {
+      ...businesses,
       service: {
         title: serviceData?.title,
         description: serviceData?.description,
@@ -531,8 +535,10 @@ const BasicServices = () => {
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
-          {filteredServices?.map((splServices, index) => (
-            <tr
+          {filteredServices?.map((splServices, index) => {
+            if(splServices?.title || splServices?.description){
+              return (
+                <tr
               className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
               key={index}
             >
@@ -584,7 +590,9 @@ const BasicServices = () => {
                 </button>
               </td>
             </tr>
-          ))}
+              )
+            }
+          })}
 
           {/* Edit Service Modal */}
           <Modal show={showModal} onHide={(() => {

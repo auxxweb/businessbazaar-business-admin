@@ -87,6 +87,7 @@ const Judges = () => {
     e.preventDefault()
 
     const updatedData = {
+      ...businesses,
       productSection: {
         title: productData?.title,
         description: productData?.description,
@@ -213,6 +214,7 @@ const Judges = () => {
         : product,
     )
     const updateData = {
+      ...businesses,
       productSection: {
         title: productData?.title,
         description: productData?.description,
@@ -237,6 +239,7 @@ const Judges = () => {
       )
 
       const updatedData = {
+        ...businesses,
         productSection: {
           title: productData?.title,
           description: productData?.description,
@@ -288,6 +291,7 @@ const Judges = () => {
 
       // Create the updated data payload
       const updateData = {
+        ...businesses,
         productSection: {
           title: productData?.title || '', // Default to an empty string if undefined
           description: productData?.description || '', // Default to an empty string if undefined
