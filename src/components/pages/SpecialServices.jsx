@@ -10,6 +10,7 @@ import getCroppedImg from '../../utils/cropper.utils'
 import FullPageLoader from '../FullPageLoader/FullPageLoader'
 import { TextField } from '@mui/material'
 import { handleWordExceeded } from '../../utils/appUtils'
+import { showToast } from '../../utils/notification'
 
 const SpecialServices = () => {
   const fileInputRef = useRef(null)
@@ -191,20 +192,27 @@ const SpecialServices = () => {
     }
   }
   const handleSaveChanges = async (e) => {
-    console.log("updatedServices");
     e.preventDefault()
+    console.log("updatedServices");
 
     if (!updatedServices?.title || !updatedServices?.description) {
-      toast.warning('Please enter title and description', {
-        position: 'top-right',
-        duration: 2000,
-        style: {
-          backgroundColor: 'yellow', // Custom yellow color for warning
-          color: '#FFFFFF', // Text color
-        },
-        dismissible: true,
-      })
+      if (!updatedServices?.title) {
+        showToast('Please enter title ')
+        return
+      }
+      if (!updatedServices?.description) {
+        showToast('Please enter description ')
+        return
+      }
     } else {
+      if (handleWordExceeded(updatedServices?.title, 8)) {
+        showToast('Title cannot exceed 8 words ')
+        return
+      }
+      if (handleWordExceeded(updatedServices?.description, 50)) {
+        showToast('Description cannot exceed 50 words')
+        return
+      }
       let imageAccessUrl = currentImage.image
 
       if (currentImage?.file) {
@@ -223,6 +231,7 @@ const SpecialServices = () => {
       )
       setServices(updatedService)
       const updatedData = {
+        ...businesses,
         specialServices: {
           ...businesses?.specialServices,
           data: [...updatedService],
@@ -235,13 +244,15 @@ const SpecialServices = () => {
     }
   }
 
-  const handleDeleteServices = async () => {
+  const handleDeleteServices = async (e) => {
+    e.preventDefault()
     try {
       const updatedServices = await services?.filter(
         (ser) => ser?._id !== selectedService?._id,
       )
 
       const updatedService = {
+        ...businesses,
         specialServices: {
           ...(businesses?.specialServices ?? []),
           data: updatedServices,
@@ -260,17 +271,28 @@ const SpecialServices = () => {
   const handleCreateService = async (e) => {
     e.preventDefault()
 
+    if (!newService?.title || !newService?.description) {
+      if (!newService?.title) {
+        showToast('Please enter title ')
+        return
+      }
+      if (!newService?.description) {
+        showToast('Please enter description ')
+        return
+      }
+    }
     if (!currentImage?.file) {
-      return toast.warning('Please select a image file', {
-        position: 'top-right',
-        duration: 2000,
-        style: {
-          backgroundColor: 'yellow', // Custom yellow color for warning
-          color: '#FFFFFF', // Text color
-        },
-        dismissible: true,
-      })
+      return showToast('Please select a image file ')
+
     } else {
+      if (handleWordExceeded(newService?.title, 8)) {
+        showToast('Title cannot exceed 8 words ')
+        return
+      }
+      if (handleWordExceeded(newService?.description, 50)) {
+        showToast('Description cannot exceed 50 words')
+        return
+      }
       try {
         let imgAccessUrl = null
         if (currentImage?.file) {
@@ -294,6 +316,7 @@ const SpecialServices = () => {
         })
         // Prepare updated business data immutably
         const updatedData = {
+          ...businesses,
           specialServices: {
             ...(businesses?.specialServices ?? []),
             data: newServices,
@@ -306,27 +329,23 @@ const SpecialServices = () => {
         toast.error('Something went wrong , please try again!')
       }
     }
-    // setServices((prevServices) => {
-    //   const updatedServices = Array.isArray(prevServices)
-    //     ? [...prevServices, newService]
-    //     : [newService];
 
-    //   const updatedData = {
-    //     specialServices: {
-    //       ...businessData.specialServices,
-    //       data: updatedServices,
-    //     },
-    //   };
-
-    //   setBusinessData(updatedData);
-    //   handleCloseModal();
-    //   return updatedServices;
-    // });
   }
 
   const handleServiceMainSubmit = async (e) => {
     e.preventDefault()
+    if (handleWordExceeded(serviceData?.title, 8)) {
+      showToast('Title cannot exceed 8 words ')
+      return
+    }
+    if (handleWordExceeded(serviceData?.description, 50)) {
+      showToast('Description cannot exceed 50 words')
+      return
+    }
+
+    e.preventDefault()
     const updatedData = {
+      ...businesses,
       specialServices: {
         title: serviceData?.title,
         description: serviceData?.description,
@@ -539,60 +558,64 @@ const SpecialServices = () => {
           </tr>
         </thead>
         <tbody className="border-[2px] border-opacity-50 border-[#969696]">
-          {filteredServices?.map((splServices, index) => (
-            <tr
-              className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
-              key={index}
-            >
-              <td className="px-4 py-2 border-r border-gray-400">
-                {index + 1}
-              </td>
+          {filteredServices?.map((splServices, index) => {
+            if (splServices?.title || splServices?.description) {
+              return (
+                <tr
+                  className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+                  key={index}
+                >
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    {index + 1}
+                  </td>
 
-              <td className="px-4 py-2 border-r border-gray-400">
-                <img
-                  alt="img"
-                  src={splServices?.image ?? 't'}
-                  className="w-14 h-14 rounded-full mr-2 mt-2"
-                />
-              </td>
-              <td className="px-4 py-2 border-r border-gray-400">
-                {splServices?.title}
-              </td>
-              {/* <td className="px-4 py-2 border-r border-gray-400">
-                {splServices?._id}
-              </td> */}
-              <td className="px-4 py-2 border-r border-gray-400">
-                <div className="flex -space-x-2">
-                  {splServices?.description}
-                </div>
-              </td>
-              <td className="px-4 py-2 border-r border-gray-400">
-                <button
-                  onClick={(e) => {
-                    handleShowModal(splServices)
-                  }}
-                >
-                  <img
-                    alt="pics"
-                    src="/icons/edit.svg"
-                    className="w-6 h-6 rounded-full mr-2"
-                  />
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(true)
-                    setSelectedService(splServices)
-                  }}
-                >
-                  <img
-                    alt="pics"
-                    src="/icons/delete.svg"
-                    className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                  />
-                </button>
-              </td>
-            </tr>
-          ))}
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <img
+                      alt="img"
+                      src={splServices?.image ?? 't'}
+                      className="w-14 h-14 rounded-full mr-2 mt-2"
+                    />
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    {splServices?.title}
+                  </td>
+                  {/* <td className="px-4 py-2 border-r border-gray-400">
+                  {splServices?._id}
+                </td> */}
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <div className="flex -space-x-2">
+                      {splServices?.description}
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <button
+                      onClick={(e) => {
+                        handleShowModal(splServices)
+                      }}
+                    >
+                      <img
+                        alt="pics"
+                        src="/icons/edit.svg"
+                        className="w-6 h-6 rounded-full mr-2"
+                      />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDeleteModal(true)
+                        setSelectedService(splServices)
+                      }}
+                    >
+                      <img
+                        alt="pics"
+                        src="/icons/delete.svg"
+                        className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              )
+            }
+          })}
 
           {/* Edit Service Modal */}
           <Modal show={showModal} onHide={handleCloseModal}>
@@ -601,23 +624,23 @@ const SpecialServices = () => {
                 <Modal.Title>Edit Special Services</Modal.Title>
                 <CloseButton onClick={handleCloseModal} />
               </Modal.Header>
-              <Modal.Body> 
+              <Modal.Body>
                 <Form.Group controlId="formTitle">
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  label="Title (8 words)"
-                  id="title"
-                  name="title"
-                  autoComplete="title"
-                  value={updatedServices?.title}
-                  onChange={handleInputChange}
-                  error={handleWordExceeded(updatedServices?.title, 8)}
-                  helperText={handleWordExceeded(updatedServices?.title, 8) ? "exceeded the limit" : ""}
-                  className="my-4"
-                />
-              </Form.Group>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    label="Title (8 words)"
+                    id="title"
+                    name="title"
+                    autoComplete="title"
+                    value={updatedServices?.title}
+                    onChange={handleInputChange}
+                    error={handleWordExceeded(updatedServices?.title, 8)}
+                    helperText={handleWordExceeded(updatedServices?.title, 8) ? "exceeded the limit" : ""}
+                    className="my-4"
+                  />
+                </Form.Group>
                 <Form.Group controlId="formDescription" className="mt-3">
                   <TextField
                     variant="outlined"

@@ -103,7 +103,7 @@ const News = () => {
       title: newsData.title,
       description: newsData.description,
       link: newsData.link,
-      isBanner: newsData.isBanner ? true : false,
+      isBanner: newsData.isBanner ,
       image: newsData.image,
     });
     setShowModal(true);
@@ -544,6 +544,7 @@ const News = () => {
               <Form.Check
                 name="isBanner"
                 required
+                checked={updatedNews?.isBanner ? true : false}
                 value={updatedNews?.isBanner ? true : false}
                 onChange={handleInputChange}
               />

@@ -2,8 +2,8 @@ import axios from "axios";
 import { clearBusinessData } from "./slices/business";
 import { toast } from "sonner";
 
-const API_BASE_URL = process.env.REACT_APP_BE_API_KEY;
-// const API_BASE_URL = "http://localhost:5000"
+// const API_BASE_URL = process.env.REACT_APP_BE_API_KEY;
+const API_BASE_URL = "http://localhost:5000"
 
 export const postApi = async (
   url,

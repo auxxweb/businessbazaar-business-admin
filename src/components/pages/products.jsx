@@ -8,6 +8,9 @@ import getCroppedImg from '../../utils/cropper.utils';
 import FullPageLoader from '../FullPageLoader/FullPageLoader';
 import { TextField } from '@mui/material';
 import { handleWordExceeded } from '../../utils/appUtils';
+import { toast } from 'sonner';
+import { showToast } from '../../utils/notification';
+
 
 const Judges = () => {
   const fileInputRef = useRef(null);
@@ -86,7 +89,34 @@ const Judges = () => {
   const handleProductMainSubmit = async (e) => {
     e.preventDefault()
 
+    if (!productData.title || !productData.description) {
+      toast.warning('Please enter title and description', {
+        theme: "colored",
+        position: "top-right",
+        style: {
+          backgroundColor: "orange",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center"
+        }
+      })
+    }
+
+    if (handleWordExceeded(productData?.title, 8)) {
+      showToast('Title cannot exceed 8 words ')
+      return
+    }
+    if (handleWordExceeded(productData?.description, 50)) {
+      showToast('Description cannot exceed 50 words')
+      return
+    }
+
     const updatedData = {
+      ...businesses,
       productSection: {
         title: productData?.title,
         description: productData?.description,
@@ -201,7 +231,18 @@ const Judges = () => {
       setNewProduct((prevProduct) => ({ ...prevProduct, [name]: value }))
     }
   }
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (e) => {
+    e.preventDefault()
+
+    if (handleWordExceeded(updatedProduct?.title, 8)) {
+      showToast('Title cannot exceed 8 words ')
+      return
+    }
+    if (handleWordExceeded(updatedProduct?.description, 50)) {
+      showToast('Description cannot exceed 50 words')
+      return
+    }
+
     let accessLink = selectedProduct.image
     if (currentImage?.file) {
       const data = await uploadImage(currentImage?.file, 'products')
@@ -213,6 +254,7 @@ const Judges = () => {
         : product,
     )
     const updateData = {
+      ...businesses,
       productSection: {
         title: productData?.title,
         description: productData?.description,
@@ -226,7 +268,8 @@ const Judges = () => {
     handleCloseModal()
   }
 
-  const handleDeleteProduct = async () => {
+  const handleDeleteProduct = async (e) => {
+    e.preventDefault()
     // setProducts((prevProducts) =>
     //   prevProducts.filter((product) => product._id !== selectedProduct._id),
     // )
@@ -237,6 +280,7 @@ const Judges = () => {
       )
 
       const updatedData = {
+        ...businesses,
         productSection: {
           title: productData?.title,
           description: productData?.description,
@@ -266,7 +310,14 @@ const Judges = () => {
       setValidated(true);
       return;
     }
-
+    if (handleWordExceeded(newProduct?.title, 8)) {
+      showToast('Title cannot exceed 8 words ')
+      return
+    }
+    if (handleWordExceeded(newProduct?.description, 50)) {
+      showToast('Description cannot exceed 50 words')
+      return
+    }
     try {
       let accessLink = null;
 
@@ -288,6 +339,7 @@ const Judges = () => {
 
       // Create the updated data payload
       const updateData = {
+        ...businesses,
         productSection: {
           title: productData?.title || '', // Default to an empty string if undefined
           description: productData?.description || '', // Default to an empty string if undefined
@@ -540,57 +592,59 @@ const Judges = () => {
             </tr>
           </thead>
           <tbody>
-            {products?.map((product, index) => (
-              <tr
-                key={product?._id}
-                className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
-              >
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  {index + 1}
-                </td>
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  <img
-                    src={product?.image || 'default-image.png'}
-                    alt="Product"
-                    className="w-12 h-12 object-cover"
-                  />
-                </td>
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  {product?.title}
-                </td>
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  {product?.description}
-                </td>
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  {product?.price}
-                </td>
-                <td className="px-4 py-4 text-left border-r border-gray-400">
-                  <button
-                    variant="info"
-                    onClick={() => handleShowModal(product)}
-                  >
+            {products?.map((product, index) => {
+              if (product?.title || product?.description) {
+                return (<tr
+                  key={product?._id}
+                  className="odd:bg-[#d4e0ec] even:bg-grey border-[2px] border-opacity-50 border-[#9e9696]"
+                >
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
+                    {index + 1}
+                  </td>
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
                     <img
-                      alt="edit"
-                      src="/icons/edit.svg"
-                      className="w-6 h-6 rounded-full mr-2"
+                      src={product?.image || 'default-image.png'}
+                      alt="Product"
+                      className="w-12 h-12 object-cover"
                     />
-                  </button>
-                  <button
-                    variant="danger"
-                    onClick={() => {
-                      setSelectedProduct(product)
-                      setShowDeleteModal(true)
-                    }}
-                  >
-                    <img
-                      alt="delete"
-                      src="/icons/delete.svg"
-                      className="w-6 h-6 rounded-full mr-2 fill-red-500"
-                    />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
+                    {product?.title}
+                  </td>
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
+                    {product?.description}
+                  </td>
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
+                    {product?.price}
+                  </td>
+                  <td className="px-4 py-4 text-left border-r border-gray-400">
+                    <button
+                      variant="info"
+                      onClick={() => handleShowModal(product)}
+                    >
+                      <img
+                        alt="edit"
+                        src="/icons/edit.svg"
+                        className="w-6 h-6 rounded-full mr-2"
+                      />
+                    </button>
+                    <button
+                      variant="danger"
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setShowDeleteModal(true)
+                      }}
+                    >
+                      <img
+                        alt="delete"
+                        src="/icons/delete.svg"
+                        className="w-6 h-6 rounded-full mr-2 fill-red-500"
+                      />
+                    </button>
+                  </td>
+                </tr>)
+              }
+            })}
           </tbody>
         </table>
       </div>
@@ -601,8 +655,8 @@ const Judges = () => {
           <Modal.Title>Edit Product</Modal.Title>
           <CloseButton onClick={handleCloseModal} />
         </Modal.Header>
-        <Modal.Body>
-          <Form>
+        <Form validated noValidate onSubmit={handleSaveChanges}>
+          <Modal.Body>
             <Form.Group controlId="formTitle">
               <TextField
                 variant="outlined"
@@ -675,13 +729,13 @@ const Judges = () => {
                 />
               )}
             </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={handleSaveChanges}>
-            Save changes
-          </Button>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" type="submit"  >
+              Save changes
+            </Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
 
       {/* Delete Product Confirmation Modal */}

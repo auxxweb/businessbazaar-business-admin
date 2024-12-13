@@ -91,6 +91,7 @@ const LandingPage = () => {
       }
       // Prepare updated business data immutably
       const updatedData = {
+        ...businesses,
         landingPageHero: {
           ...businesses?.landingPageHero,
           title: businessData?.title,

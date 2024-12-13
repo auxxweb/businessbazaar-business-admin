@@ -55,7 +55,7 @@ const Gallery = () => {
       if (data?.accessLink) {
         const newGallery = [...gallery];
         newGallery[currentImage.index] = data.accessLink;
-        await updateBusiness({ gallery: newGallery });
+        await updateBusiness({...businesses, gallery: newGallery });
         setGallery(newGallery);
       }
     }
@@ -65,7 +65,7 @@ const Gallery = () => {
 
   const handleDeleteGallery = async () => {
     const newGallery = gallery.filter((_, i) => i !== currentImage.index);
-    await updateBusiness({ gallery: newGallery });
+    await updateBusiness({ ...businesses, gallery: newGallery });
     setGallery(newGallery);
     resetCurrentImage();
     handleModalState("showDelete", false);
@@ -76,7 +76,7 @@ const Gallery = () => {
       const data = await uploadImage(currentImage.file, "gallery");
       if (data?.accessLink) {
         const newGallery = [...gallery, data.accessLink];
-        await updateBusiness({ gallery: newGallery });
+        await updateBusiness({ ...businesses, gallery: newGallery });
         setGallery(newGallery);
       }
     }
@@ -133,8 +133,10 @@ const Gallery = () => {
           {imageLoading && (
             <FullPageLoader />
           )}
-          {gallery.map((item, index) => (
-            <div className="col-md-3 p-2" key={index}>
+          {gallery.map((item, index) => {
+            if(item?.includes("http")) {
+              return (
+                <div className="col-md-3 p-2" key={index}>
               <div className="w-fit h-full border relative rounded-md mx-auto hover:shadow-xl duration-300">
                 <img src={item} alt="" className="w-48 h-auto mx-auto" />
                 <div className="absolute left-0 bottom-0 flex justify-between w-full hover:flex py-2">
@@ -166,7 +168,9 @@ const Gallery = () => {
                 </div>
               </div>
             </div>
-          ))}
+              )
+            }
+          })}
         </div>
       </div>
 
