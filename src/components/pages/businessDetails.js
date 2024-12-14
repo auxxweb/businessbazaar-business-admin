@@ -10,6 +10,7 @@ import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
 import { toast } from "sonner";
+import { showToast } from "../../utils/notification";
 
 const openInNewTab = (url) => {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -185,25 +186,36 @@ const BusinessDetails = () => {
       [e.target.name]: e.target.value
     });
   };
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    if(!formData.primaryNumber && !formData.secondaryNumber && !formData.whatsAppNumber  ) {
-      toast.warning("Please enter at least one contact number", {
-        theme: "colored",
-        position: "top-right", // Position the toast at the top-center of the screen
-        style: {
-          backgroundColor: "orange", // Custom green background color for success
-          color: "#FFFFFF", // White text
-          height: "60px", // Set a higher height for the toast
-          fontSize: "14px", // Increase font size for better readability
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          right:".5rem"
-        }
-      });
-return
+    if(!formData.buildingName ) {
+      return showToast('Please enter a building name')      
+    }
+
+    if(!formData.landmark ) {
+      return showToast('Please enter a landmark')
+    }
+    if(!formData.state ) {      
+      return showToast('Please enter a state')
+    }
+    if(!formData.email ) {
+      return showToast('Please enter a email')
+    } 
+    if(!formData.description ) {
+      return showToast('Please enter a description')
+    }
+
+    if(!formData.streetName ) {
+      return showToast('Please enter a street name')
+    }
+
+    if(!formData.primaryNumber ) {
+      return showToast('Please enter a primary number')
+    }
+
+    if(!formData.whatsAppNumber ){
+     return showToast('Please enter a whatsapp number')
     }
 
     setUPdateLoading(true)
@@ -313,12 +325,12 @@ return
       <div className="m-4 mx-auto bg-transparent shadow-md rounded-lg p-6 mt-4 border border-gray-200 relative">
         {imageLoading || (loading && <FullPageLoader />)}
         <div
-          className="h-full w-full absolute z-0 top-0 left-0"
+          className="h-full w-full absolute z-0 top-0 left-0 "
           style={{
             backgroundImage: `url(${businessDetails?.logo})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            opacity: "0.2",
+            opacity: "0.1",
           }}
         ></div>
         {/* Business Details */}
@@ -326,9 +338,9 @@ return
           <img
             src={businessDetails?.logo ?? placeholder}
             alt="Business Logo"
-            className="w-full sm:w-1/2 md:w-1/3 mb-3 sm:mb-0 mx-auto h-fit rounded border shadow  object-cover"
+            className="w-full sm:w-1/2 md:w-1/3 mb-3 sm:mb-0 h-fit rounded border shadow  object-cover"
           />
-          <div className="ml-6  px-2">
+          <div className=" sm:ml-0 md:ml-4  md:px-2  w-100">
             {/* Edit Icon Button */}
             <button onClick={handleShowModal} className=" p-2 float-end">
               <img
@@ -337,7 +349,7 @@ return
                 className="w-5 h-5 cursor-pointer"
               />
             </button>
-            <h1 className=" font-semibold text-gray-800">
+            <h1 className=" font-semibold text-gray-800 capitalize">
               {businessDetails?.businessName}
             </h1>
             <p className="text-gray-500 italic">

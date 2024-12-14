@@ -106,6 +106,12 @@ const Plans = () => {
                           </div>
                           <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
                             <div className="price-section">
+                            <h5
+                                className="fs-16 text-muted text-decoration-line-through "
+                                style={{ color: "gray" }}
+                              >
+                                ₹{plan?.actualAmount}
+                              </h5>
                               <h2 className="fw-bold fs-28 text-primary mb-0">
                                 ₹{plan?.amount}
                               </h2>
@@ -125,6 +131,7 @@ const Plans = () => {
                                 className="d-flex align-items-center mt-2"
                                 key={descIndex}
                               >
+                                
                                 <span className="subscription-tick bg-light text-success me-2">
                                   <i className="bi bi-check"></i>
                                 </span>
