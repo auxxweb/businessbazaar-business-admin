@@ -412,17 +412,16 @@ const News = () => {
                   <p>{data?.title}</p>
                 </td>
 
-                <td className="px-4 py-2 border-r border-gray-400 ">
-                  <div className="flex flex-col  justify-between border h-full ">
-                    <div className="flex -space-x-2">
+                <td className=" p-2 border-r border-gray-400 h-100 relative ">
+                  <div className=" w-100   h-100 ">
+                    <div className="flex -space-x-2 mb-3">
                       {showMore?.index === index && showMore?.status
                         ? data?.description.substring(0)
                         : data?.description.substring(0, 100)}
-
                     </div>
                     <p onClick={() =>
                       setShowMore({ index: index, status: !showMore?.status })
-                    } className="m-0 p-0 text-xs text-end  text-blue-500 ">
+                    } className="m-1 p-0 text-xs text-end  text-blue-500 absolute right-1 bottom-1 ">
                       {showMore?.status && showMore?.index === index
                         ? "Show Less..."
                         : "Show More..."}
@@ -430,7 +429,7 @@ const News = () => {
                   </div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  {data?.image ? <div> <img width={300} src={data?.image} className="h-auto" /> </div> : <LinkPreviewComponent url={data?.link} />}
+                  {data?.image ? <div> <img width={200} src={data?.image} className="h-auto" /> </div> : <LinkPreviewComponent url={data?.link} />}
 
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
