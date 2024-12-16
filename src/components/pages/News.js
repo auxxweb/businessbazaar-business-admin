@@ -8,7 +8,6 @@ import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
 
-
 const News = () => {
   const { imageLoading, uploadImage } = useImageUpload();
   const {
@@ -87,7 +86,7 @@ const News = () => {
 
   const resetCropper = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Clear the file input
+      fileInputRef.current.value = ""; // Clear the file input
     }
   };
 
@@ -103,7 +102,7 @@ const News = () => {
       title: newsData.title,
       description: newsData.description,
       link: newsData.link,
-      isBanner: newsData.isBanner ,
+      isBanner: newsData.isBanner,
       image: newsData.image,
     });
     setShowModal(true);
@@ -132,7 +131,7 @@ const News = () => {
       isBanner: false,
       image: null,
     });
-    setCurrentImage({ file: null, image: null, preview: null })
+    setCurrentImage({ file: null, image: null, preview: null });
   };
 
   const handleDeleteCloseModal = () => {
@@ -148,8 +147,8 @@ const News = () => {
       if (file) {
         setCurrentImage((prev) => ({
           ...prev,
-          preview: URL.createObjectURL(file)
-        }))
+          preview: URL.createObjectURL(file),
+        }));
       } else {
         console.error("Access link not found in response.");
       }
@@ -172,8 +171,8 @@ const News = () => {
       if (file) {
         setCurrentImage((prev) => ({
           ...prev,
-          preview: URL.createObjectURL(file)
-        }))
+          preview: URL.createObjectURL(file),
+        }));
       } else {
         console.error("Access link not found in response.");
       }
@@ -187,15 +186,17 @@ const News = () => {
     }
   };
   const handleSaveChanges = async (e) => {
-    e.preventDefault()
-    let imageLink = currentImage?.image
+    e.preventDefault();
+    let imageLink = currentImage?.image;
 
     if (currentImage?.file) {
-      const response = await uploadImage(currentImage?.file, "news")
-      imageLink = response.accessLink
+      const response = await uploadImage(currentImage?.file, "news");
+      imageLink = response.accessLink;
     }
+
+    console.log(updatedNews, "updated newsaaaennnneee");
     await updateNewsArticles({ ...updatedNews, image: imageLink });
-    setCurrentImage({ file: null, image: null, preview: null })
+    setCurrentImage({ file: null, image: null, preview: null });
     handleCloseModal();
   };
 
@@ -213,15 +214,15 @@ const News = () => {
   };
 
   const handleCreateNewsArticle = async (e) => {
-    e.preventDefault()
-    let imageLink = null
+    e.preventDefault();
+    let imageLink = null;
     if (currentImage?.file) {
-      const response = await uploadImage(currentImage?.file, "news")
-      imageLink = response?.accessLink
+      const response = await uploadImage(currentImage?.file, "news");
+      imageLink = response?.accessLink;
     }
 
     await addNewsArticles({ ...newNewsArticle, image: imageLink });
-    setCurrentImage({ file: null, image: null, preview: null })
+    setCurrentImage({ file: null, image: null, preview: null });
     handleCreateCloseModal();
   };
 
@@ -229,7 +230,7 @@ const News = () => {
     <>
       {imageLoading && <FullPageLoader />}
       <div className="flex rounded-lg py-4 items-center justify-between">
-        <h2 className="text-2xl font-semibold text-nowrap text-gray-700 p-0 m-0  " >
+        <h2 className="text-2xl font-semibold text-nowrap text-gray-700 p-0 m-0  ">
           Our Blogs
         </h2>
         <div className=" flex items-center ">
@@ -245,9 +246,7 @@ const News = () => {
       </div>
 
       {/* Add Product Modal */}
-      <Modal
-        show={showCreateModal}
-        onHide={handleCreateCloseModal}>
+      <Modal show={showCreateModal} onHide={handleCreateCloseModal}>
         <Form noValidate validated onSubmit={handleCreateNewsArticle}>
           <Modal.Header>
             <Modal.Title> Add Blogs</Modal.Title>
@@ -274,9 +273,7 @@ const News = () => {
               />
             </Form.Group>
             <Form.Group controlId="formDescription" className="mt-3">
-              <Form.Label style={{ fontWeight: "500" }}>
-                Description
-              </Form.Label>
+              <Form.Label style={{ fontWeight: "500" }}>Description</Form.Label>
               <Form.Control
                 type="text"
                 name="description"
@@ -362,7 +359,7 @@ const News = () => {
             </Button>
           </Modal.Footer>
         </Form>
-      </Modal >
+      </Modal>
 
       <table className="min-w-full table-auto mt-6 border-collapse">
         <thead className="bg-white border-gray-400 border-t-[2px] border-l-[2px] border-r-[2px] border-b-[2px]">
@@ -381,6 +378,9 @@ const News = () => {
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Url
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              IsBanner
             </th>
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Actions
@@ -419,9 +419,12 @@ const News = () => {
                         ? data?.description.substring(0)
                         : data?.description.substring(0, 100)}
                     </div>
-                    <p onClick={() =>
-                      setShowMore({ index: index, status: !showMore?.status })
-                    } className="m-1 p-0 text-xs text-end  text-blue-500 absolute right-1 bottom-1 ">
+                    <p
+                      onClick={() =>
+                        setShowMore({ index: index, status: !showMore?.status })
+                      }
+                      className="m-1 p-0 text-xs text-end  text-blue-500 absolute right-1 bottom-1 "
+                    >
                       {showMore?.status && showMore?.index === index
                         ? "Show Less..."
                         : "Show More..."}
@@ -429,14 +432,37 @@ const News = () => {
                   </div>
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
-                  {data?.image ? <div> <img width={200} src={data?.image} className="h-auto" /> </div> : <LinkPreviewComponent url={data?.link} />}
-
+                  {data?.image ? (
+                    <div>
+                      {" "}
+                      <img
+                        width={200}
+                        src={data?.image}
+                        className="h-auto"
+                      />{" "}
+                    </div>
+                  ) : (
+                    <LinkPreviewComponent url={data?.link} />
+                  )}
                 </td>
                 <td className="px-4 py-2 border-r border-gray-400">
                   <div className="flex -space-x-2">
                     <a target="_blank" href={data?.link} rel="no referrer">
                       Url
                     </a>{" "}
+                  </div>
+                </td>
+                <td className="px-4 py-2 border-r border-gray-400">
+                  <div className="flex items-center">
+                    {data?.isBanner === true ? (
+                      <span className="text-green-500 font-semibold">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="text-red-500 font-semibold">
+                        Inactive
+                      </span>
+                    )} 
                   </div>
                 </td>
 
@@ -472,7 +498,7 @@ const News = () => {
       {/* Edit Product Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Form noValidate validated={validated} onSubmit={handleSaveChanges}>
-          <Modal.Header >
+          <Modal.Header>
             <Modal.Title>Edit Blog</Modal.Title>
             <CloseButton onClick={handleCloseModal} />
           </Modal.Header>
@@ -517,7 +543,7 @@ const News = () => {
                 Image <span style={{ color: "grey" }}>(Ratio 16 : 9)</span>
               </Form.Label>
               <Form.Control
-               ref={fileInputRef}
+                ref={fileInputRef}
                 type="file"
                 name="image"
                 accept="image/*"
@@ -543,9 +569,14 @@ const News = () => {
               <Form.Check
                 name="isBanner"
                 required
-                checked={updatedNews?.isBanner ? true : false}
-                value={updatedNews?.isBanner ? true : false}
-                onChange={handleInputChange}
+                checked={updatedNews?.isBanner}
+                value={updatedNews?.isBanner}
+                onChange={(e) =>
+                  setUpdatedNews((prevNewsData) => ({
+                    ...prevNewsData,
+                    isBanner: e.target.checked, // Set the value based on the checkbox's state
+                  }))
+                }
               />
             </Form.Group>
           </Modal.Body>
@@ -555,10 +586,10 @@ const News = () => {
             </Button>
           </Modal.Footer>
         </Form>
-      </Modal >
+      </Modal>
 
       {/* Delete Product Confirmation Modal */}
-      < Modal show={showDeleteModal} onHide={handleDeleteCloseModal} >
+      <Modal show={showDeleteModal} onHide={handleDeleteCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
@@ -571,7 +602,7 @@ const News = () => {
             Delete
           </Button>
         </Modal.Footer>
-      </Modal >
+      </Modal>
       <div className="m-auto flex justify-end mt-8">
         <Pagination
           totalItems={totalNews}
@@ -584,15 +615,19 @@ const News = () => {
       {/* Crop Modal */}
       <Modal
         show={modalState.showCrop}
-        onHide={(() =>{ resetCropper()
-        handleModalState("showCrop", false)})}
+        onHide={() => {
+          resetCropper();
+          handleModalState("showCrop", false);
+        }}
       >
-        <Modal.Header >
+        <Modal.Header>
           <Modal.Title>Crop Image</Modal.Title>
-          <CloseButton  onClick={(() =>{ 
-           resetCropper()
-            handleModalState("showCrop", false)
-        })}/>
+          <CloseButton
+            onClick={() => {
+              resetCropper();
+              handleModalState("showCrop", false);
+            }}
+          />
         </Modal.Header>
         <Modal.Body>
           <div
@@ -710,7 +745,7 @@ const LinkPreviewComponent = ({ url }) => {
       onClick={handleClick}
       style={{ cursor: "pointer" }}
     >
-      {(previewData.image) && (
+      {previewData.image && (
         <img
           src={previewData?.image}
           alt="Link Preview"
