@@ -3,6 +3,7 @@ import { getApi } from "../api/api";
 
 const useCategory = (category_id) => {
   const [category, setCategory] = useState([]);
+  const [allCategories, setAllCategory] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchCategory = async (id) => {
@@ -10,6 +11,17 @@ const useCategory = (category_id) => {
     try {
       const response = await getApi(`api/v1/category/${id}`, true);
       setCategory(response?.data);
+    } catch (e) {
+      console.log(e, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchAllCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(`api/v1/category/all`, true);
+      setAllCategory(response?.data?.data);
     } catch (e) {
       console.log(e, "error");
     } finally {
@@ -25,8 +37,11 @@ const useCategory = (category_id) => {
 
   return {
     fetchCategory,
+    fetchAllCategories,
     category,
+    allCategories,
     loading,
+
   };
 };
 

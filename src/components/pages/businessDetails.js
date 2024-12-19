@@ -9,25 +9,27 @@ import { Button, CloseButton, Modal, Spinner } from "react-bootstrap";
 import useImageUpload from "../../api/imageUpload/useImageUpload";
 import getCroppedImg from "../../utils/cropper.utils";
 import FullPageLoader from "../FullPageLoader/FullPageLoader";
-import { toast } from "sonner";
 import { showToast } from "../../utils/notification";
+import useCategory from "../../Hooks/useCategory";
 
 const openInNewTab = (url) => {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = 'https://' + url; // Add 'https://' if missing
   }
-  const newTab = window.open(url, '_blank','noopener,noreferrer');
+  const newTab = window.open(url, '_blank', 'noopener,noreferrer');
   if (newTab) {
     newTab.opener = null;
     newTab.focus(); // Ensure the new tab is focused
-  } 
+  }
 };
 
 const BusinessDetails = () => {
   const { uploadImage, imageLoading } = useImageUpload();
+  const { fetchAllCategories, allCategories } = useCategory()
   const [businessDetails, setBusinessDetails] = useState([]);
   const [updateLoading, setUPdateLoading] = useState(false)
   const [category, setCategory] = useState({});
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [isSocialMedia, setSocialMediaModal] = useState(false);
@@ -72,6 +74,8 @@ const BusinessDetails = () => {
 
   // State for form data within the modal
   const [formData, setFormData] = useState({
+    businessName: businessDetails?.businessName || "",
+    category: businessDetails?.category || "",
     buildingName: businessDetails?.address?.buildingName || "",
     streetName: businessDetails?.address?.streetName || "",
     landmark: businessDetails?.address?.landMark || "",
@@ -122,6 +126,8 @@ const BusinessDetails = () => {
 
   useEffect(() => {
     setFormData({
+      businessName: businessDetails?.businessName,
+      category: businessDetails?.category,
       buildingName: businessDetails?.address?.buildingName,
       streetName: businessDetails?.address?.streetName,
       landmark: businessDetails?.address?.landMark,
@@ -142,6 +148,7 @@ const BusinessDetails = () => {
       theme: businessDetails?.theme,
       secondaryTheme: businessDetails?.secondaryTheme
     });
+    fetchAllCategories()
   }, [businessDetails]);
 
   const handleShowModal = () => setIsModalOpen(true);
@@ -189,33 +196,36 @@ const BusinessDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!formData.buildingName ) {
-      return showToast('Please enter a building name')      
+    if (!formData.buildingName) {
+      return showToast('Please enter a building name')
+    }
+    if (!formData.businessName) {
+      return showToast('Please enter a business name')
     }
 
-    if(!formData.landmark ) {
+    if (!formData.landmark) {
       return showToast('Please enter a landmark')
     }
-    if(!formData.state ) {      
+    if (!formData.state) {
       return showToast('Please enter a state')
     }
-    if(!formData.email ) {
+    if (!formData.email) {
       return showToast('Please enter a email')
-    } 
-    if(!formData.description ) {
+    }
+    if (!formData.description) {
       return showToast('Please enter a description')
     }
 
-    if(!formData.streetName ) {
+    if (!formData.streetName) {
       return showToast('Please enter a street name')
     }
 
-    if(!formData.primaryNumber ) {
+    if (!formData.primaryNumber) {
       return showToast('Please enter a primary number')
     }
 
-    if(!formData.whatsAppNumber ){
-     return showToast('Please enter a whatsapp number')
+    if (!formData.whatsAppNumber) {
+      return showToast('Please enter a whatsapp number')
     }
 
     setUPdateLoading(true)
@@ -228,6 +238,8 @@ const BusinessDetails = () => {
     }
     const updatedBusinessDetails = {
       ...businessDetails,
+      businessName: formData?.businessName, 
+      category: formData?.category?._id??formData?.category,
       logo,
       address: {
         ...businessDetails.address,
@@ -242,7 +254,7 @@ const BusinessDetails = () => {
         primaryNumber: formData.primaryNumber,
         secondaryNumber: formData.secondaryNumber,
         website: formData.website,
-        email:formData.email
+        email: formData.email
       },
       description: formData.description
     };
@@ -253,8 +265,10 @@ const BusinessDetails = () => {
     patchApi("api/v1/business", updatedBusinessDetails)
       .then((result) => {
         if (result?.success) {
-          setBusinessDetails({ email: businessDetails?.email, ...updatedBusinessDetails });
-          dispatch(setBusinessData({ email: businessDetails?.email, ...updatedBusinessDetails }));
+          const category = allCategories.filter((item)=> item?._id===formData?.category?._id||item?._id===formData?.category)[0]
+          
+          setBusinessDetails({ category:category, ...updatedBusinessDetails });
+          dispatch(setBusinessData({category:category, ...updatedBusinessDetails }));
         }
         setUPdateLoading(false)
         handleCloseModal();
@@ -380,7 +394,7 @@ const BusinessDetails = () => {
                 {businessDetails?.address?.state}
               </p>
               <p className={` `}>
-               Email:{" "}
+                Email:{" "}
                 {businessDetails?.contactDetails?.email || (
                   <span className="text-red-500 text-sm">Not Available</span>
                 )}
@@ -567,7 +581,7 @@ const BusinessDetails = () => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center overflow-y-scroll top-0 pt-32 justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <div className="bg-white mt-56 mb-10 p-6 rounded-lg shadow-lg w-96 relative pt-10 ">
               {updateLoading &&
                 <div className="absolute  z-30 bg-white rounded-lg opacity-80 left-0 top-0 w-100 h-100 flex justify-center items-center ">
                   <Spinner className="z-50" variant="success" />
@@ -576,6 +590,20 @@ const BusinessDetails = () => {
                 Edit Contact & Location Details
               </h3>
               <div className="space-y-3">
+                <input
+                  type="text"
+                  name="businessName"
+                  value={formData?.businessName}
+                  onChange={handleChange}
+                  placeholder="Business Name"
+                  className="border border-gray-300 p-2 w-full rounded"
+                />
+                <select name="category" onChange={handleChange} className="border border-gray-300 p-2 w-full rounded">
+                  <option value={formData?.category?._id}>{formData?.category?.name}</option>
+                  {allCategories?.map((item) => (
+                    <option value={item._id}>{item?.name}</option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   name="buildingName"
@@ -796,9 +824,9 @@ const BusinessDetails = () => {
 
 export default BusinessDetails;
 
-const Twitter = ({ url,handleClick }) => {
+const Twitter = ({ url, handleClick }) => {
   return (
-    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
+    <a className="cursor-pointer" onClick={(() => handleClick(url))}>
       <svg
         className="w-10 h-10 "
         xmlns="http://www.w3.org/2000/svg"
@@ -825,9 +853,9 @@ z"
   );
 };
 
-const Facebook = ({ url,handleClick }) => {
+const Facebook = ({ url, handleClick }) => {
   return (
-    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
+    <a className="cursor-pointer" onClick={(() => handleClick(url))}>
       <svg
         className="w-8 h-8 "
         fill="#000000"
@@ -842,9 +870,9 @@ const Facebook = ({ url,handleClick }) => {
   );
 };
 
-const Instagram = ({ url,handleClick }) => {
+const Instagram = ({ url, handleClick }) => {
   return (
-    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
+    <a className="cursor-pointer" onClick={(() => handleClick(url))}>
       <svg
         width="27px"
         height="27px"
@@ -873,9 +901,9 @@ const Instagram = ({ url,handleClick }) => {
   );
 };
 
-const LinkedIn = ({ url,handleClick }) => {
+const LinkedIn = ({ url, handleClick }) => {
   return (
-    <a className="cursor-pointer" onClick={(()=>handleClick(url))}>
+    <a className="cursor-pointer" onClick={(() => handleClick(url))}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 50 50"
@@ -889,9 +917,9 @@ const LinkedIn = ({ url,handleClick }) => {
   );
 };
 
-const Youtube = ({ url ,handleClick}) => {
+const Youtube = ({ url, handleClick }) => {
   return (
-    <a className="cursor-pointer " onClick={(()=>handleClick(url))}>
+    <a className="cursor-pointer " onClick={(() => handleClick(url))}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 50 50"
