@@ -1,249 +1,262 @@
-import { useEffect, useRef, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-import Cropper from 'react-easy-crop'
-import { Button, Modal, Form, CloseButton } from 'react-bootstrap'
-import useBusiness from '../../api/useBusiness'
-import useImageUpload from '../../api/imageUpload/useImageUpload'
-import { toast } from 'sonner'
-import Pagination from '../Pagination'
-import getCroppedImg from '../../utils/cropper.utils'
-import FullPageLoader from '../FullPageLoader/FullPageLoader'
-import { TextField } from '@mui/material'
-import { handleWordExceeded } from '../../utils/appUtils'
-import { showToast } from '../../utils/notification'
+import { useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import Cropper from "react-easy-crop";
+import { Button, Modal, Form, CloseButton } from "react-bootstrap";
+import useBusiness from "../../api/useBusiness";
+import useImageUpload from "../../api/imageUpload/useImageUpload";
+import { toast } from "sonner";
+import Pagination from "../Pagination";
+import getCroppedImg from "../../utils/cropper.utils";
+import FullPageLoader from "../FullPageLoader/FullPageLoader";
+import { TextField } from "@mui/material";
+import { handleWordExceeded } from "../../utils/appUtils";
+import { showToast } from "../../utils/notification";
 
 const BasicServices = () => {
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
 
-  const [services, setServices] = useState([])
-  const [filteredServices, setFilteredServices] = useState([])
+  const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
 
-  const { imageLoading, uploadImage } = useImageUpload()
-  const { businesses, loading, getBusiness, updateBusiness } = useBusiness()
-  const [page, setPage] = useState(1)
-  const [reFetch, SetReFetch] = useState(false)
-  const limit = 10
+  const { imageLoading, uploadImage } = useImageUpload();
+  const { businesses, loading, getBusiness, updateBusiness } = useBusiness();
+  const [page, setPage] = useState(1);
+  const [reFetch, SetReFetch] = useState(false);
+  const limit = 10;
 
   useEffect(() => {
     const fetchBusiness = async () => {
-      await getBusiness()
-    }
-    fetchBusiness()
-  }, [])
+      await getBusiness();
+    };
+    fetchBusiness();
+  }, []);
   const resetCropper = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = '' // Clear the file input
+      fileInputRef.current.value = ""; // Clear the file input
     }
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (businesses) {
-          console.log(businesses)
-          setServices(businesses?.service?.data)
+          console.log(businesses);
+          setServices(businesses?.service?.data);
           setServiceData({
-            title: businesses?.service?.title ?? '',
-            description: businesses?.service?.description ?? '',
-          })
+            title: businesses?.service?.title ?? "",
+            description: businesses?.service?.description ?? "",
+          });
         }
       } catch (error) {
         console.error(
-          'Error fetching business details:',
-          error.message || error,
-        )
+          "Error fetching business details:",
+          error.message || error
+        );
       }
-    }
-    fetchData()
-  }, [businesses])
+    };
+    fetchData();
+  }, [businesses]);
 
   useEffect(() => {
     if (!services?.length) {
-      setFilteredServices([])
-      return
+      setFilteredServices([]);
+      return;
     }
 
-    const startIndex = (page - 1) * limit
-    const paginatedServices = services.slice(startIndex, startIndex + limit)
+    const startIndex = (page - 1) * limit;
+    const paginatedServices = services.slice(startIndex, startIndex + limit);
 
-    setFilteredServices(paginatedServices)
-  }, [services, page, limit])
+    setFilteredServices(paginatedServices);
+  }, [services, page, limit]);
 
-  const [showModal, setShowModal] = useState(false)
-  const [selectedService, setSelectedService] = useState(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [newService, setNewService] = useState({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
     image: null,
-  })
+    link: "",
+  });
 
   const [serviceData, setServiceData] = useState({
-    title: '',
-    description: '',
-  })
+    title: "",
+    description: "",
+  });
 
   const [updatedServices, setUpdatedServices] = useState({
-    _id: '',
-    title: '',
-    description: '',
+    _id: "",
+    title: "",
+    description: "",
     image: null,
-  })
+    link:''
+  });
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
-  const [isCropping, setIsCropping] = useState(false)
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isCropping, setIsCropping] = useState(false);
 
-  const [currentImage, setCurrentImage] = useState({ file: null, preview: null, image: null })
+  const [currentImage, setCurrentImage] = useState({
+    file: null,
+    preview: null,
+    image: null,
+  });
 
   const handleShowModal = (Servi) => {
-    setSelectedService(Servi)
+    setSelectedService(Servi);
     setUpdatedServices({
       _id: Servi._id,
       title: Servi.title,
       description: Servi.description,
       image: Servi.image,
-    })
-    setCurrentImage({ image: Servi.image }) // Initialize preview with current image
-    setShowModal(true)
-  }
+      link: Servi?.link,
+    });
+    setCurrentImage({ image: Servi.image }); // Initialize preview with current image
+    setShowModal(true);
+  };
 
   const handleCloseModal = () => {
-    setShowModal(false)
-    setSelectedService(null)
+    setShowModal(false);
+    setSelectedService(null);
     setUpdatedServices({
-      _id: '',
-      title: '',
-      description: '',
-      price: '',
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
       image: null,
-    })
-    setCurrentImage({ image: null, preview: null, file: null })
-  }
+    });
+    setCurrentImage({ image: null, preview: null, file: null });
+  };
 
   const handlePageChange = (page) => {
-    setPage(page)
-  }
+    setPage(page);
+  };
 
   const handleCreateCloseModal = () => {
-    setShowCreateModal(false)
+    setShowCreateModal(false);
     setNewService({
-      _id: '',
-      title: '',
-      description: '',
-      price: '',
+      _id: "",
+      title: "",
+      description: "",
+      price: "",
       image: null,
-    })
-  }
+    });
+  };
 
   const handleDeleteCloseModal = () => {
-    setShowDeleteModal(false)
-  }
+    setShowDeleteModal(false);
+  };
 
-  const handleShowCreateModal = () => setShowCreateModal(true)
+  const handleShowCreateModal = () => setShowCreateModal(true);
 
   const handleInputChange = async (e) => {
-    const { name, value, type } = e.target
-    if (type === 'file') {
-      const file = e.target.files[0]
+    const { name, value, type } = e.target;
+    if (type === "file") {
+      const file = e.target.files[0];
       if (file) {
         setUpdatedServices((prevServices) => ({
           ...prevServices,
           image: file, // Remove quotes here
-        }))
-        setCurrentImage((prev) => ({ ...prev, preview: URL.createObjectURL(file) }))
-        setIsCropping(true)
+        }));
+        setCurrentImage((prev) => ({
+          ...prev,
+          preview: URL.createObjectURL(file),
+        }));
+        setIsCropping(true);
       }
     } else {
       setUpdatedServices((prevServices) => ({
         ...prevServices,
         [name]: value,
-      }))
+      }));
     }
-  }
+  };
 
   const setServiceInputChange = (e) => {
     setServiceData((prev) => ({
       ...prev, // Spread the previous state to retain other properties
       [e.target.name]: e.target.value, // Dynamically set the property from the input name and value
-    }))
-  }
+    }));
+  };
 
   // Fix handleCreateInputChange similarly
   const handleCreateInputChange = async (e) => {
-    const { name, value, type } = e.target
-    if (type === 'file') {
-      const file = e.target.files[0]
+    const { name, value, type } = e.target;
+    if (type === "file") {
+      const file = e.target.files[0];
       if (file) {
-        setCurrentImage((prev) => ({ ...prev, preview: URL.createObjectURL(file) }))
-        setNewService((prevServices) => ({ ...prevServices, image: file }))
-        setIsCropping(true)
+        setCurrentImage((prev) => ({
+          ...prev,
+          preview: URL.createObjectURL(file),
+        }));
+        setNewService((prevServices) => ({ ...prevServices, image: file }));
+        setIsCropping(true);
       }
     } else {
-      setNewService((prevServices) => ({ ...prevServices, [name]: value }))
+      setNewService((prevServices) => ({ ...prevServices, [name]: value }));
     }
-  }
+  };
 
   const handleSaveChanges = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     console.log("updatedServices");
 
     if (!updatedServices?.title || !updatedServices?.description) {
       if (!updatedServices?.title) {
-        showToast('Please enter title ')
-        return
+        showToast("Please enter title ");
+        return;
       }
       if (!updatedServices?.description) {
-        showToast('Please enter description ')
-        return
+        showToast("Please enter description ");
+        return;
       }
     } else {
       if (handleWordExceeded(updatedServices?.title, 8)) {
-        showToast('Title cannot exceed 8 words ')
-        return
+        showToast("Title cannot exceed 8 words ");
+        return;
       }
       if (handleWordExceeded(updatedServices?.description, 50)) {
-        showToast('Description cannot exceed 50 words')
-        return
+        showToast("Description cannot exceed 50 words");
+        return;
       }
-      var imageAccessUrl = currentImage?.image
+      var imageAccessUrl = currentImage?.image;
       if (currentImage?.file) {
-        const data = await uploadImage(currentImage?.file, 'service')
-        imageAccessUrl = data?.accessLink
+        const data = await uploadImage(currentImage?.file, "service");
+        imageAccessUrl = data?.accessLink;
         setUpdatedServices((prevService) => ({
           ...prevService,
           image: imageAccessUrl, // Remove quotes here
-        }))
-        updatedServices.image = imageAccessUrl
+        }));
+        updatedServices.image = imageAccessUrl;
       }
       const updatedService = services.map((Servi) =>
-        Servi._id === updatedServices._id ? updatedServices : Servi,
-      )
-      setServices(updatedService)
+        Servi._id === updatedServices._id ? updatedServices : Servi
+      );
+      setServices(updatedService);
       const updatedData = {
         ...businesses,
         service: {
           ...businesses?.service,
           data: [...updatedService],
         },
-      }
-      console.log(updatedData, '')
-      await updateBusiness(updatedData)
-      setCurrentImage({ file: null, preview: null, image: null })
-      console.log(updatedData, 'updatedData')
-      handleCloseModal()
+      };
+      console.log(updatedData, "");
+      await updateBusiness(updatedData);
+      setCurrentImage({ file: null, preview: null, image: null });
+      console.log(updatedData, "updatedData");
+      handleCloseModal();
     }
-  }
+  };
 
   const handleDeleteServices = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
       const updatedServices = await services?.filter(
-        (ser) => ser?._id !== selectedService?._id,
-      )
+        (ser) => ser?._id !== selectedService?._id
+      );
 
       const updatedService = {
         ...businesses,
@@ -251,55 +264,54 @@ const BasicServices = () => {
           ...(businesses?.service ?? []),
           data: updatedServices,
         },
-      }
+      };
 
-      await updateBusiness(updatedService)
-      setServices(updatedServices)
-      handleDeleteCloseModal()
+      await updateBusiness(updatedService);
+      setServices(updatedServices);
+      handleDeleteCloseModal();
     } catch (error) {
-      console.log(error, 'error')
+      console.log(error, "error");
     }
-  }
+  };
   const handleCreateService = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!newService?.title || !newService?.description) {
       if (!newService?.title) {
-        showToast('Please enter title ')
+        showToast("Please enter title ");
       }
       if (!newService?.description) {
-        showToast('Please enter description ')
+        showToast("Please enter description ");
       }
-
     } else {
       if (handleWordExceeded(newService?.title, 8)) {
-        showToast('Title cannot exceed 8 words ')
-        return
+        showToast("Title cannot exceed 8 words ");
+        return;
       }
       if (handleWordExceeded(newService?.description, 50)) {
-        showToast('Description cannot exceed 50 words')
-        return
+        showToast("Description cannot exceed 50 words");
+        return;
       }
       try {
-        let imgAccessUrl = null
+        let imgAccessUrl = null;
         if (currentImage?.file) {
-          const data = await uploadImage(currentImage?.file, 'service')
-          imgAccessUrl = data?.accessLink
+          const data = await uploadImage(currentImage?.file, "service");
+          imgAccessUrl = data?.accessLink;
         }
 
-        const newServices = businesses?.service?.data || []
+        const newServices = businesses?.service?.data || [];
         await newServices.push({
           ...newService,
           image: imgAccessUrl,
-        })
+        });
 
         await newServices?.map((p) => {
-          if (!p?._id || p._id === '') {
-            delete p._id // Remove the _id property
-            return p // Return the updated object
+          if (!p?._id || p._id === "") {
+            delete p._id; // Remove the _id property
+            return p; // Return the updated object
           } else {
-            return p // Return the object unchanged
+            return p; // Return the object unchanged
           }
-        })
+        });
         // Prepare updated business data immutably
         const updatedData = {
           ...businesses,
@@ -307,28 +319,27 @@ const BasicServices = () => {
             ...(businesses?.service ?? []),
             data: newServices,
           },
-        }
-        await updateBusiness(updatedData)
-        handleCreateCloseModal()
+        };
+        await updateBusiness(updatedData);
+        handleCreateCloseModal();
       } catch (error) {
-        console.log(error, 'error ---------------------')
-        toast.error('Something went wrong , please try again!')
+        console.log(error, "error ---------------------");
+        toast.error("Something went wrong , please try again!");
       }
     }
-
-  }
+  };
 
   const handleServiceMainSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (handleWordExceeded(serviceData?.title, 8)) {
-      showToast('Title cannot exceed 8 words ')
-      return
+      showToast("Title cannot exceed 8 words ");
+      return;
     }
     if (handleWordExceeded(serviceData?.description, 50)) {
-      showToast('Description cannot exceed 50 words')
-      return
+      showToast("Description cannot exceed 50 words");
+      return;
     }
-    e.preventDefault()
+    e.preventDefault();
     const updatedData = {
       ...businesses,
       service: {
@@ -336,26 +347,26 @@ const BasicServices = () => {
         description: serviceData?.description,
         data: services,
       },
-    }
+    };
 
-    updateBusiness(updatedData)
-  }
+    updateBusiness(updatedData);
+  };
 
   const handleSearchChange = useDebouncedCallback((value) => {
     if (!value?.trim()) {
-      setFilteredServices(services)
-      return
+      setFilteredServices(services);
+      return;
     } // Exit if value is empty or only whitespace
 
     const filteredServices = services?.filter(
       (ser) =>
         ser?.title?.toLowerCase().includes(value.toLowerCase()) ||
-        ser?.description?.toLowerCase().includes(value.toLowerCase()),
-    )
+        ser?.description?.toLowerCase().includes(value.toLowerCase())
+    );
 
     // Assuming you have a state or method to handle filtered results
-    setFilteredServices(filteredServices)
-  }, 500)
+    setFilteredServices(filteredServices);
+  }, 500);
 
   if (loading) {
     return (
@@ -364,7 +375,7 @@ const BasicServices = () => {
           <FullPageLoader />
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -380,17 +391,22 @@ const BasicServices = () => {
           >
             Add Service
           </button>
-          <Modal show={showCreateModal} onHide={(() => {
-            handleCreateCloseModal()
-            setCurrentImage({ image: null, preview: null, file: null })
-          })}>
+          <Modal
+            show={showCreateModal}
+            onHide={() => {
+              handleCreateCloseModal();
+              setCurrentImage({ image: null, preview: null, file: null });
+            }}
+          >
             <Form onSubmit={handleCreateService}>
-              <Modal.Header >
+              <Modal.Header>
                 <Modal.Title>Add Service</Modal.Title>
-                <CloseButton onClick={(() => {
-                  handleCreateCloseModal()
-                  setCurrentImage({ image: null, preview: null, file: null })
-                })} />
+                <CloseButton
+                  onClick={() => {
+                    handleCreateCloseModal();
+                    setCurrentImage({ image: null, preview: null, file: null });
+                  }}
+                />
               </Modal.Header>
               <Modal.Body>
                 <Form.Group controlId="formTitle">
@@ -405,7 +421,11 @@ const BasicServices = () => {
                     value={newService?.title}
                     onChange={handleCreateInputChange}
                     error={handleWordExceeded(newService?.title, 8)}
-                    helperText={handleWordExceeded(newService?.title, 8) ? "exceeded the limit" : ""}
+                    helperText={
+                      handleWordExceeded(newService?.title, 8)
+                        ? "exceeded the limit"
+                        : ""
+                    }
                     className="my-4"
                   />
                 </Form.Group>
@@ -423,13 +443,30 @@ const BasicServices = () => {
                     value={newService?.description}
                     onChange={handleCreateInputChange}
                     error={handleWordExceeded(newService?.description, 50)}
-                    helperText={handleWordExceeded(newService?.description, 50) ? "exceeded the limit" : ""}
+                    helperText={
+                      handleWordExceeded(newService?.description, 50)
+                        ? "exceeded the limit"
+                        : ""
+                    }
                     className="mb-4"
+                  />
+                </Form.Group>
+                <Form.Group controlId="formLink">
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Link"
+                    id="link"
+                    name="link"
+                    autoComplete="link"
+                    value={newService?.link}
+                    onChange={handleCreateInputChange}
+                    className="my-4"
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image <span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
+                    Image <span style={{ color: "grey" }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
                     required
@@ -445,8 +482,8 @@ const BasicServices = () => {
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
-                        objectFit: 'cover',
-                        marginInline: 'auto',
+                        objectFit: "cover",
+                        marginInline: "auto",
                       }}
                     />
                   )}
@@ -456,7 +493,7 @@ const BasicServices = () => {
                 <Button variant="dark" onClick={handleCreateCloseModal}>
                   Close
                 </Button>
-                <Button type='submit' variant="success" >
+                <Button type="submit" variant="success">
                   Add Service
                 </Button>
               </Modal.Footer>
@@ -468,7 +505,7 @@ const BasicServices = () => {
         <form
           onSubmit={handleServiceMainSubmit}
           className="bg-white p-4 border shadow-lg border-gray-400 rounded-md mb-6"
-          style={{ maxWidth: '65rem', width: '100%' }}
+          style={{ maxWidth: "65rem", width: "100%" }}
         >
           <div className="flex flex-col space-y-4">
             {/* Title Input */}
@@ -485,10 +522,13 @@ const BasicServices = () => {
               value={serviceData?.title}
               onChange={setServiceInputChange}
               error={handleWordExceeded(serviceData?.title, 8)}
-              helperText={handleWordExceeded(serviceData?.title, 8) ? "exceeded the limit" : ""}
+              helperText={
+                handleWordExceeded(serviceData?.title, 8)
+                  ? "exceeded the limit"
+                  : ""
+              }
               className="mb-4"
             />
-
 
             {/* Description Input */}
             <TextField
@@ -503,7 +543,11 @@ const BasicServices = () => {
               value={serviceData?.description}
               onChange={setServiceInputChange}
               error={handleWordExceeded(serviceData?.description, 50)}
-              helperText={handleWordExceeded(serviceData?.description, 50) ? "exceeded the limit" : ""}
+              helperText={
+                handleWordExceeded(serviceData?.description, 50)
+                  ? "exceeded the limit"
+                  : ""
+              }
               className="mb-4"
               rows={8}
             />
@@ -513,7 +557,7 @@ const BasicServices = () => {
             <button
               type="submit"
               className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
-              style={{ backgroundColor: '#105193' }}
+              style={{ backgroundColor: "#105193" }}
             >
               Update Details
             </button>
@@ -528,7 +572,7 @@ const BasicServices = () => {
               className="p-2 lg:w-[250px] w-full appearance-none bg-white border border-gray-400 rounded-3xl"
               placeholder="Search by title,description"
               onChange={(e) => {
-                handleSearchChange(e.target.value)
+                handleSearchChange(e.target.value);
               }}
             />
           </span>
@@ -555,6 +599,10 @@ const BasicServices = () => {
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Description
             </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Link
+            </th>
+
             <th className="px-4 py-4 text-left">Action</th>
           </tr>
         </thead>
@@ -573,7 +621,7 @@ const BasicServices = () => {
                   <td className="px-4 py-2 border-r border-gray-400">
                     <img
                       alt="img"
-                      src={splServices?.image ?? 't'}
+                      src={splServices?.image ?? "t"}
                       className="w-14 h-14 rounded-full mr-2 mt-2"
                     />
                   </td>
@@ -589,9 +637,14 @@ const BasicServices = () => {
                     </div>
                   </td>
                   <td className="px-4 py-2 border-r border-gray-400">
+                    <div className="flex -space-x-2">
+                      <a href={splServices?.link}>{splServices?.link}</a>
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
                     <button
                       onClick={(e) => {
-                        handleShowModal(splServices)
+                        handleShowModal(splServices);
                       }}
                     >
                       <img
@@ -602,8 +655,8 @@ const BasicServices = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setShowDeleteModal(true)
-                        setSelectedService(splServices)
+                        setShowDeleteModal(true);
+                        setSelectedService(splServices);
                       }}
                     >
                       <img
@@ -614,25 +667,29 @@ const BasicServices = () => {
                     </button>
                   </td>
                 </tr>
-              )
+              );
             }
           })}
 
           {/* Edit Service Modal */}
-          <Modal show={showModal} onHide={(() => {
-            handleCloseModal()
-            setCurrentImage({ image: null, preview: null, file: null })
-          })}>
+          <Modal
+            show={showModal}
+            onHide={() => {
+              handleCloseModal();
+              setCurrentImage({ image: null, preview: null, file: null });
+            }}
+          >
             <Form onSubmit={handleSaveChanges}>
-              <Modal.Header >
+              <Modal.Header>
                 <Modal.Title>Edit Special Services</Modal.Title>
-                <CloseButton onClick={(() => {
-                  handleCloseModal()
-                  setCurrentImage({ image: null, preview: null, file: null })
-                })} />
+                <CloseButton
+                  onClick={() => {
+                    handleCloseModal();
+                    setCurrentImage({ image: null, preview: null, file: null });
+                  }}
+                />
               </Modal.Header>
               <Modal.Body>
-
                 <TextField
                   variant="outlined"
                   required
@@ -645,7 +702,11 @@ const BasicServices = () => {
                   value={updatedServices?.title}
                   onChange={handleInputChange}
                   error={handleWordExceeded(updatedServices?.title, 8)}
-                  helperText={handleWordExceeded(updatedServices?.title, 8) ? "exceeded the limit" : ""}
+                  helperText={
+                    handleWordExceeded(updatedServices?.title, 8)
+                      ? "exceeded the limit"
+                      : ""
+                  }
                   className="mb-4"
                 />
                 {/* Description Input */}
@@ -661,13 +722,29 @@ const BasicServices = () => {
                   value={updatedServices?.description}
                   onChange={handleInputChange}
                   error={handleWordExceeded(updatedServices?.description, 50)}
-                  helperText={handleWordExceeded(updatedServices?.description, 50) ? "exceeded the limit" : ""}
+                  helperText={
+                    handleWordExceeded(updatedServices?.description, 50)
+                      ? "exceeded the limit"
+                      : ""
+                  }
                   className="mb-4"
                   rows={6}
                 />
+
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="Link"
+                  id="link"
+                  name="link"
+                  autoComplete="link"
+                  value={updatedServices?.link}
+                  onChange={handleInputChange}
+                  className="my-4"
+                />
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image<span style={{ color: 'grey' }}>(Ratio 16 : 8)</span>
+                    Image<span style={{ color: "grey" }}>(Ratio 16 : 8)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -682,8 +759,8 @@ const BasicServices = () => {
                       alt="Image Preview"
                       className="mt-3 w-1/2 h-auto mx-auto "
                       style={{
-                        objectFit: 'cover',
-                        marginInline: 'auto',
+                        objectFit: "cover",
+                        marginInline: "auto",
                       }}
                     />
                   )}
@@ -693,7 +770,7 @@ const BasicServices = () => {
                 <Button variant="dark" onClick={handleCloseModal}>
                   Close
                 </Button>
-                <Button type='submit' variant="success" >
+                <Button type="submit" variant="success">
                   Save changes
                 </Button>
               </Modal.Footer>
@@ -727,21 +804,27 @@ const BasicServices = () => {
           onPageChange={handlePageChange}
         />
       </div>
-      <Modal show={isCropping} onHide={(() => {
-        resetCropper()
-        setIsCropping(false)
-      })}>
-        <Modal.Header >
+      <Modal
+        show={isCropping}
+        onHide={() => {
+          resetCropper();
+          setIsCropping(false);
+        }}
+      >
+        <Modal.Header>
           <Modal.Title>Crop Image</Modal.Title>
-          <CloseButton onClick={(() => {
-            resetCropper()
-            setIsCropping(false)
-          })} />
+          <CloseButton
+            onClick={() => {
+              resetCropper();
+              setIsCropping(false);
+            }}
+          />
         </Modal.Header>
         <Modal.Body>
           <div
             className="crop-container position-relative"
-            style={{ height: '400px' }} >
+            style={{ height: "400px" }}
+          >
             <Cropper
               image={currentImage?.preview}
               crop={crop}
@@ -750,7 +833,7 @@ const BasicServices = () => {
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {
-                setCroppedAreaPixels(croppedAreaPixels)
+                setCroppedAreaPixels(croppedAreaPixels);
               }}
             />
           </div>
@@ -760,15 +843,15 @@ const BasicServices = () => {
             onClick={async () => {
               const { blob, fileUrl } = await getCroppedImg(
                 currentImage?.preview,
-                croppedAreaPixels,
-              )
+                croppedAreaPixels
+              );
               setCurrentImage((prev) => ({
                 ...prev,
                 preview: fileUrl,
                 image: fileUrl,
                 file: blob,
-              }))
-              setIsCropping(false)
+              }));
+              setIsCropping(false);
             }}
           >
             Crop & Save
@@ -776,7 +859,7 @@ const BasicServices = () => {
         </Modal.Footer>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default BasicServices
+export default BasicServices;

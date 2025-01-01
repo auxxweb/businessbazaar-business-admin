@@ -46,6 +46,7 @@ const Judges = () => {
     description: '',
     price: null,
     image: null,
+    link:''
   })
   const [imageCreatePreview, setImageCreatePreview] = useState('')
   const [imageFile, setImageFile] = useState(null)
@@ -56,6 +57,7 @@ const Judges = () => {
     description: '',
     price: '',
     image: null,
+    link:''
   })
   const [imagePreview, setImagePreview] = useState('')
 
@@ -148,6 +150,7 @@ const Judges = () => {
       description: product.description,
       price: product.price,
       image: product.image,
+      link: product.link,
     })
     setCurrentImage({ preview: product.image, image: product.image }) // Initialize preview with current image
     setShowModal(true)
@@ -462,6 +465,22 @@ const Judges = () => {
                   className="mb-4"
                 />
               </Form.Group>
+
+              <Form.Group controlId="formLink" className='mt-3'>
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Link"
+                    id="link"
+                    name="link"
+                    autoComplete="link"
+                    value={newProduct?.link}
+                    onChange={handleCreateInputChange}
+                    className="my-4"
+                  />
+                </Form.Group>
+
+
               {/* Image Upload Field */}
               <Form.Group controlId="formImage" className="mt-3">
                 <Form.Label>
@@ -587,6 +606,9 @@ const Judges = () => {
                 Price
               </th>
               <th className="px-4 py-4 text-left border-r border-gray-400">
+                Link
+              </th>
+              <th className="px-4 py-4 text-left border-r border-gray-400">
                 Actions
               </th>
             </tr>
@@ -616,6 +638,11 @@ const Judges = () => {
                   </td>
                   <td className="px-4 py-4 text-left border-r border-gray-400">
                     {product?.price}
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <div className="flex -space-x-2">
+                      <a href={product?.link}>{product?.link}</a>
+                    </div>
                   </td>
                   <td className="px-4 py-4 text-left border-r border-gray-400">
                     <button
@@ -705,6 +732,21 @@ const Judges = () => {
                 className="mb-4"
               />
             </Form.Group>
+
+            <Form.Group controlId="formLink" className='mt-3'>
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Link"
+                    id="link"
+                    name="link"
+                    autoComplete="link"
+                    value={updatedProduct?.link}
+                    onChange={handleInputChange}
+                    className="mb-4"
+                  />
+                </Form.Group>
+
             <Form.Group controlId="formImage" className="mt-3">
               <Form.Label>
                 Image <span style={{ color: 'grey' }}>(Ratio 1 : 1)</span>
