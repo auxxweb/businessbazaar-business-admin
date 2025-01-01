@@ -77,6 +77,7 @@ const SpecialServices = () => {
     title: '',
     description: '',
     image: null,
+    link:""
   })
   const [currentImage, setCurrentImage] = useState({ image: null, preview: null, file: null })
 
@@ -90,6 +91,7 @@ const SpecialServices = () => {
     title: '',
     description: '',
     image: null,
+    link:""
   })
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -105,6 +107,7 @@ const SpecialServices = () => {
       title: serviceData.title,
       description: serviceData.description,
       image: serviceData.image,
+      link:serviceData?.link
     })
     setCurrentImage(((prev) => ({ ...prev, image: serviceData.image })))
     setShowModal(true)
@@ -436,6 +439,19 @@ const SpecialServices = () => {
                     className="mb-4"
                   />
                 </Form.Group>
+                <Form.Group controlId="formLink">
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Link"
+                    id="link"
+                    name="link"
+                    autoComplete="link"
+                    value={newService?.link}
+                    onChange={handleCreateInputChange}
+                    className="my-4"
+                  />
+                </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
                     Image <span style={{ color: 'grey' }}>(Ratio 4 : 3)</span>
@@ -550,9 +566,13 @@ const SpecialServices = () => {
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Title
             </th>
+          
             {/* <th className="px-4 py-4 text-left border-r border-gray-400">ID</th> */}
             <th className="px-4 py-4 text-left border-r border-gray-400">
               Description
+            </th>
+            <th className="px-4 py-4 text-left border-r border-gray-400">
+              Link
             </th>
             <th className="px-4 py-4 text-left">Action</th>
           </tr>
@@ -585,6 +605,11 @@ const SpecialServices = () => {
                   <td className="px-4 py-2 border-r border-gray-400">
                     <div className="flex -space-x-2">
                       {splServices?.description}
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 border-r border-gray-400">
+                    <div className="flex -space-x-2">
+                      <a href={splServices?.link}>{splServices?.link}</a>
                     </div>
                   </td>
                   <td className="px-4 py-2 border-r border-gray-400">
@@ -657,6 +682,19 @@ const SpecialServices = () => {
                     error={handleWordExceeded(updatedServices?.description, 50)}
                     helperText={handleWordExceeded(updatedServices?.description, 50) ? "exceeded the limit" : ""}
                     className="mb-4"
+                  />
+                </Form.Group>
+                <Form.Group controlId="formLink">
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Link"
+                    id="link"
+                    name="link"
+                    autoComplete="link"
+                    value={updatedServices?.link}
+                    onChange={handleInputChange}
+                    className="my-4"
                   />
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
