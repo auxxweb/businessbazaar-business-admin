@@ -466,7 +466,7 @@ const BasicServices = () => {
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image <span style={{ color: "grey" }}>(Ratio 16 : 8)</span>
+                    Image <span style={{ color: "grey" }}>(Ratio 3 : 4)</span>
                   </Form.Label>
                   <Form.Control
                     required
@@ -744,7 +744,7 @@ const BasicServices = () => {
                 />
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image<span style={{ color: "grey" }}>(Ratio 16 : 8)</span>
+                    Image<span style={{ color: "grey" }}>(Ratio 3 : 4)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -829,7 +829,7 @@ const BasicServices = () => {
               image={currentImage?.preview}
               crop={crop}
               zoom={zoom}
-              aspect={16 / 8} // Adjust aspect ratio as needed
+              aspect={4 / 5} // Adjust aspect ratio as needed
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {
