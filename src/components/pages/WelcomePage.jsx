@@ -157,7 +157,7 @@ export default function WelcomePage() {
             htmlFor="image"
             className="block text-gray-700 text-sm font-medium mb-1"
           >
-            Image <span style={{ color: "grey" }}>(Ratio 5 : 7)</span>
+            Image <span style={{ color: "grey" }}>(Ratio 7 : 5)</span>
           </label>
           <input
             type="file"
@@ -207,7 +207,7 @@ export default function WelcomePage() {
               image={currentImage.preview}
               crop={crop}
               zoom={zoom}
-              aspect={5 / 7}
+              aspect={7 / 5}
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {

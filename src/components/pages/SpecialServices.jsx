@@ -454,7 +454,7 @@ const SpecialServices = () => {
                 </Form.Group>
                 <Form.Group controlId="formImage" className="mt-3">
                   <Form.Label>
-                    Image <span style={{ color: 'grey' }}>(Ratio 4 : 3)</span>
+                    Image <span style={{ color: 'grey' }}>(Ratio 3 : 4)</span>
                   </Form.Label>
                   <Form.Control
                     type="file"
@@ -777,7 +777,7 @@ const SpecialServices = () => {
               image={currentImage.preview}
               crop={crop}
               zoom={zoom}
-              aspect={4 / 5} // Adjust aspect ratio as needed
+              aspect={3 / 4} // Adjust aspect ratio as needed
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={(croppedArea, croppedAreaPixels) => {

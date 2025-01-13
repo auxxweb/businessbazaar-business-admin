@@ -30,6 +30,7 @@ import Gallery from "../pages/Gallery";
 import Plans from "../pages/Plans";
 import PreviewTemplates from "../pages/PreviewTemplates";
 import Razorpay from "../Razorpay/Razorpay";
+import SeoDetails from "../SeoDetails";
 
 function ContentArea() {
   const [token, setToken] = useState(null);
@@ -58,6 +59,7 @@ function ContentArea() {
     { path: "/products", element: <Judges />, protected: true },
     { path: "/judges/:id", element: <JudgeDetails />, protected: true },
     { path: "/special-services", element: <SpecialServices />, protected: true },
+    { path: "/seo-details", element: <SeoDetails />, protected: true },
     { path: "/services", element: <BasicServices />, protected: true },
     { path: "/participants/:id", element: <ParticipantDetails />, protected: true },
     { path: "/questions/:id", element: <QuestionDetails />, protected: true },

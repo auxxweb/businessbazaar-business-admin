@@ -301,6 +301,38 @@ function Sidebar({ isOpen, setIsOpen }) {
           </span>
         </div>
 
+
+        <div
+          onClick={() => navigate("/seo-details")}
+          className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "seo-details"
+            ? "text-[#d4e0ec]"
+            : "text-[#909294]"
+            }  hover:text-[#d4e0ec]`}>
+          <span className="flex items-center ml-2">
+          <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={
+                location?.pathname?.split("/")[1] === "seo-details"
+                  ? "#107D93"
+                  : "currentColor"
+              }
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4 3H20C20.55 3 21 3.45 21 4V17C21 18.65 19.65 20 18 20H6C4.35 20 3 18.65 3 17V4C3 3.45 3.45 3 4 3ZM19 5H5V17C5 17.55 5.45 18 6 18H18C18.55 18 19 17.55 19 17V5ZM7 7H13C13.55 7 14 7.45 14 8C14 8.55 13.55 9 13 9H7C6.45 9 6 8.55 6 8C6 7.45 6.45 7 7 7ZM7 11H17C17.55 11 18 11.45 18 12C18 12.55 17.55 13 17 13H7C6.45 13 6 12.55 6 12C6 11.45 6.45 11 7 11ZM7 15H17C17.55 15 18 15.45 18 16C18 16.55 17.55 17 17 17H7C6.45 17 6 16.55 6 16C6 15.45 6.45 15 7 15Z"
+                fill={
+                  location?.pathname?.split("/")[1] === "seo-details"
+                    ? "#107D93"
+                    : "currentColor"
+                }
+              />
+            </svg>
+
+            <span className="text-custom-16 ml-4">Seo-Details</span>
+          </span>
+        </div>
+
         <div
           onClick={() => navigate("/subscription")}
           className={`cursor-pointer flex items-center ${location?.pathname?.split("/")[1] === "subscription"
