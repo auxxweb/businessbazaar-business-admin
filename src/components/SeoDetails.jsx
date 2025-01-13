@@ -5,28 +5,20 @@ import { useSEO } from "../api/useSEO";
 import { toast } from "sonner";
 
 const SeoDetails = () => {
-  const fixedSocialMediaLinks = [
-    { tag: "instagram", link: "" },
-    { tag: "facebook", link: "" },
-    { tag: "twitter", link: "" },
-    { tag: "youtube", link: "" },
-    { tag: "linkedin", link: "" },
-  ];
-
   const [seoData, setSeoData] = useState({
     title: "",
     description: "",
     metaTags: [],
+    newTag: "", // Tracks the current input for a new meta tag
   });
 
-  const [socialMediaLinks, setSocialMediaLinks] = useState(fixedSocialMediaLinks);
   const [loading, setLoading] = useState(false);
 
   const { seoDetails, updateSeoDetails, getSeoDetails } = useSEO();
 
   useEffect(() => {
     const fetchSeo = async () => {
-      await getSeoDetails(); // Fetch initial data
+      await getSeoDetails(); // Fetch initial SEO details
     };
     fetchSeo();
   }, []);
@@ -34,23 +26,12 @@ const SeoDetails = () => {
   useEffect(() => {
     if (seoDetails?.seoData) {
       const { title, description, metaTags } = seoDetails.seoData;
-
-      // Update SEO data
       setSeoData({
         title: title || "",
         description: description || "",
         metaTags: metaTags || [],
+        newTag: "", // Reset the new tag input
       });
-
-      // Map metaTags URLs to fixedSocialMediaLinks
-      const updatedSocialMediaLinks = fixedSocialMediaLinks.map((fixed, index) => {
-        return {
-          tag: fixed.tag,
-          link: metaTags[index] || "", // Match index directly from metaTags array
-        };
-      });
-
-      setSocialMediaLinks(updatedSocialMediaLinks);
     }
   }, [seoDetails]);
 
@@ -58,29 +39,33 @@ const SeoDetails = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Extract links to save in metaTags
-      const updatedMetaTags = socialMediaLinks.map((link) => link.link);
-      const updatedSeoData = { ...seoData, metaTags: updatedMetaTags };
-
+      // Filter out empty meta tags
+      const filteredMetaTags = seoData.metaTags.filter(
+        (tag) => tag.trim() !== ""
+      );
 
       const updatedData = {
         ...seoDetails,
-        seoData: updatedSeoData, // Directly replace seoData
+        seoData: {
+          ...seoData,
+          metaTags: filteredMetaTags,
+        },
       };
+
       await updateSeoDetails(updatedData);
-      toast.success("Business Updated successfully", {
+      toast.success("SEO details updated successfully!", {
         theme: "colored",
-        position: "top-right", // Position the toast at the top-center of the screen
+        position: "top-right",
         style: {
-          backgroundColor: "green", // Custom green background color for success
-          color: "#FFFFFF", // White text
-          height: "60px", // Set a higher height for the toast
-          fontSize: "14px", // Increase font size for better readability
+          backgroundColor: "green",
+          color: "#FFFFFF",
+          height: "60px",
+          fontSize: "14px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          textAlign: "center"
-        }
+          textAlign: "center",
+        },
       });
     } catch (error) {
       console.error("Error updating SEO details:", error);
@@ -90,78 +75,116 @@ const SeoDetails = () => {
     }
   };
 
+  const handleAddMetaTag = () => {
+    if (seoData.newTag.trim() !== "") {
+      setSeoData((prev) => ({
+        ...prev,
+        metaTags: [...prev.metaTags, prev.newTag],
+        newTag: "", // Clear the input field
+      }));
+    }
+  };
+
+  const handleRemoveMetaTag = (index) => {
+    setSeoData((prev) => ({
+      ...prev,
+      metaTags: prev.metaTags.filter((_, i) => i !== index),
+    }));
+  };
+
   return (
+    <div>
+      <form
+        onSubmit={handleSeoSubmit}
+        className="bg-white p-4 border shadow-lg border-gray-400 rounded-md mb-6 mx-auto"
+        style={{ maxWidth: "38rem", width: "100%" }}
+      >
+        <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+          Edit SEO Details
+        </h2>
+        <div className="flex flex-col space-y-4">
+          {/* Title Input */}
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            label="Title"
+            name="title"
+            value={seoData.title}
+            onChange={(e) =>
+              setSeoData({ ...seoData, title: e.target.value })
+            }
+          />
 
-    <div >
-      <h1 className="">SEO Details</h1>
-   
-    <form
-      onSubmit={handleSeoSubmit}
-      className="bg-white p-4 border shadow-lg border-gray-400 rounded-md mb-6"
-      style={{ maxWidth: "65rem", width: "100%" }}
-    >
-      <div className="flex flex-col space-y-4">
-        {/* Title Input */}
-        <TextField
-          variant="outlined"
-          required
-          fullWidth
-          label="Title"
-          name="title"
-          value={seoData.title}
-          onChange={(e) => setSeoData({ ...seoData, title: e.target.value })}
-        />
+          {/* Description Input */}
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            multiline
+            rows={5}
+            label="Description"
+            name="description"
+            value={seoData.description}
+            onChange={(e) =>
+              setSeoData({ ...seoData, description: e.target.value })
+            }
+          />
 
-        {/* Description Input */}
-        <TextField
-          variant="outlined"
-          required
-          fullWidth
-          multiline
-          rows={5}
-          label="Description"
-          name="description"
-          value={seoData.description}
-          onChange={(e) =>
-            setSeoData({ ...seoData, description: e.target.value })
-          }
-        />
+          {/* Meta Tags */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Meta Tags</h3>
+            <div className="flex items-center space-x-4 mb-4">
+              <TextField
+                fullWidth
+                placeholder="Add a meta tag"
+                value={seoData.newTag}
+                onChange={(e) =>
+                  setSeoData({ ...seoData, newTag: e.target.value })
+                }
+              />
+              <button
+                type="button"
+                onClick={handleAddMetaTag}
+                className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                style={{ backgroundColor: "#105193" }}
+              >
+                Add
+              </button>
+            </div>
+            {seoData.metaTags.map((tag, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between px-4 py-2 bg-blue-100 rounded mb-2"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => handleRemoveMetaTag(index)}
+                >
+                  &#x2715; {/* 'X' icon for deletion */}
+                </button>
+              </div>
+            ))}
+          </div>
 
-        {/* Social Media Links */}
-        <div>
-          {socialMediaLinks.map((link, index) => (
-            <TextField
-              key={index}
-              fullWidth
-              label={`${link.tag.charAt(0).toUpperCase() + link.tag.slice(1)} Link`}
-              placeholder={`Enter ${link.tag} link`}
-              value={link.link}
-              onChange={(e) => {
-                const updatedLinks = [...socialMediaLinks];
-                updatedLinks[index].link = e.target.value;
-                setSocialMediaLinks(updatedLinks);
-              }}
-              className="my-2"
-            />
-          ))}
+          {/* Submit Button */}
+          <div className="mt-4 flex justify-end">
+            {loading ? (
+              <Spinner variant="primary" />
+            ) : (
+              <button
+                type="submit"
+                className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
+                style={{ backgroundColor: "#105193" }}
+              >
+                Save Changes
+              </button>
+            )}
+          </div>
         </div>
-
-        {/* Submit Button */}
-        <div className="mt-4 flex justify-end">
-          {loading ? (
-            <Spinner variant="primary" />
-          ) : (
-            <button
-              type="submit"
-              className="px-6 py-2 text-white rounded-md shadow hover:bg-blue-600"
-              style={{ backgroundColor: "#105193" }}
-            >
-              Save & Next
-            </button>
-          )}
-        </div>
-      </div>
-    </form>
+      </form>
     </div>
   );
 };
