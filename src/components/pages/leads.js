@@ -8,11 +8,15 @@ import Pagination from "../Pagination";
 
 const Zones = () => {
   const { leads, loading, totalLeads, fetchLeads } = useLeads();
+ 
+  
 
   const [searchValue, setSearchValue] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10; 
+
+  console.log(Math.ceil(totalLeads / limit),"apple", totalLeads);
 
   const handleSearchChange = useDebouncedCallback(
     // function
@@ -124,7 +128,7 @@ const Zones = () => {
           itemsPerPage={10}
           currentPage={currentPage}
           onPageChange={handlePageChange}
-          totalPages={Math.ceil(totalLeads / limit)}
+          totalItems={totalLeads}
         />
       </div>
     </>
