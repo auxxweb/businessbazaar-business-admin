@@ -79,6 +79,7 @@ const BusinessDetails = () => {
     buildingName: businessDetails?.address?.buildingName || "",
     streetName: businessDetails?.address?.streetName || "",
     landmark: businessDetails?.address?.landMark || "",
+    city:businessDetails?.address?.city || "",
     state: businessDetails?.address?.state || "",
     whatsAppNumber: businessDetails?.contactDetails?.whatsAppNumber || "",
     primaryNumber: businessDetails?.contactDetails?.primaryNumber || "",
@@ -130,6 +131,7 @@ const BusinessDetails = () => {
       category: businessDetails?.category,
       buildingName: businessDetails?.address?.buildingName,
       streetName: businessDetails?.address?.streetName,
+      city:businessDetails?.address?.city,
       landmark: businessDetails?.address?.landMark,
       state: businessDetails?.address?.state,
       whatsAppNumber: businessDetails?.contactDetails?.whatsAppNumber,
@@ -219,6 +221,9 @@ const BusinessDetails = () => {
     if (!formData.streetName) {
       return showToast('Please enter a street name')
     }
+    if (!formData.city) {
+      return showToast('Please enter a city name')
+    }
 
     if (!formData.primaryNumber) {
       return showToast('Please enter a primary number')
@@ -244,6 +249,7 @@ const BusinessDetails = () => {
       address: {
         ...businessDetails.address,
         buildingName: formData.buildingName,
+        city:formData?.city,
         streetName: formData.streetName,
         landMark: formData.landmark,
         state: formData.state
@@ -389,6 +395,11 @@ const BusinessDetails = () => {
                 {" "}
                 {businessDetails?.address?.landMark}
               </p>
+              <p
+                className={`${businessDetails?.address?.city ?? "hidden"}`}>
+                {" "}
+                {businessDetails?.address?.city}
+              </p>
               <p className={`${businessDetails?.address?.state ?? "hidden"}`}>
                 {" "}
                 {businessDetails?.address?.state}
@@ -424,7 +435,7 @@ const BusinessDetails = () => {
                 <a
                   href={businessDetails?.website}
                   target="_blank"
-                  rel="no opener no referrer"
+                  rel="no opener no referrer noreferrer"
                   className="text-blue-500">
                   {" "}
                   {businessDetails?.contactDetails?.website}
@@ -626,6 +637,14 @@ const BusinessDetails = () => {
                   value={formData?.landmark}
                   onChange={handleChange}
                   placeholder="Landmark"
+                  className="border border-gray-300 p-2 w-full rounded"
+                />
+                <input
+                  type="text"
+                  name="city"
+                  value={formData?.city}
+                  onChange={handleChange}
+                  placeholder="City"
                   className="border border-gray-300 p-2 w-full rounded"
                 />
                 <input
